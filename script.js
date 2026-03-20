@@ -17,9 +17,8 @@ async function loadVault() {
         const { result } = await response.json();
         allItems = result || [];
         
-        // Render sections separately to prevent search duplicating items into the Latest section
-        renderGrid('latestGrid', allItems.filter(i => i.isLatest));
-        renderGrid('sportGrid', allItems, true);
+        if(document.getElementById('latestGrid')) renderGrid('latestGrid', allItems.filter(i => i.isLatest));
+        if(document.getElementById('sportGrid')) renderGrid('sportGrid', allItems, true);
         
         setupFilters();
         setupSearch();

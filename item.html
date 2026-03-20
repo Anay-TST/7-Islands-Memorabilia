@@ -3,76 +3,98 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vault Item | 7 Islands</title>
+    <title>Legends & Stats | 7 Islands</title>
     <link href="https://fonts.googleapis.com/css2?family=Arvo:700&family=Inter:wght@400;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <header><nav><div class="logo" onclick="window.location.href='index.html'">7 ISLANDS</div></nav></header>
-    <div class="detail-view-container">
-        <div id="itemDetail"></div>
-        <div class="related-section">
-            <h2 class="section-title">RELATED <span class="gold-text">ITEMS</span></h2>
-            <div class="sport-grid" id="relatedGrid"></div>
+    <header>
+        <nav>
+            <div class="logo" onclick="window.location.href='index.html'">7 ISLANDS</div>
+            <ul class="nav-links">
+                <li><a href="index.html">The Vault</a></li>
+                <li><a href="celebrities.html" class="active">Legends</a></li>
+                <li><a href="index.html#latest">Latest</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <h1>THE <span class="gold-text">LEGENDS</span></h1>
+        <div class="search-container">
+            <input type="text" id="celebSearch" placeholder="Search for a Legend...">
+            <button id="clearCelebSearch" class="action-btn" style="display:none;">✕ Clear</button>
         </div>
+    </section>
+
+    <div class="section-padding">
+        <div class="sport-grid" id="celebGrid">
+            </div>
     </div>
+
     <script src="script.js"></script>
     <script>
-        const params = new URLSearchParams(window.location.search);
-        const itemTitle = params.get('name');
+        let allCelebrities = [];
 
-        async function loadDetail() {
-            const query = encodeURIComponent(`*[_type == "memorabilia" && title == "${itemTitle}"][0]{
-                title, year, "venueName": venue->name, "venueLoc": venue->location,
-                description, coaProvider, serialNumber, isMatchWorn,
-                "imageUrl": image.asset->url, "itemType": itemType->name,
-                "athleteNames": sportsmen[]->name, "sportNames": sports[]->name, "teamNames": teams[]->name
+        async function loadCelebrities() {
+            const query = encodeURIComponent(`*[_type == "sportsman"] | order(name asc) {
+                name,
+                "itemCount": count(*[_type == "memorabilia" && references(^._id)])
             }`);
-            const resp = await fetch(`https://dpcpc70i.api.sanity.io/v2021-10-21/data/query/production?query=${query}`);
-            const {result} = await resp.json();
-
-            if (result) {
-                document.title = `${result.title} | 7 Islands`;
-                
-                let metaHTML = "";
-                if(result.venueName) metaHTML += `<p class="clickable" onclick="goToFilter('venue','${result.venueName}')">📍 <strong>Venue:</strong> ${result.venueName} ${result.venueLoc ? '(' + result.venueLoc + ')' : ''}</p>`;
-                if(result.teamNames) metaHTML += `<p>👥 <strong>Teams:</strong> ${result.teamNames.map(t => `<span class="clickable" onclick="goToFilter('team','${t}')">${t}</span>`).join(', ')}</p>`;
-                if(result.coaProvider) metaHTML += `<p>🛡️ <strong>Authentication:</strong> ${result.coaProvider}</p>`;
-                if(result.serialNumber) metaHTML += `<p>🆔 <strong>Serial:</strong> ${result.serialNumber}</p>`;
-
-                document.getElementById('itemDetail').innerHTML = `
-                    <div class="detail-grid">
-                        <div class="detail-image">
-                            <img src="${result.imageUrl}" alt="${result.title}">
-                            ${result.isMatchWorn ? '<span style="position:absolute; top:20px; left:20px; background:#8B0000; color:white; padding:5px 15px; font-weight:900; border-radius:4px; border:1px solid var(--gold);">MATCH USED</span>' : ''}
-                        </div>
-                        <div class="detail-content">
-                            <p class="gold-text">
-                                <span class="clickable" onclick="goToFilter('type','${result.itemType}')">${result.itemType || ''}</span> 
-                                ${result.year ? `• <span class="clickable" onclick="goToFilter('year','${result.year}')">${result.year}</span>` : ''}
-                            </p>
-                            <h1>${result.title}</h1>
-                            <div class="detail-athletes" style="margin-bottom:20px;">
-                                ${result.athleteNames ? result.athleteNames.map(a => `<span class="clickable" onclick="goToFilter('athlete','${a}')" style="color:var(--gold); font-size:1.5rem; font-weight:700; margin-right:15px;">${a}</span>`).join('') : ''}
-                            </div>
-                            ${metaHTML ? `<div class="detail-meta-box">${metaHTML}</div>` : ''}
-                            <p class="detail-desc">${result.description || ''}</p>
-                            <div class="tags-row" style="margin-top:20px;">
-                                ${result.sportNames ? result.sportNames.map(s => `<span class="clickable-tag clickable" onclick="goToFilter('sport','${s}')" style="background:rgba(212,175,55,0.1); color:var(--gold); padding:5px 12px; border-radius:4px; font-size:0.7rem; font-weight:900; margin-right:8px;">${s}</span>`).join('') : ''}
-                            </div>
-                        </div>
-                    </div>`;
-                
-                // Fetch Related
-                const rQuery = encodeURIComponent(`*[_type == "memorabilia" && sports[0]->name == "${result.sportNames[0]}" && title != "${itemTitle}"][0...4]{
-                    title, year, "imageUrl": image.asset->url, "itemType": itemType->name, "sportNames": sports[]->name, "athleteNames": sportsmen[]->name
-                }`);
-                const rResp = await fetch(`https://dpcpc70i.api.sanity.io/v2021-10-21/data/query/production?query=${rQuery}`);
-                const {result: related} = await rResp.json();
-                if(related) related.forEach(item => document.getElementById('relatedGrid').appendChild(createCard(item)));
-            }
+            const url = `https://dpcpc70i.api.sanity.io/v2021-10-21/data/query/production?query=${query}`;
+            
+            try {
+                const resp = await fetch(url);
+                const { result } = await resp.json();
+                allCelebrities = result || [];
+                renderCelebrities(allCelebrities);
+                setupCelebSearch();
+            } catch (e) { console.error("Legends Load Error:", e); }
         }
-        loadDetail();
+
+        function renderCelebrities(list) {
+            const grid = document.getElementById('celebGrid');
+            grid.innerHTML = '';
+            
+            list.forEach(celeb => {
+                const card = document.createElement('div');
+                card.className = 'sport-card';
+                card.style.textAlign = 'center';
+                card.style.padding = '40px 20px';
+                card.onclick = () => goToFilter('athlete', celeb.name);
+                
+                card.innerHTML = `
+                    <h3 class="gold-text" style="margin-bottom:10px;">${celeb.name}</h3>
+                    <p style="font-size:0.8rem; text-transform:uppercase; letter-spacing:2px; opacity:0.7;">
+                        ${celeb.itemCount} ${celeb.itemCount === 1 ? 'Item' : 'Items'} in Vault
+                    </p>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function setupCelebSearch() {
+            const searchInput = document.getElementById('celebSearch');
+            const clearBtn = document.getElementById('clearCelebSearch');
+
+            searchInput.addEventListener('input', (e) => {
+                const term = e.target.value.toLowerCase();
+                clearBtn.style.display = term.length > 0 ? "flex" : "none";
+
+                const filtered = allCelebrities.filter(c => 
+                    c.name.toLowerCase().includes(term)
+                );
+                renderCelebrities(filtered);
+            });
+
+            clearBtn.addEventListener('click', () => {
+                searchInput.value = "";
+                clearBtn.style.display = "none";
+                renderCelebrities(allCelebrities);
+            });
+        }
+
+        loadCelebrities();
     </script>
 </body>
 </html>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Legends | 7 Islands</title>
+    <title>Legends & Stats | 7 Islands</title>
     <link href="https://fonts.googleapis.com/css2?family=Arvo:700&family=Inter:wght@400;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
@@ -21,7 +21,7 @@
 
     <section class="hero">
         <h1>THE <span class="gold-text">LEGENDS</span></h1>
-        <p>Explore the icons who defined sporting history.</p>
+        <p>Explore the icons and their archived history in our vault.</p>
     </section>
 
     <div class="section-padding">
@@ -32,21 +32,34 @@
     <script src="script.js"></script>
     <script>
         async function loadCelebrities() {
-            const query = encodeURIComponent(`*[_type == "sportsman"] | order(name asc) { name }`);
+            // GROQ Query: Fetches name AND counts how many memorabilia documents reference this sportsman
+            const query = encodeURIComponent(`*[_type == "sportsman"] | order(name asc) {
+                name,
+                "itemCount": count(*[_type == "memorabilia" && references(^._id)])
+            }`);
             const url = `https://dpcpc70i.api.sanity.io/v2021-10-21/data/query/production?query=${query}`;
-            const resp = await fetch(url);
-            const { result } = await resp.json();
-
-            const grid = document.getElementById('celebGrid');
-            result.forEach(celeb => {
-                const card = document.createElement('div');
-                card.className = 'sport-card'; // Reuses card styling for consistency
-                card.style.textAlign = 'center';
-                card.style.padding = '40px 20px';
-                card.onclick = () => goToFilter('athlete', celeb.name);
-                card.innerHTML = `<h3 class="gold-text">${celeb.name}</h3>`;
-                grid.appendChild(card);
-            });
+            
+            try {
+                const resp = await fetch(url);
+                const { result } = await resp.json();
+                const grid = document.getElementById('celebGrid');
+                
+                result.forEach(celeb => {
+                    const card = document.createElement('div');
+                    card.className = 'sport-card';
+                    card.style.textAlign = 'center';
+                    card.style.padding = '40px 20px';
+                    card.onclick = () => goToFilter('athlete', celeb.name);
+                    
+                    card.innerHTML = `
+                        <h3 class="gold-text" style="margin-bottom:10px;">${celeb.name}</h3>
+                        <p style="font-size:0.8rem; text-transform:uppercase; letter-spacing:2px; opacity:0.7;">
+                            ${celeb.itemCount} ${celeb.itemCount === 1 ? 'Item' : 'Items'} in Vault
+                        </p>
+                    `;
+                    grid.appendChild(card);
+                });
+            } catch (e) { console.error("Legends Load Error:", e); }
         }
         loadCelebrities();
     </script>
