@@ -3,7 +3,11 @@ export const memorabilia = {
   title: 'Memorabilia Vault',
   type: 'document',
   fields: [
-    { name: 'title', title: 'Item Title', type: 'string' },
+    { 
+      name: 'title', 
+      title: 'Item Title', 
+      type: 'string' 
+    },
     {
       name: 'sport',
       title: 'Sport',
@@ -16,7 +20,16 @@ export const memorabilia = {
       type: 'reference',
       to: [{ type: 'sportsman' }]
     },
-    { name: 'image', title: 'Item Image', type: 'image', options: { hotspot: true } },
-    { name: 'isLatest', title: 'Show in Latest Arrivals?', type: 'boolean' }
+    { 
+      name: 'image', 
+      title: 'Item Image', 
+      type: 'image', 
+      options: { hotspot: true } 
+    },
+    { 
+      name: 'isLatest', 
+      title: 'Show in Latest Arrivals?', 
+      type: 'boolean' 
+    } // Ensure there's no trailing comma here if it's the last item
   ]
-}ˇ
+}
