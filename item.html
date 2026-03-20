@@ -145,30 +145,33 @@
                                 encCard.className = 'sport-card';
                                 encCard.style.cursor = 'default'; 
                                 
-                                // UNIVERSAL VIDEO PLAYER FIX
-                                let mediaHTML = '';
+                                // TOP MEDIA LOGIC: Replace Image with Video perfectly.
+                                let topMediaHTML = '';
                                 if (enc.videoFileUrl) {
-                                    mediaHTML = `
-                                    <div style="margin-top: 15px; border: 1px solid var(--gold); border-radius: 8px; overflow: hidden; background: #000;">
-                                        <video controls playsinline preload="metadata" style="width: 100%; display: block; max-height: 250px;">
+                                    topMediaHTML = `
+                                        <video controls playsinline preload="metadata" poster="${enc.imageUrl || ''}" style="width: 100%; height: 100%; object-fit: cover; background: #000; outline: none;">
                                             <source src="${enc.videoFileUrl}">
                                             Your browser does not support the video player.
-                                        </video>
-                                    </div>`;
-                                } else if (enc.videoUrl) {
-                                    mediaHTML = `<a href="${enc.videoUrl}" target="_blank" style="display:inline-block; margin-top:10px; padding:6px 18px; border:1px solid var(--gold); color:black; background:var(--gold); text-decoration:none; border-radius:50px; font-size:0.8rem; font-weight:bold;">▶ Watch Video</a>`;
+                                        </video>`;
+                                } else {
+                                    topMediaHTML = `<img src="${enc.imageUrl || 'https://via.placeholder.com/400x300/050505/D4AF37?text=Encounter'}" alt="${enc.title}" style="width: 100%; height: 100%; object-fit: cover; padding: 0;">`;
+                                }
+
+                                let linkHTML = '';
+                                if (enc.videoUrl && !enc.videoFileUrl) {
+                                    linkHTML = `<a href="${enc.videoUrl}" target="_blank" style="display:inline-block; margin-top:10px; padding:6px 18px; border:1px solid var(--gold); color:black; background:var(--gold); text-decoration:none; border-radius:50px; font-size:0.8rem; font-weight:bold;">▶ Watch External Video</a>`;
                                 }
 
                                 encCard.innerHTML = `
-                                    <div class="card-image-container" style="height: 300px; padding:0; border-bottom: 2px solid var(--gold); position: relative;">
-                                        <img src="${enc.imageUrl || 'https://via.placeholder.com/400x300/050505/D4AF37?text=Encounter'}" alt="${enc.title}" style="width: 100%; height: 100%; object-fit: cover; padding: 0;">
+                                    <div class="card-image-container" style="height: 300px; padding:0; border-bottom: 2px solid var(--gold); position: relative; overflow:hidden;">
+                                        ${topMediaHTML}
                                         ${enc.sportName ? `<span style="position: absolute; top: 15px; right: 15px; background: var(--gold); color: black; padding: 4px 10px; font-size: 0.6rem; font-weight: 900; border-radius: 4px; z-index: 10;">${enc.sportName}</span>` : ''}
                                     </div>
                                     <div class="card-info" style="text-align:center; padding: 1.5rem;">
                                         <h3 style="color:var(--gold); font-size:1.1rem; margin-bottom:5px;">${enc.title}</h3>
                                         ${enc.date ? `<p style="font-size:0.8rem; opacity:0.6; margin-bottom: 10px;">${enc.date}</p>` : ''}
                                         ${enc.description ? `<p style="font-size:0.85rem; line-height:1.6; opacity:0.85; margin-bottom: 10px;">${enc.description}</p>` : ''}
-                                        ${mediaHTML}
+                                        ${linkHTML}
                                     </div>
                                 `;
                                 encGrid.appendChild(encCard);

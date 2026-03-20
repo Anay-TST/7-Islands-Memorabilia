@@ -3,46 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Legends & Athletes | 7 Islands</title>
+    <title>Legends & Stats | 7 Islands Memorabilia</title>
     <link href="https://fonts.googleapis.com/css2?family=Arvo:700&family=Inter:wght@400;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-    <style>
-        .celeb-img-container {
-            width: 100%;
-            height: 250px;
-            background: #000;
-            overflow: hidden;
-            border-bottom: 2px solid var(--gold);
-        }
-        .celeb-img-container img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: 0.5s;
-        }
-        .sport-card:hover .celeb-img-container img {
-            transform: scale(1.1);
-        }
-        .celeb-desc {
-            font-size: 0.85rem;
-            opacity: 0.8;
-            margin: 10px 0 15px;
-            display: -webkit-box;
-            -webkit-line-clamp: 3;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-        .stats-badge {
-            display: inline-block;
-            background: rgba(212, 175, 55, 0.1);
-            color: var(--gold);
-            padding: 4px 12px;
-            border-radius: 50px;
-            font-size: 0.7rem;
-            font-weight: 900;
-            letter-spacing: 1px;
-        }
-    </style>
 </head>
 <body>
     <header>
@@ -74,14 +37,11 @@
         let allCelebrities = [];
 
         async function loadCelebrities() {
-            // Updated GROQ Query: 
-            // 1. Gets athlete image
-            // 2. Gets athlete description
-            // 3. FALLBACK: If athlete has no image, get the image of the first memorabilia linked to them
+            // NEW QUERY: Prioritizes Encounter Image, then Memorabilia Image
             const query = encodeURIComponent(`*[_type == "sportsman"] | order(name asc) {
                 name,
                 description,
-                "profileImg": image.asset->url,
+                "encounterImg": *[_type == "encounter" && references(^._id)][0].image.asset->url,
                 "fallbackImg": *[_type == "memorabilia" && references(^._id)][0].image.asset->url,
                 "itemCount": count(*[_type == "memorabilia" && references(^._id)])
             }`);
@@ -103,20 +63,24 @@
             list.forEach(celeb => {
                 const card = document.createElement('div');
                 card.className = 'sport-card';
-                card.onclick = () => goToFilter('athlete', celeb.name);
                 
-                // Use profile image, if null use fallback, if null use a dark placeholder
-                const displayImg = celeb.profileImg || celeb.fallbackImg || 'https://via.placeholder.com/400x500/050505/D4AF37?text=7+Islands+Legend';
+                const displayImg = celeb.encounterImg || celeb.fallbackImg || 'https://via.placeholder.com/400x500/050505/D4AF37?text=Legend';
+                const profileUrl = `filter.html?athlete=${encodeURIComponent(celeb.name)}`;
 
+                // Pure HTML a tag wrapping the whole card to fix the click bug
                 card.innerHTML = `
-                    <div class="celeb-img-container">
-                        <img src="${displayImg}" alt="${celeb.name}">
-                    </div>
-                    <div class="card-info">
-                        <h3 class="gold-text">${celeb.name}</h3>
-                        <p class="celeb-desc">${celeb.description || 'A legendary figure in sporting history, featured prominently in our curated vault.'}</p>
-                        <div class="stats-badge">${celeb.itemCount} ${celeb.itemCount === 1 ? 'Archive' : 'Archives'}</div>
-                    </div>
+                    <a href="${profileUrl}" style="text-decoration: none; display: flex; flex-direction: column; height: 100%;">
+                        <div class="card-image-container" style="height:250px; border-bottom: 2px solid var(--gold); overflow: hidden;">
+                            <img src="${displayImg}" alt="${celeb.name}" style="object-fit:cover; padding:0; width:100%; height: 100%; transition: transform 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                        </div>
+                        <div class="card-info" style="text-align:center; padding: 1.5rem; flex-grow: 1;">
+                            <h3 class="gold-text" style="margin-bottom:10px; font-size: 1.2rem;">${celeb.name}</h3>
+                            <p style="font-size:0.85rem; margin-bottom:15px; opacity:0.8; color: white;">${celeb.description || 'Explore the curated archive of this legendary figure.'}</p>
+                            <div style="display:inline-block; background:rgba(212,175,55,0.1); color:var(--gold); padding:6px 16px; border-radius:50px; font-size:0.75rem; font-weight:900;">
+                                ${celeb.itemCount} ${celeb.itemCount === 1 ? 'ARCHIVE' : 'ARCHIVES'}
+                            </div>
+                        </div>
+                    </a>
                 `;
                 grid.appendChild(card);
             });
