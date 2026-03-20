@@ -9,57 +9,97 @@
 </head>
 <body>
     <header><nav><div class="logo" onclick="window.location.href='index.html'">7 ISLANDS</div></nav></header>
+    
     <div class="detail-view-container">
         <div id="itemDetail"></div>
+        
         <div class="related-section">
             <h2 class="section-title">RELATED <span class="gold-text">ITEMS</span></h2>
             <div class="sport-grid" id="relatedGrid"></div>
         </div>
     </div>
+
     <script src="script.js"></script>
     <script>
         const params = new URLSearchParams(window.location.search);
         const itemTitle = params.get('name');
 
         async function loadDetail() {
+            // Updated QUERY to fetch every single field we created
             const query = encodeURIComponent(`*[_type == "memorabilia" && title == "${itemTitle}"][0]{
-                title, year, "venueName": venue->name, description, coaProvider, serialNumber,
-                "imageUrl": image.asset->url, "itemType": itemType->name, "sportNames": sports[]->name, 
-                "athleteNames": sportsmen[]->name, "teamNames": teams[]->name
+                title, 
+                year, 
+                "venueName": venue->name, 
+                "venueLoc": venue->location,
+                description, 
+                coaProvider, 
+                serialNumber, 
+                isMatchWorn,
+                "imageUrl": image.asset->url, 
+                "itemType": itemType->name, 
+                "sportNames": sports[]->name, 
+                "athleteNames": sportsmen[]->name, 
+                "teamNames": teams[]->name
             }`);
+            
             const resp = await fetch(`https://dpcpc70i.api.sanity.io/v2021-10-21/data/query/production?query=${query}`);
             const {result} = await resp.json();
 
             if (result) {
                 document.title = `${result.title} | 7 Islands`;
+
+                // Build Metadata Box (Hides empty fields automatically)
                 let metaHTML = "";
-                if(result.venueName) metaHTML += `<p class="clickable" onclick="goToFilter('venue','${result.venueName}')">📍 <strong>Venue:</strong> ${result.venueName}</p>`;
-                if(result.coaProvider) metaHTML += `<p>🛡️ <strong>Auth:</strong> ${result.coaProvider}</p>`;
-                if(result.serialNumber) metaHTML += `<p>🆔 <strong>Serial:</strong> ${result.serialNumber}</p>`;
+                if(result.venueName) {
+                    metaHTML += `<p class="clickable" onclick="goToFilter('venue','${result.venueName}')">📍 <strong>Venue:</strong> ${result.venueName} ${result.venueLoc ? '(' + result.venueLoc + ')' : ''}</p>`;
+                }
+                if(result.teamNames && result.teamNames.length > 0) {
+                    metaHTML += `<p>👥 <strong>Teams:</strong> ${result.teamNames.map(t => `<span class="clickable" onclick="goToFilter('team','${t}')">${t}</span>`).join(', ')}</p>`;
+                }
+                if(result.coaProvider) {
+                    metaHTML += `<p>🛡️ <strong>Authentication:</strong> ${result.coaProvider}</p>`;
+                }
+                if(result.serialNumber) {
+                    metaHTML += `<p>🆔 <strong>Serial Number:</strong> ${result.serialNumber}</p>`;
+                }
 
                 document.getElementById('itemDetail').innerHTML = `
                     <div class="detail-grid">
-                        <div class="detail-image"><img src="${result.imageUrl}" alt="${result.title}"></div>
+                        <div class="detail-image">
+                            <img src="${result.imageUrl}" alt="${result.title}">
+                            ${result.isMatchWorn ? '<span class="match-badge" style="position:absolute; top:20px; left:20px; background:#8B0000; color:white; padding:5px 15px; font-weight:900; border-radius:4px; border:1px solid var(--gold);">MATCH USED</span>' : ''}
+                        </div>
                         <div class="detail-content">
                             <p class="gold-text">
-                                <span class="clickable" onclick="goToFilter('type','${result.itemType}')">${result.itemType || ''}</span> 
+                                <span class="clickable" onclick="goToFilter('type','${result.itemType}')">${result.itemType || 'Memorabilia'}</span> 
                                 ${result.year ? `• <span class="clickable" onclick="goToFilter('year','${result.year}')">${result.year}</span>` : ''}
                             </p>
                             <h1>${result.title}</h1>
-                            <div class="detail-athletes">
-                                ${result.athleteNames ? result.athleteNames.map(a => `<span class="clickable" onclick="goToFilter('athlete','${a}')">${a}</span>`).join(', ') : ''}
+                            <div class="detail-athletes" style="margin-bottom:20px;">
+                                ${result.athleteNames ? result.athleteNames.map(a => `<span class="clickable" onclick="goToFilter('athlete','${a}')" style="color:var(--gold); font-size:1.5rem; font-weight:700; margin-right:15px;">${a}</span>`).join('') : ''}
                             </div>
+                            
                             ${metaHTML ? `<div class="detail-meta-box">${metaHTML}</div>` : ''}
-                            <p class="detail-desc">${result.description || ''}</p>
+                            
+                            <p class="detail-desc" style="margin-top:20px; line-height:1.8; opacity:0.9;">${result.description || ''}</p>
+                            
+                            <div class="tags-row" style="margin-top:30px; border-top:1px solid rgba(212,175,55,0.2); padding-top:20px;">
+                                <strong style="font-size:0.7rem; color:var(--gold); text-transform:uppercase; display:block; margin-bottom:10px;">Categories</strong>
+                                ${result.sportNames ? result.sportNames.map(s => `<span class="clickable-tag clickable" onclick="goToFilter('sport','${s}')" style="background:rgba(212,175,55,0.1); color:var(--gold); padding:5px 12px; border-radius:4px; font-size:0.7rem; font-weight:900; margin-right:8px;">${s}</span>`).join('') : ''}
+                            </div>
                         </div>
                     </div>`;
                 
-                const rQuery = encodeURIComponent(`*[_type == "memorabilia" && sports[0]->name == "${result.sportNames[0]}" && title != "${itemTitle}"][0...4]{
-                    title, year, "imageUrl": image.asset->url, "itemTypeName": itemType->name, "sportNames": sports[]->name, "athleteNames": sportsmen[]->name
-                }`);
-                const rResp = await fetch(`https://dpcpc70i.api.sanity.io/v2021-10-21/data/query/production?query=${rQuery}`);
-                const {result: related} = await rResp.json();
-                related.forEach(item => document.getElementById('relatedGrid').appendChild(createCard(item)));
+                // Fetch Related items based on the first sport linked
+                if(result.sportNames && result.sportNames.length > 0) {
+                    const rQuery = encodeURIComponent(`*[_type == "memorabilia" && sports[0]->name == "${result.sportNames[0]}" && title != "${itemTitle}"][0...4]{
+                        title, year, "imageUrl": image.asset->url, "itemTypeName": itemType->name, "sportNames": sports[]->name, "athleteNames": sportsmen[]->name
+                    }`);
+                    const rResp = await fetch(`https://dpcpc70i.api.sanity.io/v2021-10-21/data/query/production?query=${rQuery}`);
+                    const {result: related} = await rResp.json();
+                    const relatedGrid = document.getElementById('relatedGrid');
+                    if(related) related.forEach(item => relatedGrid.appendChild(createCard(item)));
+                }
             }
         }
         loadDetail();
