@@ -3,9 +3,10 @@ const DATASET = 'production';
 const BASE_URL = `https://${PROJECT_ID}.api.sanity.io/v2021-10-21/data/query/${DATASET}?query=`;
 
 const MAIN_QUERY = encodeURIComponent(`*[_type == "memorabilia"]{
-  title, year, "venueName": venue->name, "imageUrl": image.asset->url,
-  "itemTypeName": itemType->name, "sportNames": sports[]->name,
-  "athleteNames": sportsmen[]->name, "teamNames": teams[]->name, isLatest
+  title, year, "venueName": venue->name, "venueLoc": venue->location,
+  description, coaProvider, serialNumber, isMatchWorn,
+  "imageUrl": image.asset->url, "itemType": itemType->name,
+  "sportNames": sports[]->name, "athleteNames": sportsmen[]->name, "teamNames": teams[]->name, isLatest
 }`);
 
 let allItems = [];
@@ -16,7 +17,7 @@ async function loadVault() {
         const { result } = await response.json();
         allItems = result || [];
         
-        // Render sections separately to avoid duplication
+        // Render sections separately to prevent search duplicating items into the Latest section
         renderGrid('latestGrid', allItems.filter(i => i.isLatest));
         renderGrid('sportGrid', allItems, true);
         
@@ -29,7 +30,6 @@ function renderGrid(gridId, items, shuffle = false) {
     const grid = document.getElementById(gridId);
     if (!grid) return;
     grid.innerHTML = '';
-    
     const displayItems = shuffle ? [...items].sort(() => 0.5 - Math.random()) : items;
     displayItems.forEach(item => grid.appendChild(createCard(item)));
 }
@@ -46,7 +46,7 @@ function createCard(item) {
     card.innerHTML = `
         <div class="card-image-container">
             <img src="${item.imageUrl}" alt="${item.title}">
-            ${item.itemTypeName ? `<span class="type-badge clickable" onclick="goToFilter('type','${item.itemTypeName}')">${item.itemTypeName}</span>` : ''}
+            ${item.itemType ? `<span class="type-badge clickable" onclick="goToFilter('type','${item.itemType}')">${item.itemType}</span>` : ''}
         </div>
         <div class="card-info">
             <div class="tags-row">
@@ -92,8 +92,7 @@ function setupSearch() {
             const athletes = (item.athleteNames || []).join(" ").toLowerCase();
             const sports = (item.sportNames || []).join(" ").toLowerCase();
             const year = (item.year || "").toLowerCase();
-            const venue = (item.venueName || "").toLowerCase();
-            return title.includes(term) || athletes.includes(term) || sports.includes(term) || year.includes(term) || venue.includes(term);
+            return title.includes(term) || athletes.includes(term) || sports.includes(term) || year.includes(term);
         });
         renderGrid('sportGrid', filtered, true);
     });

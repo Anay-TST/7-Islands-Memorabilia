@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Legends | 7 Islands</title>
+    <link href="https://fonts.googleapis.com/css2?family=Arvo:700&family=Inter:wght@400;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo" onclick="window.location.href='index.html'">7 ISLANDS</div>
+            <ul class="nav-links">
+                <li><a href="index.html">The Vault</a></li>
+                <li><a href="celebrities.html" class="active">Legends</a></li>
+                <li><a href="index.html#latest">Latest</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <h1>THE <span class="gold-text">LEGENDS</span></h1>
+        <p>Explore the icons who defined sporting history.</p>
+    </section>
+
+    <div class="section-padding">
+        <div class="sport-grid" id="celebGrid">
+            </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        async function loadCelebrities() {
+            const query = encodeURIComponent(`*[_type == "sportsman"] | order(name asc) { name }`);
+            const url = `https://dpcpc70i.api.sanity.io/v2021-10-21/data/query/production?query=${query}`;
+            const resp = await fetch(url);
+            const { result } = await resp.json();
+
+            const grid = document.getElementById('celebGrid');
+            result.forEach(celeb => {
+                const card = document.createElement('div');
+                card.className = 'sport-card'; // Reuses card styling for consistency
+                card.style.textAlign = 'center';
+                card.style.padding = '40px 20px';
+                card.onclick = () => goToFilter('athlete', celeb.name);
+                card.innerHTML = `<h3 class="gold-text">${celeb.name}</h3>`;
+                grid.appendChild(card);
+            });
+        }
+        loadCelebrities();
+    </script>
+</body>
+</html>
