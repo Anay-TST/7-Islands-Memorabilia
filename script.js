@@ -29,7 +29,7 @@ function renderGrids(items) {
     if (latestGrid) latestGrid.innerHTML = '';
 
     items.forEach(item => {
-        const athletes = item.athleteNames ? item.athleteNames.join(', ') : '';
+        const athletes = item.athleteNames ? item.athleteNames.join(', ') : 'Multi-Signed';
         const sports = item.sportNames ? item.sportNames.join(' & ') : 'General';
         
         const card = document.createElement('div');
@@ -60,8 +60,8 @@ function openLightbox(url, title, athletes, desc) {
     document.getElementById('lightbox-img').src = url;
     document.getElementById('lightbox-caption').innerHTML = `
         <h2 style="color:var(--gold); margin-bottom:5px;">${title}</h2>
-        <p style="font-weight:bold;">${athletes}</p>
-        <p style="font-size:0.9rem; opacity:0.8; margin-top:10px;">${desc || ''}</p>
+        <p style="font-weight:bold; color:white;">${athletes}</p>
+        <p style="font-size:0.9rem; opacity:0.8; margin-top:10px; color:white;">${desc || ''}</p>
     `;
     lightbox.style.display = "flex";
 }
