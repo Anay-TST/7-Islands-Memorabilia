@@ -8,15 +8,13 @@
 </head>
 <body>
     <header><nav><div class="logo" onclick="window.location.href='index.html'">7 ISLANDS</div></nav></header>
-
-    <div id="itemPageContainer" class="detail-view-container">
+    <div class="detail-view-container">
         <div id="itemDetail"></div>
         <div class="related-section">
-            <h2 class="section-title">RELATED <span class="gold-text">MEMORABILIA</span></h2>
+            <h2 class="section-title">RELATED <span class="gold-text">ITEMS</span></h2>
             <div class="sport-grid" id="relatedGrid"></div>
         </div>
     </div>
-
     <script src="script.js"></script>
     <script>
         const params = new URLSearchParams(window.location.search);
@@ -25,8 +23,7 @@
         async function loadDetail() {
             const query = encodeURIComponent(`*[_type == "memorabilia" && title == "${itemTitle}"][0]{
                 title, year, "venueName": venue->name, description, coaProvider, serialNumber,
-                "imageUrl": image.asset->url, "itemType": itemType->name, "sportNames": sports[]->name,
-                "athleteNames": sportsmen[]->name
+                "imageUrl": image.asset->url, "itemType": itemType->name, "sportNames": sports[]->name, "athleteNames": sportsmen[]->name
             }`);
             const resp = await fetch(`https://dpcpc70i.api.sanity.io/v2021-10-21/data/query/production?query=${query}`);
             const {result} = await resp.json();
@@ -36,26 +33,22 @@
                     <div class="detail-grid">
                         <div class="detail-image"><img src="${result.imageUrl}"></div>
                         <div class="detail-content">
-                            <p class="gold-text">${result.itemType} • ${result.year}</p>
+                            <p class="gold-text">${result.itemType || ''} • ${result.year || ''}</p>
                             <h1>${result.title}</h1>
-                            <p class="detail-athletes">${result.athleteNames.join(', ')}</p>
+                            <p class="detail-athletes">${result.athleteNames ? result.athleteNames.join(', ') : ''}</p>
                             <div class="detail-meta-box">
                                 <p>📍 <strong>Venue:</strong> ${result.venueName || 'Global'}</p>
                                 <p>🛡️ <strong>Auth:</strong> ${result.coaProvider || 'Verified'}</p>
                                 <p>🆔 <strong>Serial:</strong> ${result.serialNumber || 'N/A'}</p>
                             </div>
-                            <div class="detail-desc">${result.description || ''}</div>
-                            <button class="filter-btn" onclick="window.location.href='index.html'">← Back to Vault</button>
+                            <p class="detail-desc">${result.description || ''}</p>
                         </div>
-                    </div>
-                `;
-
-                // Load Related Items
-                const relatedQuery = encodeURIComponent(`*[_type == "memorabilia" && sports[0]->name == "${result.sportNames[0]}" && title != "${itemTitle}"][0...4]{
-                    title, year, "venueName": venue->name, "imageUrl": image.asset->url,
-                    "itemTypeName": itemType->name, "sportNames": sports[]->name, "athleteNames": sportsmen[]->name
+                    </div>`;
+                
+                const rQuery = encodeURIComponent(`*[_type == "memorabilia" && sports[0]->name == "${result.sportNames[0]}" && title != "${itemTitle}"][0...4]{
+                    title, year, "imageUrl": image.asset->url, "itemTypeName": itemType->name, "sportNames": sports[]->name, "athleteNames": sportsmen[]->name
                 }`);
-                const rResp = await fetch(`https://dpcpc70i.api.sanity.io/v2021-10-21/data/query/production?query=${relatedQuery}`);
+                const rResp = await fetch(`https://dpcpc70i.api.sanity.io/v2021-10-21/data/query/production?query=${rQuery}`);
                 const {result: related} = await rResp.json();
                 const grid = document.getElementById('relatedGrid');
                 related.forEach(item => grid.appendChild(createCard(item)));

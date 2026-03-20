@@ -1,31 +1,37 @@
 const PROJECT_ID = 'dpcpc70i';
 const DATASET = 'production';
-const QUERY = encodeURIComponent(`*[_type == "memorabilia"]{
+const BASE_URL = `https://${PROJECT_ID}.api.sanity.io/v2021-10-21/data/query/${DATASET}?query=`;
+
+const MAIN_QUERY = encodeURIComponent(`*[_type == "memorabilia"]{
   title, year, "venueName": venue->name, "imageUrl": image.asset->url,
   "itemTypeName": itemType->name, "sportNames": sports[]->name,
   "athleteNames": sportsmen[]->name, "teamNames": teams[]->name, isLatest
 }`);
 
-const URL = `https://${PROJECT_ID}.api.sanity.io/v2021-10-21/data/query/${DATASET}?query=${QUERY}`;
 let allItems = [];
 
 async function loadVault() {
     try {
-        const response = await fetch(URL);
+        const response = await fetch(BASE_URL + MAIN_QUERY);
         const { result } = await response.json();
         allItems = result || [];
         if(document.getElementById('sportGrid')) renderGrids(allItems);
         setupFilters();
-    } catch (e) { console.error(e); }
+    } catch (e) { console.error("Data Load Error:", e); }
 }
 
 function renderGrids(items) {
     const mainGrid = document.getElementById('sportGrid');
     const latestGrid = document.getElementById('latestGrid');
     if(mainGrid) mainGrid.innerHTML = '';
+    
     const shuffled = [...items].sort(() => 0.5 - Math.random());
-    items.forEach(item => { if(item.isLatest && latestGrid) latestGrid.appendChild(createCard(item)); });
-    shuffled.forEach(item => { if(mainGrid) mainGrid.appendChild(createCard(item)); });
+    items.forEach(item => {
+        if(item.isLatest && latestGrid) latestGrid.appendChild(createCard(item));
+    });
+    shuffled.forEach(item => {
+        if(mainGrid) mainGrid.appendChild(createCard(item));
+    });
 }
 
 function createCard(item) {
@@ -36,6 +42,7 @@ function createCard(item) {
             window.location.href = `item.html?name=${encodeURIComponent(item.title)}`;
         }
     };
+
     card.innerHTML = `
         <div class="card-image-container">
             <img src="${item.imageUrl}" alt="${item.title}">
@@ -55,21 +62,30 @@ function createCard(item) {
     return card;
 }
 
-function goToFilter(type, val) { window.location.href = `filter.html?${type}=${encodeURIComponent(val)}`; }
+function goToFilter(type, val) {
+    window.location.href = `filter.html?${type}=${encodeURIComponent(val)}`;
+}
 
 function setupFilters() {
     document.querySelectorAll('.filter-btn').forEach(btn => {
         btn.onclick = () => {
+            document.querySelector('.filter-btn.active')?.classList.remove('active');
+            btn.classList.add('active');
             const sport = btn.getAttribute('data-sport');
             renderGrids(sport === 'all' ? allItems : allItems.filter(i => i.sportNames?.includes(sport)));
         };
     });
 }
 
-const btt = document.getElementById("backToTop");
-if(btt) {
-    window.onscroll = () => { btt.style.display = (window.scrollY > 400) ? "flex" : "none"; };
-    btt.onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
-}
+// Search Logic
+document.getElementById('vaultSearch')?.addEventListener('input', (e) => {
+    const term = e.target.value.toLowerCase();
+    const filtered = allItems.filter(item => {
+        const names = item.athleteNames ? item.athleteNames.join(' ').toLowerCase() : '';
+        const sports = item.sportNames ? item.sportNames.join(' ').toLowerCase() : '';
+        return item.title.toLowerCase().includes(term) || names.includes(term) || sports.includes(term);
+    });
+    renderGrids(filtered);
+});
 
 document.addEventListener('DOMContentLoaded', loadVault);

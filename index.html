@@ -11,7 +11,6 @@
     <div class="ticker-container">
         <div class="ticker-wrap"><div class="ticker">CRICKET • FOOTBALL • TENNIS • NBA • F1 • GOLF • OLYMPICS • BASEBALL • HOCKEY • RUGBY • BOXING • MOTOGP • SQUASH •</div></div>
     </div>
-
     <header>
         <nav>
             <div class="logo" onclick="window.location.href='index.html'">7 ISLANDS</div>
@@ -21,38 +20,26 @@
             </ul>
         </nav>
     </header>
-
     <section class="hero">
-        <div class="hero-content">
-            <h1>WORLD <span class="gold-text">HISTORY</span></h1>
-            <div class="search-box">
-                <input type="text" id="vaultSearch" placeholder="Search Athlete, Sport, Team, or Year...">
-            </div>
-        </div>
+        <h1>WORLD <span class="gold-text">HISTORY</span></h1>
+        <input type="text" id="vaultSearch" placeholder="Search Athlete, Sport, or Team...">
     </section>
-
     <div class="category-bar">
         <div class="filter-container">
             <button class="filter-btn active" data-sport="all">🏆 All</button>
             <button class="filter-btn" data-sport="Cricket">🏏 Cricket</button>
             <button class="filter-btn" data-sport="Football">⚽ Football</button>
-            <button class="filter-btn" data-sport="F1 Racing">🏎️ F1</button>
             <button class="filter-btn" data-sport="Basketball">🏀 NBA</button>
         </div>
     </div>
-
     <section id="latest" class="section-padding">
-        <div class="section-title"><h2>NEW <span class="gold-text">ARRIVALS</span></h2></div>
+        <h2 class="section-title">NEW <span class="gold-text">ARRIVALS</span></h2>
         <div class="sport-grid" id="latestGrid"></div>
     </section>
-
     <section id="collection" class="section-padding">
-        <div class="section-title"><h2>THE <span class="gold-text">100+</span> VAULT</h2></div>
+        <h2 class="section-title">THE <span class="gold-text">100+</span> VAULT</h2>
         <div class="sport-grid" id="sportGrid"></div>
     </section>
-
-    <button id="backToTop" class="back-to-top"><span class="arrow">↑</span><span class="text">TOP</span></button>
-
     <script src="script.js"></script>
 </body>
 </html>

@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8"><title>Collection | 7 Islands</title>
+    <meta charset="UTF-8">
+    <title>Collection | 7 Islands</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -21,17 +22,14 @@
             let f = "";
             if(type === 'sport') f = `sports[]->name match "${val}"`;
             if(type === 'athlete') f = `sportsmen[]->name match "${val}"`;
-            if(type === 'team') f = `teams[]->name match "${val}"`;
             if(type === 'venue') f = `venue->name match "${val}"`;
-
+            
             const query = encodeURIComponent(`*[_type == "memorabilia" && ${f}]{
-                title, year, "venueName": venue->name, "imageUrl": image.asset->url,
-                "itemTypeName": itemType->name, "sportNames": sports[]->name, "athleteNames": sportsmen[]->name
+                title, year, "imageUrl": image.asset->url, "itemTypeName": itemType->name, "sportNames": sports[]->name, "athleteNames": sportsmen[]->name
             }`);
             const resp = await fetch(`https://dpcpc70i.api.sanity.io/v2021-10-21/data/query/production?query=${query}`);
             const {result} = await resp.json();
-            const grid = document.getElementById('filterGrid');
-            result.forEach(item => grid.appendChild(createCard(item)));
+            result.forEach(item => document.getElementById('filterGrid').appendChild(createCard(item)));
         }
         loadFiltered();
     </script>
