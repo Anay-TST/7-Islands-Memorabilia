@@ -35,36 +35,29 @@ function renderGrid(gridId, items, shuffle = false) {
 function createCard(item) {
     const card = document.createElement('div');
     card.className = 'sport-card';
-    
-    // CRITICAL FIX: The main card click only triggers if you DON'T click a specific tag
-    card.onclick = (e) => {
-        if (!e.target.closest('.clickable')) {
-            window.location.href = `item.html?name=${encodeURIComponent(item.title)}`;
-        }
-    };
 
     card.innerHTML = `
-        <div class="card-image-container">
+        <a href="item.html?name=${encodeURIComponent(item.title)}" class="card-image-link">
             <img src="${item.imageUrl}" alt="${item.title}">
-            ${item.itemType ? `<span class="type-badge clickable" onclick="goToFilter('type','${item.itemType}')">${item.itemType}</span>` : ''}
-        </div>
+            ${item.itemType ? `<span class="type-badge">${item.itemType}</span>` : ''}
+        </a>
         <div class="card-info">
             <div class="tags-row">
-                ${item.year ? `<span class="year-label clickable" onclick="goToFilter('year','${item.year}')">${item.year}</span>` : ''}
-                ${item.sportNames ? item.sportNames.map(s => `<span class="clickable-tag clickable" onclick="goToFilter('sport','${s}')">${s}</span>`).join('') : ''}
+                ${item.year ? `<span class="year-label" style="font-size:0.7rem; opacity:0.5; font-weight:900; margin-right:8px;">${item.year}</span>` : ''}
+                ${item.sportNames ? item.sportNames.map(s => `<span class="clickable-tag" onclick="goToFilter('sport','${s}')">${s}</span>`).join('') : ''}
             </div>
-            <h3>${item.title}</h3>
-            ${item.venueName ? `<p class="venue-text clickable" onclick="goToFilter('venue','${item.venueName}')">📍 ${item.venueName}</p>` : ''}
+            <h3 onclick="window.location.href='item.html?name=${encodeURIComponent(item.title)}'" style="cursor:pointer; margin-bottom:10px;">${item.title}</h3>
+            ${item.venueName ? `<p class="venue-text" style="font-size:0.75rem; color:var(--gold); margin-bottom:10px; cursor:pointer;" onclick="goToFilter('venue','${item.venueName}')">📍 ${item.venueName}</p>` : ''}
             <div class="athlete-row">
-                ${item.athleteNames ? item.athleteNames.map(a => `<p class="clickable" onclick="goToFilter('athlete','${a}')" style="color:var(--gold); font-weight:700; font-size:0.9rem; display:inline-block; margin-right:10px;">${a}</p>`).join('') : ''}
+                ${item.athleteNames ? item.athleteNames.map(a => `<span class="athlete-name" onclick="goToFilter('athlete','${a}')">${a}</span>`).join('') : ''}
             </div>
         </div>`;
     return card;
 }
 
 function goToFilter(type, val) {
-    // This stops the event from "bubbling" up to the card's onclick
-    event.stopPropagation(); 
+    // Prevent the click from affecting anything else
+    if (event) event.stopPropagation();
     window.location.href = `filter.html?${type}=${encodeURIComponent(val)}`;
 }
 
@@ -88,13 +81,11 @@ function setupSearch() {
     searchInput.addEventListener('input', (e) => {
         const term = e.target.value.toLowerCase();
         if(clearBtn) clearBtn.style.display = term.length > 0 ? "flex" : "none";
-
         const filtered = allItems.filter(item => {
             const title = (item.title || "").toLowerCase();
             const athletes = (item.athleteNames || []).join(" ").toLowerCase();
             const sports = (item.sportNames || []).join(" ").toLowerCase();
-            const year = (item.year || "").toLowerCase();
-            return title.includes(term) || athletes.includes(term) || sports.includes(term) || year.includes(term);
+            return title.includes(term) || athletes.includes(term) || sports.includes(term);
         });
         renderGrid('sportGrid', filtered, true);
     });
