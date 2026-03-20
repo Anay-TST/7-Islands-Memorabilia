@@ -25,13 +25,25 @@ export const encounter = {
       name: 'sportsman',
       title: 'Tag the Legend',
       type: 'reference',
-      to: [{ type: 'sportsman' }],
-      description: 'Which athlete is in this picture?'
+      to: [{ type: 'sportsman' }]
+    },
+    {
+      name: 'sport',
+      title: 'Associated Sport',
+      type: 'reference',
+      to: [{ type: 'sport' }],
+      description: 'Tag the sport this legend belongs to.'
     },
     { 
       name: 'date', 
       title: 'Date of Encounter', 
       type: 'date' 
+    },
+    {
+      name: 'description',
+      title: 'The Story / Description',
+      type: 'text',
+      description: 'Tell the story behind this photo or meeting.'
     }
   ]
 }
