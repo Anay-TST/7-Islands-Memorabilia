@@ -15,24 +15,26 @@ async function loadVault() {
         const response = await fetch(BASE_URL + MAIN_QUERY);
         const { result } = await response.json();
         allItems = result || [];
-        if(document.getElementById('sportGrid')) renderGrids(allItems);
+        
+        // Render Latest Arrivals once and leave them alone
+        const latestItems = allItems.filter(i => i.isLatest);
+        renderSpecificGrid('latestGrid', latestItems);
+        
+        // Render Main Vault
+        renderSpecificGrid('sportGrid', allItems, true);
+        
         setupFilters();
         setupSearch();
-    } catch (e) { console.error("Data Load Error:", e); }
+    } catch (e) { console.error("Load Error:", e); }
 }
 
-function renderGrids(items) {
-    const mainGrid = document.getElementById('sportGrid');
-    const latestGrid = document.getElementById('latestGrid');
-    if(mainGrid) mainGrid.innerHTML = '';
+function renderSpecificGrid(gridId, items, shuffle = false) {
+    const grid = document.getElementById(gridId);
+    if (!grid) return;
+    grid.innerHTML = '';
     
-    const shuffled = [...items].sort(() => 0.5 - Math.random());
-    items.forEach(item => {
-        if(item.isLatest && latestGrid) latestGrid.appendChild(createCard(item));
-    });
-    shuffled.forEach(item => {
-        if(mainGrid) mainGrid.appendChild(createCard(item));
-    });
+    const displayItems = shuffle ? [...items].sort(() => 0.5 - Math.random()) : items;
+    displayItems.forEach(item => grid.appendChild(createCard(item)));
 }
 
 function createCard(item) {
@@ -73,7 +75,10 @@ function setupFilters() {
             document.querySelector('.filter-btn.active')?.classList.remove('active');
             btn.classList.add('active');
             const sport = btn.getAttribute('data-sport');
-            renderGrids(sport === 'all' ? allItems : allItems.filter(i => i.sportNames?.includes(sport)));
+            // ONLY updates the main vault grid
+            const filtered = (sport === 'all' ? allItems : allItems.filter(i => i.sportNames?.includes(sport)));
+            renderSpecificGrid('sportGrid', filtered, true);
+            window.location.hash = "collection";
         };
     });
 }
@@ -94,14 +99,15 @@ function setupSearch() {
             const year = (item.year || "").toLowerCase();
             return title.includes(term) || athletes.includes(term) || sports.includes(term) || year.includes(term);
         });
-        renderGrids(filtered);
+        // ONLY updates the main vault grid
+        renderSpecificGrid('sportGrid', filtered, true);
     });
 
     if (clearBtn) {
         clearBtn.addEventListener('click', () => {
             searchInput.value = "";
             clearBtn.style.display = "none";
-            renderGrids(allItems);
+            renderSpecificGrid('sportGrid', allItems, true);
         });
     }
 }

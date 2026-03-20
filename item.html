@@ -31,8 +31,7 @@
             const {result} = await resp.json();
 
             if (result) {
-                // Dynamic SEO
-                document.title = `${result.title} | 7 Islands Vault`;
+                document.title = `${result.title} | 7 Islands`;
                 
                 let metaHTML = "";
                 if(result.venueName) metaHTML += `<p class="clickable" onclick="goToFilter('venue','${result.venueName}')">📍 <strong>Venue:</strong> ${result.venueName}</p>`;
@@ -60,7 +59,7 @@
                         </div>
                     </div>`;
                 
-                // Related logic
+                // Fetch Related items
                 const rQuery = encodeURIComponent(`*[_type == "memorabilia" && sports[0]->name == "${result.sportNames[0]}" && title != "${itemTitle}"][0...4]{
                     title, year, "imageUrl": image.asset->url, "itemTypeName": itemType->name, "sportNames": sports[]->name, "athleteNames": sportsmen[]->name
                 }`);
