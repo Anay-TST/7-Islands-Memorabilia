@@ -10,8 +10,8 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
-    background: radial-gradient(circle at top, var(--royal-purple), var(--pitch-black));
-    background-color: var(--pitch-black); /* Fallback to prevent white BG */
+    background-color: var(--pitch-black);
+    background-image: radial-gradient(circle at top, var(--royal-purple), var(--pitch-black));
     background-attachment: fixed;
     color: white;
     font-family: 'Inter', sans-serif;
@@ -69,7 +69,7 @@ nav { display: flex; justify-content: space-between; align-items: center; paddin
 .action-btn { background: var(--glass); border: 1px solid var(--gold); color: var(--gold); padding: 12px 20px; border-radius: 50px; cursor: pointer; font-weight: 700; font-size: 0.8rem; text-transform: uppercase; display: flex; align-items: center; gap: 8px; }
 .action-btn:hover { background: var(--gold); color: black; }
 
-/* --- Category Bar (Aligned perfectly) --- */
+/* --- Category Bar (Properly Aligned) --- */
 .category-bar { 
     background: rgba(0,0,0,0.4); 
     padding: 1.2rem 0; 
@@ -86,6 +86,7 @@ nav { display: flex; justify-content: space-between; align-items: center; paddin
     gap: 12px; 
     padding: 0 5%; 
     margin: 0 auto;
+    width: max-content;
 }
 .filter-btn { 
     background: var(--glass); 
@@ -103,7 +104,7 @@ nav { display: flex; justify-content: space-between; align-items: center; paddin
 }
 .filter-btn.active, .filter-btn:hover { background: var(--gold); color: black; border-color: var(--gold); }
 
-/* --- Grid & Cards (Fixed Image Sizes) --- */
+/* --- Grid System --- */
 .section-padding { padding: 4rem 5%; max-width: 1400px; margin: 0 auto; }
 .section-title { text-align: center; margin-bottom: 3rem; font-size: 2rem; letter-spacing: 2px; }
 .sport-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; }
@@ -113,27 +114,6 @@ nav { display: flex; justify-content: space-between; align-items: center; paddin
     border-radius: 15px; overflow: hidden; transition: 0.3s ease; display: flex; flex-direction: column;
 }
 .sport-card:hover { transform: translateY(-10px); border-color: var(--gold); box-shadow: 0 10px 40px rgba(212,175,55,0.2); }
-
-.card-image-container { position: relative; height: 300px; background: #000; display: flex; align-items: center; justify-content: center; border-bottom: 2px solid var(--gold); overflow: hidden; }
-.card-image-container img { max-width: 100%; max-height: 100%; object-fit: contain; padding: 15px; transition: 0.5s; }
-.card-image-container:hover img { transform: scale(1.05); }
-
-.card-info { padding: 1.5rem; flex-grow: 1; }
-.tags-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
-
-/* Tag Styling */
-.year-label { color: rgba(255,255,255,0.4); font-size: 0.7rem; font-weight: 900; }
-.year-label:hover { color: var(--gold); }
-.type-badge { position: absolute; top: 15px; right: 15px; background: var(--gold); color: black; padding: 4px 10px; font-size: 0.6rem; font-weight: 900; border-radius: 4px; z-index: 5; }
-
-.clickable-tag { background: rgba(212,175,55,0.1); color: var(--gold); padding: 4px 10px; border-radius: 4px; font-size: 0.65rem; font-weight: 900; transition: 0.3s; }
-.clickable-tag:hover { background: var(--gold); color: black; }
-
-.venue-text { font-size: 0.75rem; color: var(--gold); text-transform: uppercase; margin-bottom: 8px; }
-.venue-text:hover { text-decoration: underline; color: white; }
-
-.athlete-name { color: var(--gold); font-weight: 700; font-size: 0.9rem; margin-right: 10px; display: inline-block; transition: 0.2s; }
-.athlete-name:hover { text-decoration: underline; color: white; }
 
 /* --- Detail Page --- */
 .detail-view-container { padding: 4rem 5%; max-width: 1200px; margin: 0 auto; }
