@@ -28,31 +28,51 @@ function renderGrids(items) {
     mainGrid.innerHTML = '';
     if (latestGrid) latestGrid.innerHTML = '';
 
+    // Randomize for the 100+ Vault
+    const shuffledItems = [...items].sort(() => 0.5 - Math.random());
+
     items.forEach(item => {
-        const athletes = item.athleteNames ? item.athleteNames.join(', ') : 'Multi-Signed';
-        const sports = item.sportNames ? item.sportNames.join(' & ') : 'General';
-        
-        const card = document.createElement('div');
-        card.className = 'sport-card';
-        card.onclick = () => openLightbox(item.imageUrl, item.title, athletes, item.description);
-
-        card.innerHTML = `
-            <div class="card-image-container">
-                <img src="${item.imageUrl}" alt="${item.title}">
-            </div>
-            <div class="card-info">
-                <span class="sport-tag">${sports}</span>
-                <h3>${item.title}</h3>
-                <p class="athlete-name">${athletes}</p>
-                <p class="item-desc">${item.description || ''}</p>
-            </div>
-        `;
-
         if (item.isLatest && latestGrid) {
-            latestGrid.appendChild(card.cloneNode(true));
+            latestGrid.appendChild(createCard(item));
         }
-        mainGrid.appendChild(card);
     });
+
+    shuffledItems.forEach(item => {
+        mainGrid.appendChild(createCard(item));
+    });
+}
+
+function createCard(item) {
+    const athletes = item.athleteNames ? item.athleteNames.join(', ') : '';
+    const card = document.createElement('div');
+    card.className = 'sport-card';
+    
+    // Clicking card opens Zoom
+    card.onclick = (e) => {
+        if (e.target.tagName !== 'SPAN' && e.target.tagName !== 'P') {
+            openLightbox(item.imageUrl, item.title, athletes, item.description);
+        }
+    };
+
+    card.innerHTML = `
+        <div class="card-image-container"><img src="${item.imageUrl}" alt="${item.title}"></div>
+        <div class="card-info">
+            <div class="tags-row">${item.sportNames ? item.sportNames.map(s => `<span class="clickable-tag" onclick="filterBySport('${s}')">${s}</span>`).join('') : ''}</div>
+            <h3>${item.title}</h3>
+            <div class="athlete-row">${item.athleteNames ? item.athleteNames.map(a => `<p class="clickable-athlete" onclick="filterByAthlete('${a}')">${a}</p>`).join('') : ''}</div>
+            <p class="item-desc">${item.description || ''}</p>
+        </div>`;
+    return card;
+}
+
+function filterBySport(sportName) {
+    renderGrids(allItems.filter(i => i.sportNames && i.sportNames.includes(sportName)));
+    window.location.hash = "collection";
+}
+
+function filterByAthlete(athleteName) {
+    renderGrids(allItems.filter(i => i.athleteNames && i.athleteNames.includes(athleteName)));
+    window.location.hash = "collection";
 }
 
 function openLightbox(url, title, athletes, desc) {
@@ -68,10 +88,6 @@ function openLightbox(url, title, athletes, desc) {
 
 document.querySelector('.close-lightbox').onclick = () => document.getElementById('lightbox').style.display = "none";
 
-window.onclick = (e) => {
-    if (e.target == document.getElementById('lightbox')) document.getElementById('lightbox').style.display = "none";
-}
-
 function setupFilters() {
     document.querySelectorAll('.filter-btn').forEach(btn => {
         btn.onclick = () => {
@@ -84,6 +100,7 @@ function setupFilters() {
     });
 }
 
+// Search Logic
 document.getElementById('vaultSearch')?.addEventListener('input', (e) => {
     const term = e.target.value.toLowerCase();
     const filtered = allItems.filter(item => {
@@ -93,5 +110,12 @@ document.getElementById('vaultSearch')?.addEventListener('input', (e) => {
     });
     renderGrids(filtered);
 });
+
+// Back to Top logic
+const btt = document.getElementById("backToTop");
+window.onscroll = () => {
+    btt.style.display = (window.scrollY > 400) ? "flex" : "none";
+};
+btt.onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
 
 document.addEventListener('DOMContentLoaded', loadVault);
