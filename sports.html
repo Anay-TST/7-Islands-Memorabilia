@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Legends & Stats | 7 Islands Memorabilia</title>
+    <title>Sports Categories | 7 Islands Memorabilia</title>
     <link href="https://fonts.googleapis.com/css2?family=Arvo:700&family=Inter:wght@400;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
@@ -11,27 +11,27 @@
     <div id="navbar-placeholder"></div>
 
     <section class="hero">
-        <h1>THE <span class="gold-text">LEGENDS</span></h1>
+        <h1>THE <span class="gold-text">SPORTS</span></h1>
         <div class="search-container">
-            <input type="text" id="celebSearch" placeholder="Search for a Legend...">
-            <button id="clearCelebSearch" class="action-btn" style="display:none;">✕ Clear</button>
+            <input type="text" id="sportSearch" placeholder="Search for a Sport...">
+            <button id="clearSportSearch" class="action-btn" style="display:none;">✕ Clear</button>
         </div>
     </section>
 
     <div class="section-padding">
-        <div class="sport-grid" id="celebGrid">
+        <div class="sport-grid" id="sportCategoryGrid">
         </div>
     </div>
 
     <script src="script.js"></script>
     <script>
-        let allCelebrities = [];
+        let allSports = [];
 
-        async function loadCelebrities() {
-            const query = encodeURIComponent(`*[_type == "sportsman"] | order(name asc) {
+        async function loadSports() {
+            // Updated to fetch a fallback image from the memorabilia vault!
+            const query = encodeURIComponent(`*[_type == "sport"] | order(name asc) {
                 name,
-                description,
-                "encounterImg": *[_type == "encounter" && references(^._id)][0].image.asset->url,
+                "imageUrl": image.asset->url,
                 "fallbackImg": *[_type == "memorabilia" && references(^._id)][0].image.asset->url,
                 "itemCount": count(*[_type == "memorabilia" && references(^._id)])
             }`);
@@ -40,33 +40,33 @@
             try {
                 const resp = await fetch(url);
                 const { result } = await resp.json();
-                allCelebrities = result || [];
-                renderCelebrities(allCelebrities);
-                setupCelebSearch();
-            } catch (e) { console.error("Legends Load Error:", e); }
+                allSports = result || [];
+                renderSports(allSports);
+                setupSportSearch();
+            } catch (e) { console.error("Sports Load Error:", e); }
         }
 
-        function renderCelebrities(list) {
-            const grid = document.getElementById('celebGrid');
+        function renderSports(list) {
+            const grid = document.getElementById('sportCategoryGrid');
             grid.innerHTML = '';
             
-            list.forEach(celeb => {
+            list.forEach(sport => {
                 const card = document.createElement('div');
                 card.className = 'sport-card';
                 
-                const displayImg = celeb.encounterImg || celeb.fallbackImg || 'https://via.placeholder.com/400x500/050505/D4AF37?text=Legend';
-                const profileUrl = `filter.html?athlete=${encodeURIComponent(celeb.name)}`;
+                // Prioritize Official Sport Image -> Then Memorabilia Image -> Then Text Placeholder
+                const displayImg = sport.imageUrl || sport.fallbackImg || `https://via.placeholder.com/400x300/050505/D4AF37?text=${encodeURIComponent(sport.name)}`;
+                const filterUrl = `filter.html?sport=${encodeURIComponent(sport.name)}`;
 
                 card.innerHTML = `
-                    <a href="${profileUrl}" style="text-decoration: none; display: flex; flex-direction: column; height: 100%;">
+                    <a href="${filterUrl}" style="text-decoration: none; display: flex; flex-direction: column; height: 100%;">
                         <div class="card-image-container" style="height:250px; border-bottom: 2px solid var(--gold); overflow: hidden; background: #000; display: flex; align-items: center; justify-content: center;">
-                            <img src="${displayImg}" alt="${celeb.name}" style="object-fit:contain; padding: 15px; width:100%; height: 100%; transition: transform 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                            <img src="${displayImg}" alt="${sport.name}" style="object-fit:cover; width:100%; height: 100%; transition: transform 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
                         </div>
                         <div class="card-info" style="text-align:center; padding: 1.5rem; flex-grow: 1;">
-                            <h3 class="gold-text" style="margin-bottom:10px; font-size: 1.2rem;">${celeb.name}</h3>
-                            <p style="font-size:0.85rem; margin-bottom:15px; opacity:0.8; color: white;">${celeb.description || 'Explore the curated archive of this legendary figure.'}</p>
+                            <h3 class="gold-text" style="margin-bottom:15px; font-size: 1.4rem; text-transform: uppercase; letter-spacing: 1px;">${sport.name}</h3>
                             <div style="display:inline-block; background:rgba(212,175,55,0.1); color:var(--gold); padding:6px 16px; border-radius:50px; font-size:0.75rem; font-weight:900; text-transform: uppercase;">
-                                ${celeb.itemCount} ${celeb.itemCount === 1 ? 'MEMORABILIA' : 'MEMORABILIAS'}
+                                ${sport.itemCount} ${sport.itemCount === 1 ? 'Archive' : 'Archives'}
                             </div>
                         </div>
                     </a>
@@ -75,28 +75,28 @@
             });
         }
 
-        function setupCelebSearch() {
-            const searchInput = document.getElementById('celebSearch');
-            const clearBtn = document.getElementById('clearCelebSearch');
+        function setupSportSearch() {
+            const searchInput = document.getElementById('sportSearch');
+            const clearBtn = document.getElementById('clearSportSearch');
             if (!searchInput) return;
 
             searchInput.addEventListener('input', (e) => {
                 const term = e.target.value.toLowerCase();
                 if (clearBtn) clearBtn.style.display = term.length > 0 ? "flex" : "none";
-                const filtered = allCelebrities.filter(c => c.name.toLowerCase().includes(term));
-                renderCelebrities(filtered);
+                const filtered = allSports.filter(s => s.name.toLowerCase().includes(term));
+                renderSports(filtered);
             });
 
             if (clearBtn) {
                 clearBtn.addEventListener('click', () => {
                     searchInput.value = "";
                     clearBtn.style.display = "none";
-                    renderCelebrities(allCelebrities);
+                    renderSports(allSports);
                 });
             }
         }
 
-        loadCelebrities();
+        loadSports();
     </script>
 </body>
 </html>

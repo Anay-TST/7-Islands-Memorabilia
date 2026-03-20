@@ -8,16 +8,7 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <header>
-        <nav>
-            <div class="logo" onclick="window.location.href='index.html'">7 ISLANDS</div>
-            <ul class="nav-links">
-                <li><a href="index.html">The Vault</a></li>
-                <li><a href="celebrities.html">Legends</a></li>
-                <li><a href="index.html#latest">Latest</a></li>
-            </ul>
-        </nav>
-    </header>
+    <div id="navbar-placeholder"></div>
 
     <div class="detail-view-container">
         <div id="breadcrumb" style="margin-bottom: 20px; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;"></div>
@@ -166,7 +157,6 @@
                                     linkHTML = `<a href="${enc.videoUrl}" target="_blank" style="display:inline-block; margin-top:10px; padding:6px 18px; border:1px solid var(--gold); color:black; background:var(--gold); text-decoration:none; border-radius:50px; font-size:0.8rem; font-weight:bold;">▶ Watch External Video</a>`;
                                 }
 
-                                // SEE MORE LOGIC FOR DESCRIPTION
                                 let descHTML = '';
                                 if (enc.description) {
                                     if (enc.description.length > 120) {

@@ -1,3 +1,32 @@
+// --- DYNAMIC NAVBAR LOADER ---
+async function loadNavbar() {
+    const placeholder = document.getElementById('navbar-placeholder');
+    if (!placeholder) return;
+
+    try {
+        const response = await fetch('navbar.html');
+        const navHtml = await response.text();
+        placeholder.innerHTML = navHtml;
+
+        // Smart Active Link Highlighter
+        const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+        const navLinks = document.querySelectorAll('.nav-links .nav-item');
+        
+        navLinks.forEach(link => {
+            const linkHref = link.getAttribute('href');
+            // Check if the link matches the current page (or if it's the root domain defaulting to index.html)
+            if (linkHref === currentPage || (currentPage === '' && linkHref === 'index.html')) {
+                link.classList.add('active');
+            }
+        });
+    } catch (e) {
+        console.error("Error loading navbar:", e);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', loadNavbar);
+// -----------------------------
+
 const PROJECT_ID = 'dpcpc70i';
 const DATASET = 'production';
 const BASE_URL = `https://${PROJECT_ID}.api.sanity.io/v2021-10-21/data/query/${DATASET}?query=`;
@@ -38,7 +67,6 @@ function createCard(item) {
 
     const itemUrl = `item.html?name=${encodeURIComponent(item.title)}`;
 
-    // Pure HTML linking. Image goes to item.html. Tags go to filter.html. No javascript conflicts.
     card.innerHTML = `
         <a href="${itemUrl}" style="display: block; height: 300px; background: #000; position: relative; border-bottom: 2px solid var(--gold); text-decoration: none; overflow: hidden;">
             <img src="${item.imageUrl}" alt="${item.title}" style="width: 100%; height: 100%; object-fit: contain; padding: 15px; transition: 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
