@@ -7,20 +7,19 @@ export const memorabilia = {
     { 
       name: 'itemType', 
       title: 'Memorabilia Type', 
-      type: 'string',
-      options: {
-        list: [
-          {title: 'Signed Bat', value: 'Signed Bat'},
-          {title: 'Signed Ball', value: 'Signed Ball'},
-          {title: 'Match-Worn Jersey', value: 'Match-Worn Jersey'},
-          {title: 'Helmet', value: 'Helmet'},
-          {title: 'Autograph Card', value: 'Autograph Card'},
-          {title: 'Photograph', value: 'Photograph'},
-          {title: 'Equipment', value: 'Equipment'},
-          {title: 'Other', value: 'Other'}
-        ]
-      }
+      type: 'reference', 
+      to: [{ type: 'itemType' }] 
     },
+    { name: 'year', title: 'Year of Origin', type: 'string', description: 'e.g., 2011' },
+    { name: 'venue', title: 'Venue / Stadium', type: 'string', description: 'e.g., Wankhede Stadium, Mumbai' },
+    { 
+      name: 'isMatchWorn', 
+      title: 'Match Worn / Match Used?', 
+      type: 'boolean',
+      initialValue: false 
+    },
+    { name: 'coaProvider', title: 'Authenticated By', type: 'string', description: 'e.g., JSA, PSA, 7 Islands' },
+    { name: 'serialNumber', title: 'COA Serial Number', type: 'string' },
     { name: 'description', title: 'Item Description', type: 'text' },
     { 
       name: 'sports', 
@@ -33,6 +32,12 @@ export const memorabilia = {
       title: 'Signatures / Athletes', 
       type: 'array', 
       of: [{ type: 'reference', to: [{ type: 'sportsman' }] }] 
+    },
+    { 
+      name: 'teams', 
+      title: 'Associated Teams', 
+      type: 'array', 
+      of: [{ type: 'reference', to: [{ type: 'team' }] }] 
     },
     { name: 'image', title: 'Item Image', type: 'image', options: { hotspot: true } },
     { name: 'isLatest', title: 'Show in Latest Arrivals?', type: 'boolean' }

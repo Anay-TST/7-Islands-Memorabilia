@@ -2,10 +2,17 @@ const PROJECT_ID = 'dpcpc70i';
 const DATASET = 'production';
 const QUERY = encodeURIComponent(`*[_type == "memorabilia"]{
   title,
+  year,
+  venue,
+  isMatchWorn,
+  coaProvider,
+  serialNumber,
   description,
   "imageUrl": image.asset->url,
+  "itemTypeName": itemType->name,
   "sportNames": sports[]->name,
   "athleteNames": sportsmen[]->name,
+  "teamNames": teams[]->name,
   isLatest
 }`);
 
@@ -25,20 +32,17 @@ async function loadVault() {
 function renderGrids(items) {
     const mainGrid = document.getElementById('sportGrid');
     const latestGrid = document.getElementById('latestGrid');
-    mainGrid.innerHTML = '';
+    if (mainGrid) mainGrid.innerHTML = '';
     if (latestGrid) latestGrid.innerHTML = '';
 
-    // Randomize for the 100+ Vault
     const shuffledItems = [...items].sort(() => 0.5 - Math.random());
 
     items.forEach(item => {
-        if (item.isLatest && latestGrid) {
-            latestGrid.appendChild(createCard(item));
-        }
+        if (item.isLatest && latestGrid) latestGrid.appendChild(createCard(item));
     });
 
     shuffledItems.forEach(item => {
-        mainGrid.appendChild(createCard(item));
+        if (mainGrid) mainGrid.appendChild(createCard(item));
     });
 }
 
@@ -47,46 +51,56 @@ function createCard(item) {
     const card = document.createElement('div');
     card.className = 'sport-card';
     
-    // Clicking card opens Zoom
     card.onclick = (e) => {
-        if (e.target.tagName !== 'SPAN' && e.target.tagName !== 'P') {
-            openLightbox(item.imageUrl, item.title, athletes, item.description);
+        if (!e.target.classList.contains('clickable-tag') && !e.target.classList.contains('clickable-athlete')) {
+            openLightbox(item);
         }
     };
 
     card.innerHTML = `
-        <div class="card-image-container"><img src="${item.imageUrl}" alt="${item.title}"></div>
+        <div class="card-image-container">
+            <img src="${item.imageUrl}" alt="${item.title}" loading="lazy">
+            ${item.isMatchWorn ? `<span class="match-badge">Match Used</span>` : ''}
+            ${item.serialNumber ? `<span class="verify-icon">✓</span>` : ''}
+        </div>
         <div class="card-info">
-            <div class="tags-row">${item.sportNames ? item.sportNames.map(s => `<span class="clickable-tag" onclick="filterBySport('${s}')">${s}</span>`).join('') : ''}</div>
+            <div class="tags-row">
+                <span class="year-label">${item.year || ''}</span>
+                ${item.sportNames ? item.sportNames.map(s => `<span class="clickable-tag" onclick="filterBySport('${s}')">${s}</span>`).join('') : ''}
+            </div>
             <h3>${item.title}</h3>
-            <div class="athlete-row">${item.athleteNames ? item.athleteNames.map(a => `<p class="clickable-athlete" onclick="filterByAthlete('${a}')">${a}</p>`).join('') : ''}</div>
+            <p class="venue-text">${item.venue || ''}</p>
+            <div class="athlete-row">
+                ${item.athleteNames ? item.athleteNames.map(a => `<p class="clickable-athlete" onclick="filterByAthlete('${a}')">${a}</p>`).join('') : ''}
+            </div>
             <p class="item-desc">${item.description || ''}</p>
         </div>`;
     return card;
 }
 
-function filterBySport(sportName) {
-    renderGrids(allItems.filter(i => i.sportNames && i.sportNames.includes(sportName)));
-    window.location.hash = "collection";
-}
-
-function filterByAthlete(athleteName) {
-    renderGrids(allItems.filter(i => i.athleteNames && i.athleteNames.includes(athleteName)));
-    window.location.hash = "collection";
-}
-
-function openLightbox(url, title, athletes, desc) {
+function openLightbox(item) {
     const lightbox = document.getElementById('lightbox');
-    document.getElementById('lightbox-img').src = url;
+    const athletes = item.athleteNames ? item.athleteNames.join(', ') : '';
+    document.getElementById('lightbox-img').src = item.imageUrl;
     document.getElementById('lightbox-caption').innerHTML = `
-        <h2 style="color:var(--gold); margin-bottom:5px;">${title}</h2>
+        <div class="lightbox-meta">
+            <span class="gold-text">${item.itemTypeName || ''}</span> • <span>${item.year || ''}</span>
+        </div>
+        <h2 style="color:var(--gold); font-family:'Arvo'; margin: 10px 0;">${item.title}</h2>
+        <p style="color:white; font-size: 0.9rem; margin-bottom: 5px;">📍 ${item.venue || 'Global Collection'}</p>
         <p style="font-weight:bold; color:white;">${athletes}</p>
-        <p style="font-size:0.9rem; opacity:0.8; margin-top:10px; color:white;">${desc || ''}</p>
+        <div class="coa-box">
+            ${item.serialNumber ? `<p><strong>Serial:</strong> ${item.serialNumber}</p>` : ''}
+            ${item.coaProvider ? `<p><strong>Auth:</strong> ${item.coaProvider}</p>` : ''}
+        </div>
+        <p style="font-size:0.9rem; opacity:0.8; margin-top:15px; color:white;">${item.description || ''}</p>
     `;
     lightbox.style.display = "flex";
 }
 
-document.querySelector('.close-lightbox').onclick = () => document.getElementById('lightbox').style.display = "none";
+/** --- Filters & Navigation --- **/
+function filterBySport(s) { renderGrids(allItems.filter(i => i.sportNames?.includes(s))); window.location.hash = "collection"; }
+function filterByAthlete(a) { renderGrids(allItems.filter(i => i.athleteNames?.includes(a))); window.location.hash = "collection"; }
 
 function setupFilters() {
     document.querySelectorAll('.filter-btn').forEach(btn => {
@@ -94,28 +108,24 @@ function setupFilters() {
             document.querySelector('.filter-btn.active').classList.remove('active');
             btn.classList.add('active');
             const sport = btn.getAttribute('data-sport');
-            const filtered = (sport === 'all') ? allItems : allItems.filter(i => i.sportNames && i.sportNames.includes(sport));
-            renderGrids(filtered);
+            renderGrids(sport === 'all' ? allItems : allItems.filter(i => i.sportNames?.includes(sport)));
         };
     });
 }
 
-// Search Logic
 document.getElementById('vaultSearch')?.addEventListener('input', (e) => {
     const term = e.target.value.toLowerCase();
     const filtered = allItems.filter(item => {
         const names = item.athleteNames ? item.athleteNames.join(' ').toLowerCase() : '';
         const sports = item.sportNames ? item.sportNames.join(' ').toLowerCase() : '';
-        return item.title.toLowerCase().includes(term) || names.includes(term) || sports.includes(term);
+        const venue = item.venue ? item.venue.toLowerCase() : '';
+        return item.title.toLowerCase().includes(term) || names.includes(term) || sports.includes(term) || venue.includes(term) || (item.year && item.year.includes(term));
     });
     renderGrids(filtered);
 });
 
-// Back to Top logic
 const btt = document.getElementById("backToTop");
-window.onscroll = () => {
-    btt.style.display = (window.scrollY > 400) ? "flex" : "none";
-};
+window.onscroll = () => { btt.style.display = (window.scrollY > 400) ? "flex" : "none"; };
 btt.onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
-
+document.querySelector('.close-lightbox').onclick = () => document.getElementById('lightbox').style.display = "none";
 document.addEventListener('DOMContentLoaded', loadVault);
