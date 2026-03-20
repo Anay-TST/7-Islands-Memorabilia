@@ -33,103 +33,106 @@ header {
 nav { display: flex; justify-content: space-between; align-items: center; padding: 1rem 5%; max-width: 1400px; margin: 0 auto; }
 .logo { font-size: 1.5rem; color: var(--gold); cursor: pointer; text-decoration: none; }
 .nav-links { display: flex; list-style: none; gap: 2rem; }
-.nav-links a { text-decoration: none; color: white; font-weight: 700; font-size: 0.8rem; text-transform: uppercase; transition: 0.3s; }
+.nav-links a { text-decoration: none; color: white; font-weight: 700; font-size: 0.8rem; text-transform: uppercase; }
+
+/* --- Hero & Search Bar Fix --- */
+.hero { padding: 4rem 5% 2rem; text-align: center; }
+.hero h1 { font-size: clamp(2.5rem, 8vw, 5rem); margin-bottom: 1.5rem; }
+.search-container { 
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    gap: 15px; 
+    width: 95%; 
+    max-width: 650px; 
+    margin: 0 auto; 
+}
+#vaultSearch { 
+    flex-grow: 1; 
+    padding: 15px 30px; 
+    background: #000; 
+    border: 2px solid var(--gold); 
+    border-radius: 50px; 
+    color: white; 
+    outline: none; 
+}
 
 /* --- Category Bar (Icon Alignment Fix) --- */
 .category-bar { 
     background: rgba(0,0,0,0.4); 
     padding: 1.5rem 0; 
     border-bottom: 1px solid rgba(212,175,55,0.1); 
-    display: flex;
-    justify-content: center;
     overflow-x: auto;
 }
 .filter-container { 
     display: flex; 
+    justify-content: center; 
     gap: 15px; 
     padding: 0 20px;
-    align-items: center;
+    width: max-content;
+    margin: 0 auto;
 }
 .filter-btn { 
     background: var(--glass); 
     border: 1px solid rgba(212,175,55,0.3); 
     color: white; 
-    padding: 10px 20px; 
+    padding: 10px 22px; 
     border-radius: 50px; 
     cursor: pointer; 
     font-weight: 700; 
     display: flex;
     align-items: center;
-    justify-content: center;
     gap: 8px;
     white-space: nowrap;
     transition: 0.3s;
 }
 .filter-btn.active, .filter-btn:hover { background: var(--gold); color: black; border-color: var(--gold); }
 
-/* --- Grid & Cards --- */
+/* --- Grid & Card Fixes --- */
 .section-padding { padding: 4rem 5%; max-width: 1400px; margin: 0 auto; }
-.sport-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 30px; }
+.sport-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; }
 
 .sport-card { 
     background: var(--glass); 
     border: 1px solid rgba(212,175,55,0.1); 
     border-radius: 15px; 
     overflow: hidden; 
-    display: flex; 
-    flex-direction: column;
     position: relative;
+    display: flex;
+    flex-direction: column;
 }
 
 .card-image-link { 
     display: block; 
-    height: 320px; 
+    height: 300px; 
     background: #000; 
-    overflow: hidden; 
     position: relative; 
-    cursor: pointer;
+    border-bottom: 2px solid var(--gold);
 }
-.card-image-link img { 
-    width: 100%; 
-    height: 100%; 
-    object-fit: contain; 
-    padding: 20px;
-    transition: 0.5s;
-}
-.card-image-link:hover img { transform: scale(1.05); }
+.card-image-link img { width: 100%; height: 100%; object-fit: contain; padding: 15px; }
 
-.card-info { padding: 1.5rem; flex-grow: 1; border-top: 2px solid var(--gold); }
-.tags-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+.card-info { padding: 1.5rem; flex-grow: 1; }
+.tags-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.year-label { color: rgba(255,255,255,0.4); font-size: 0.7rem; font-weight: 900; }
 
 .clickable-tag { 
     background: rgba(212,175,55,0.1); 
     color: var(--gold); 
-    padding: 4px 10px; 
+    padding: 3px 8px; 
     border-radius: 4px; 
-    font-size: 0.7rem; 
+    font-size: 0.65rem; 
     font-weight: 900; 
-    cursor: pointer; 
+    cursor: pointer;
 }
 .clickable-tag:hover { background: var(--gold); color: black; }
 
-.athlete-name { 
+.athlete-link { 
     color: var(--gold); 
-    font-weight: 800; 
-    font-size: 1rem; 
-    margin-right: 12px; 
+    font-weight: 700; 
+    font-size: 0.9rem; 
     cursor: pointer; 
+    margin-right: 10px;
 }
-.athlete-name:hover { text-decoration: underline; color: white; }
+.athlete-link:hover { text-decoration: underline; }
 
-.type-badge { 
-    position: absolute; 
-    top: 15px; 
-    right: 15px; 
-    background: var(--gold); 
-    color: black; 
-    padding: 4px 10px; 
-    font-size: 0.6rem; 
-    font-weight: 900; 
-    border-radius: 4px; 
-    z-index: 10;
-}
+.type-badge { position: absolute; top: 15px; right: 15px; background: var(--gold); color: black; padding: 4px 10px; font-size: 0.6rem; font-weight: 900; border-radius: 4px; }
