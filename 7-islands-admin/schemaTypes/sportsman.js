@@ -1,15 +1,23 @@
-export const sportsman = {
+export default {
   name: 'sportsman',
-  title: 'Sportsman/Athlete',
+  title: 'Sportsmen / Celebrities',
   type: 'document',
   fields: [
-    { name: 'name', title: 'Athlete Name', type: 'string' },
     {
-      name: 'sport',
-      title: 'Primary Sport',
-      type: 'reference',
-      to: [{ type: 'sport' }] // Links the athlete to a Sport
+      name: 'name',
+      title: 'Full Name',
+      type: 'string',
     },
-    { name: 'photo', title: 'Athlete Photo', type: 'image' }
+    {
+      name: 'image',
+      title: 'Athlete Portrait',
+      type: 'image',
+      options: { hotspot: true },
+    },
+    {
+      name: 'description',
+      title: 'Short Bio/Description',
+      type: 'text',
+    }
   ]
 }
