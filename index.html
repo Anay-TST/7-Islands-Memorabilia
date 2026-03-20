@@ -3,38 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>7 Islands Memorabilia | The Collection</title>
+    <title>7 Islands Memorabilia | The Ultimate Sports Collection</title>
+    <link href="https://fonts.googleapis.com/css2?family=Arvo:700&family=Inter:wght@400;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
+    <div class="ticker-wrap">
+        <div class="ticker">
+            <div class="ticker__item">CRICKET • FOOTBALL • TENNIS • NBA • F1 • GOLF • OLYMPICS • BASEBALL • HOCKEY • RUGBY • BOXING • MOTOGP • SQUASH • </div>
+            <div class="ticker__item">CRICKET • FOOTBALL • TENNIS • NBA • F1 • GOLF • OLYMPICS • BASEBALL • HOCKEY • RUGBY • BOXING • MOTOGP • SQUASH • </div>
+        </div>
+    </div>
+
     <header>
         <nav>
             <div class="logo">7 ISLANDS</div>
             <ul>
-                <li><a href="#">The Collection</a></li>
-                <li><a href="#">Celebrity Highlights</a></li>
-                <li><a href="#">About the Collector</a></li>
+                <li><a href="#collection">The Collection</a></li>
+                <li><a href="#celebrities">Celebrity Highlights</a></li>
+                <li><a href="#contact">Contact</a></li>
             </ul>
         </nav>
     </header>
 
     <section class="hero">
-        <h1>100+ Sports. <span class="gold">One Rare Collection.</span></h1>
-        <p>A curated showcase of global sports history.</p>
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <span class="sub-heading">WORLD CLASS MEMORABILIA</span>
+            <h1>CRICKET <span class="gold-text">HISTORY</span> LIVES HERE.</h1>
+            <p>Home to the world's most extensive cricket collection, featuring 100+ global sports artifacts.</p>
+            <a href="#collection" class="btn-gold">Explore the Vault</a>
+        </div>
     </section>
 
-    <section class="gallery">
-        <h2>Explore by Sport</h2>
-        <div class="sport-grid">
-            <div class="sport-card">
-                <img src="https://res.cloudinary.com/dp8xauwf5/image/upload/v1773991399/653973421_17963301540048182_5365022295526270741_n_aekjer.jpg" alt="Cricket Memorabilia">
-                <h3>Cricket</h3>
+    <section id="celebrities" class="celebrities">
+        <div class="section-title">
+            <h2>CELEBRITY <span class="gold-text">VISITS</span></h2>
+            <div class="stadium-line"></div>
+        </div>
+        <div class="celeb-container">
+            <div class="celeb-video-box">
+                <video id="celebVideo" controls poster="https://via.placeholder.com/1200x600/111/D4AF37?text=Celebrity+Highlight+Video">
+                    <source src="" type="video/mp4">
+                </video>
+                <div class="celeb-overlay">
+                    <h3>Legendary Visits</h3>
+                    <p>Capturing moments when icons meet history.</p>
+                </div>
             </div>
-            <div class="sport-card">
-                <img src="https://via.placeholder.com/400x500" alt="Basketball Memorabilia">
-                <h3>Basketball</h3>
-            </div>
+        </div>
+    </section>
+
+    <section id="collection" class="gallery">
+        <div class="section-title">
+            <h2>THE <span class="gold-text">100+</span> SPORTS VAULT</h2>
+            <p>Browsing through a century of global sports excellence.</p>
+        </div>
+        
+        <div class="sport-grid" id="sportGrid">
             </div>
     </section>
+
+    <footer>
+        <p>&copy; 2026 7 Islands Memorabilia. All Rights Reserved.</p>
+    </footer>
+
+    <script src="script.js"></script>
 </body>
 </html>
