@@ -21,7 +21,10 @@
 
     <section class="hero">
         <h1>THE <span class="gold-text">LEGENDS</span></h1>
-        <p>Explore the icons and their archived history in our vault.</p>
+        <div class="search-container">
+            <input type="text" id="celebSearch" placeholder="Search for a Legend...">
+            <button id="clearCelebSearch" class="action-btn" style="display:none;">✕ Clear</button>
+        </div>
     </section>
 
     <div class="section-padding">
@@ -31,8 +34,9 @@
 
     <script src="script.js"></script>
     <script>
+        let allCelebrities = [];
+
         async function loadCelebrities() {
-            // GROQ Query: Fetches name AND counts how many memorabilia documents reference this sportsman
             const query = encodeURIComponent(`*[_type == "sportsman"] | order(name asc) {
                 name,
                 "itemCount": count(*[_type == "memorabilia" && references(^._id)])
@@ -42,25 +46,66 @@
             try {
                 const resp = await fetch(url);
                 const { result } = await resp.json();
-                const grid = document.getElementById('celebGrid');
-                
-                result.forEach(celeb => {
-                    const card = document.createElement('div');
-                    card.className = 'sport-card';
-                    card.style.textAlign = 'center';
-                    card.style.padding = '40px 20px';
-                    card.onclick = () => goToFilter('athlete', celeb.name);
-                    
-                    card.innerHTML = `
-                        <h3 class="gold-text" style="margin-bottom:10px;">${celeb.name}</h3>
-                        <p style="font-size:0.8rem; text-transform:uppercase; letter-spacing:2px; opacity:0.7;">
-                            ${celeb.itemCount} ${celeb.itemCount === 1 ? 'Item' : 'Items'} in Vault
-                        </p>
-                    `;
-                    grid.appendChild(card);
-                });
-            } catch (e) { console.error("Legends Load Error:", e); }
+                allCelebrities = result || [];
+                renderCelebrities(allCelebrities);
+                setupCelebSearch();
+            } catch (e) { 
+                console.error("Legends Load Error:", e);
+                document.getElementById('celebGrid').innerHTML = "<p>Error loading legends. Please check your connection.</p>";
+            }
         }
+
+        function renderCelebrities(list) {
+            const grid = document.getElementById('celebGrid');
+            grid.innerHTML = '';
+            
+            if (list.length === 0) {
+                grid.innerHTML = `<p style="grid-column: 1/-1; text-align:center; opacity:0.5; padding:50px;">No legends found matching your search.</p>`;
+                return;
+            }
+
+            list.forEach(celeb => {
+                const card = document.createElement('div');
+                card.className = 'sport-card';
+                card.style.textAlign = 'center';
+                card.style.padding = '40px 20px';
+                card.onclick = () => goToFilter('athlete', celeb.name);
+                
+                card.innerHTML = `
+                    <h3 class="gold-text" style="margin-bottom:10px;">${celeb.name}</h3>
+                    <p style="font-size:0.75rem; text-transform:uppercase; letter-spacing:2px; opacity:0.7; font-weight:700;">
+                        ${celeb.itemCount} ${celeb.itemCount === 1 ? 'Archive' : 'Archives'}
+                    </p>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function setupCelebSearch() {
+            const searchInput = document.getElementById('celebSearch');
+            const clearBtn = document.getElementById('clearCelebSearch');
+
+            if (!searchInput) return;
+
+            searchInput.addEventListener('input', (e) => {
+                const term = e.target.value.toLowerCase();
+                if (clearBtn) clearBtn.style.display = term.length > 0 ? "flex" : "none";
+
+                const filtered = allCelebrities.filter(c => 
+                    c.name.toLowerCase().includes(term)
+                );
+                renderCelebrities(filtered);
+            });
+
+            if (clearBtn) {
+                clearBtn.addEventListener('click', () => {
+                    searchInput.value = "";
+                    clearBtn.style.display = "none";
+                    renderCelebrities(allCelebrities);
+                });
+            }
+        }
+
         loadCelebrities();
     </script>
 </body>
