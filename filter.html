@@ -2,7 +2,6 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Collection | 7 Islands</title>
     <link rel="stylesheet" href="style.css">
 </head>
@@ -18,7 +17,7 @@
         const type = params.keys().next().value;
         const val = params.get(type);
 
-        document.title = `${val} Collection | 7 Islands`;
+        document.title = `${val} | 7 Islands`;
         document.getElementById('filterHeading').innerHTML = `${type.toUpperCase()}: <span class="gold-text">${val}</span>`;
 
         async function loadFiltered() {
@@ -26,7 +25,6 @@
             if(type === 'sport') f = `sports[]->name match "${val}"`;
             if(type === 'athlete') f = `sportsmen[]->name match "${val}"`;
             if(type === 'venue') f = `venue->name match "${val}"`;
-            if(type === 'team') f = `teams[]->name match "${val}"`;
             if(type === 'type') f = `itemType->name match "${val}"`;
             if(type === 'year') f = `year match "${val}"`; 
             

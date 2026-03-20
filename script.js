@@ -16,19 +16,16 @@ async function loadVault() {
         const { result } = await response.json();
         allItems = result || [];
         
-        // Render Latest Arrivals once and leave them alone
-        const latestItems = allItems.filter(i => i.isLatest);
-        renderSpecificGrid('latestGrid', latestItems);
-        
-        // Render Main Vault
-        renderSpecificGrid('sportGrid', allItems, true);
+        // Render sections separately to avoid duplication
+        renderGrid('latestGrid', allItems.filter(i => i.isLatest));
+        renderGrid('sportGrid', allItems, true);
         
         setupFilters();
         setupSearch();
-    } catch (e) { console.error("Load Error:", e); }
+    } catch (e) { console.error("Data Load Error:", e); }
 }
 
-function renderSpecificGrid(gridId, items, shuffle = false) {
+function renderGrid(gridId, items, shuffle = false) {
     const grid = document.getElementById(gridId);
     if (!grid) return;
     grid.innerHTML = '';
@@ -54,12 +51,12 @@ function createCard(item) {
         <div class="card-info">
             <div class="tags-row">
                 ${item.year ? `<span class="year-label clickable" onclick="goToFilter('year','${item.year}')">${item.year}</span>` : ''}
-                ${item.sportNames ? item.sportNames.map(s => `<span class="clickable-tag clickable" onclick="goToFilter('sport','${s}')">${s}</span>`).join('') : ''}
+                ${item.sportNames ? item.sportNames.map(s => `<span class="clickable-tag clickable" onclick="goToFilter('sport','${s}')" style="background:rgba(212,175,55,0.1); color:var(--gold); padding:2px 8px; border-radius:4px; font-size:0.65rem; font-weight:900; margin-right:5px;">${s}</span>`).join('') : ''}
             </div>
             <h3>${item.title}</h3>
             ${item.venueName ? `<p class="venue-text clickable" onclick="goToFilter('venue','${item.venueName}')">📍 ${item.venueName}</p>` : ''}
             <div class="athlete-row">
-                ${item.athleteNames ? item.athleteNames.map(a => `<p class="clickable-athlete clickable" onclick="goToFilter('athlete','${a}')">${a}</p>`).join('') : ''}
+                ${item.athleteNames ? item.athleteNames.map(a => `<p class="clickable" onclick="goToFilter('athlete','${a}')" style="color:var(--gold); font-weight:700; font-size:0.9rem; display:inline-block; margin-right:10px;">${a}</p>`).join('') : ''}
             </div>
         </div>`;
     return card;
@@ -75,10 +72,8 @@ function setupFilters() {
             document.querySelector('.filter-btn.active')?.classList.remove('active');
             btn.classList.add('active');
             const sport = btn.getAttribute('data-sport');
-            // ONLY updates the main vault grid
             const filtered = (sport === 'all' ? allItems : allItems.filter(i => i.sportNames?.includes(sport)));
-            renderSpecificGrid('sportGrid', filtered, true);
-            window.location.hash = "collection";
+            renderGrid('sportGrid', filtered, true);
         };
     });
 }
@@ -97,17 +92,17 @@ function setupSearch() {
             const athletes = (item.athleteNames || []).join(" ").toLowerCase();
             const sports = (item.sportNames || []).join(" ").toLowerCase();
             const year = (item.year || "").toLowerCase();
-            return title.includes(term) || athletes.includes(term) || sports.includes(term) || year.includes(term);
+            const venue = (item.venueName || "").toLowerCase();
+            return title.includes(term) || athletes.includes(term) || sports.includes(term) || year.includes(term) || venue.includes(term);
         });
-        // ONLY updates the main vault grid
-        renderSpecificGrid('sportGrid', filtered, true);
+        renderGrid('sportGrid', filtered, true);
     });
 
     if (clearBtn) {
         clearBtn.addEventListener('click', () => {
             searchInput.value = "";
             clearBtn.style.display = "none";
-            renderSpecificGrid('sportGrid', allItems, true);
+            renderGrid('sportGrid', allItems, true);
         });
     }
 }
