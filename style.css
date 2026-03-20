@@ -1,91 +1,61 @@
 :root {
     --gold: #D4AF37;
+    --royal-purple: #1a0a2e;
     --pitch-black: #050505;
-    --dark-purple: #1a0a2e; /* Subtle purple tint in the shadows */
-    --card-bg: #111111;
-    --font-main: 'Arvo', serif; /* Closest to Rockwell Nova */
+    --glass: rgba(26, 10, 46, 0.8);
 }
 
-* {
-    margin: 0; padding: 0; box-sizing: border-box;
-}
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
-    background-color: var(--pitch-black);
+    background: radial-gradient(circle at top, var(--royal-purple), var(--pitch-black));
     color: white;
     font-family: 'Inter', sans-serif;
-    overflow-x: hidden;
 }
 
-h1, h2, h3, .logo {
-    font-family: var(--font-main);
-    font-weight: 900;
-    text-transform: uppercase;
-}
-
+h1, h2, h3, .logo { font-family: 'Arvo', serif; font-weight: 900; }
 .gold-text { color: var(--gold); }
 
-/* --- Ticker --- */
-.ticker-wrap {
-    width: 100%; overflow: hidden; background: var(--gold);
-    color: black; padding: 5px 0; font-weight: 900; font-size: 0.8rem;
-}
-.ticker { display: flex; white-space: nowrap; animation: ticker 30s linear infinite; }
-.ticker__item { padding: 0 2rem; }
+/* --- Ticker Styling --- */
+.ticker-container { background: var(--gold); overflow: hidden; padding: 5px 0; }
+.ticker-wrap { width: 100%; white-space: nowrap; }
+.ticker { display: inline-block; animation: ticker 40s linear infinite; color: #000; font-weight: 900; font-size: 0.9rem; }
 @keyframes ticker { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
 
-/* --- Navigation --- */
-nav {
-    display: flex; justify-content: space-between; padding: 2rem 5%;
-    background: linear-gradient(to bottom, var(--dark-purple), transparent);
-}
-.logo { font-size: 1.8rem; letter-spacing: 2px; color: var(--gold); }
-nav ul { display: flex; list-style: none; gap: 2rem; align-items: center; }
-nav ul li a { text-decoration: none; color: white; font-weight: 700; font-size: 0.8rem; transition: 0.3s; }
-nav ul li a:hover { color: var(--gold); }
+/* --- Navigation & Mobile Menu --- */
+nav { display: flex; justify-content: space-between; align-items: center; padding: 1.5rem 5%; background: rgba(0,0,0,0.5); border-bottom: 1px solid rgba(212,175,55,0.2); }
+.nav-links { display: flex; list-style: none; gap: 2rem; }
+.nav-links a { text-decoration: none; color: white; text-transform: uppercase; font-weight: 700; font-size: 0.8rem; letter-spacing: 1px; }
 
-/* --- Hero Section --- */
-.hero {
-    height: 90vh;
-    background: linear-gradient(45deg, var(--pitch-black), var(--dark-purple)), 
-                url('https://images.unsplash.com/photo-1531415074968-036ba1b575da?auto=format&fit=crop&q=80&w=2000'); /* Cricket Ground Background */
-    background-size: cover; background-position: center;
-    display: flex; align-items: center; padding: 0 10%; position: relative;
-}
-.hero-content { z-index: 2; max-width: 800px; }
-.hero h1 { font-size: 5rem; line-height: 1; margin: 1rem 0; text-shadow: 0 10px 20px rgba(0,0,0,0.5); }
-.sub-heading { letter-spacing: 5px; color: var(--gold); font-weight: 700; }
-.btn-gold { 
-    display: inline-block; padding: 1rem 2.5rem; background: var(--gold); 
-    color: black; text-decoration: none; font-weight: 900; margin-top: 2rem;
-    border-radius: 4px; transition: 0.3s;
-}
-.btn-gold:hover { transform: scale(1.05); box-shadow: 0 0 20px var(--gold); }
+.menu-toggle { display: none; flex-direction: column; cursor: pointer; }
+.bar { height: 3px; width: 25px; background-color: var(--gold); margin: 3px 0; border-radius: 10px; }
 
-/* --- Sections --- */
-.section-title { text-align: center; padding: 5rem 0 3rem; }
-.section-title h2 { font-size: 3rem; }
-.stadium-line { width: 100px; height: 4px; background: var(--gold); margin: 1rem auto; }
+/* --- Hero & Latest Sections --- */
+.hero { height: 70vh; display: flex; align-items: center; padding: 0 5%; text-align: center; }
+.hero h1 { font-size: 4rem; width: 100%; }
 
-/* --- Video Section --- */
-.celebrities { background: #000; padding-bottom: 5rem; }
-.celeb-container { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
-.celeb-video-box { 
-    position: relative; border: 2px solid #333; border-radius: 15px; overflow: hidden; 
-    box-shadow: 0 0 50px rgba(212, 175, 55, 0.1);
-}
-video { width: 100%; display: block; filter: brightness(0.7); }
+.latest-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 0 5%; }
+.latest-item { position: relative; border: 2px solid var(--gold); border-radius: 15px; overflow: hidden; height: 300px; }
+.latest-item img { width: 100%; height: 100%; object-fit: cover; }
+.item-tag { position: absolute; bottom: 0; background: var(--gold); color: black; padding: 10px; font-weight: 900; width: 100%; }
 
-/* --- Gallery Grid --- */
-.sport-grid {
-    display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 30px; padding: 0 5%;
+/* --- 100+ Sports Grid --- */
+.sport-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; padding: 2rem 5%; }
+.sport-card { background: var(--glass); border: 1px solid rgba(212,175,55,0.2); border-radius: 10px; overflow: hidden; transition: 0.3s; }
+.sport-card:hover { border-color: var(--gold); transform: translateY(-5px); box-shadow: 0 10px 30px rgba(75, 0, 130, 0.5); }
+.sport-card img { width: 100%; height: 250px; object-fit: cover; filter: grayscale(50%); }
+.sport-card:hover img { filter: grayscale(0%); }
+
+/* --- MOBILE RESPONSIVE QUERIES --- */
+@media screen and (max-width: 768px) {
+    .hero h1 { font-size: 2.5rem; }
+    .latest-grid { grid-template-columns: 1fr; } /* Stack "Latest" items vertically on mobile */
+    .nav-links { display: none; } /* We will add JS to toggle this */
+    .menu-toggle { display: flex; }
+    .sport-grid { grid-template-columns: repeat(2, 1fr); } /* 2 columns on mobile */
 }
-.sport-card {
-    background: var(--card-bg); border-radius: 10px; overflow: hidden;
-    border-bottom: 4px solid #222; transition: 0.4s; position: relative;
+
+@media screen and (max-width: 480px) {
+    .sport-grid { grid-template-columns: 1fr; } /* 1 column on very small phones */
+    .hero { height: 50vh; }
 }
-.sport-card:hover { border-bottom-color: var(--gold); transform: translateY(-10px); }
-.sport-card img { width: 100%; height: 350px; object-fit: cover; opacity: 0.7; transition: 0.5s; }
-.sport-card:hover img { opacity: 1; }
-.sport-card h3 { padding: 1.5rem; text-align: center; font-size: 1.2rem; }

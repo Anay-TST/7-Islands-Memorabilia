@@ -3,71 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>7 Islands Memorabilia | The Ultimate Sports Collection</title>
+    <title>7 Islands Memorabilia | The Vault</title>
     <link href="https://fonts.googleapis.com/css2?family=Arvo:700&family=Inter:wght@400;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <div class="ticker-wrap">
-        <div class="ticker">
-            <div class="ticker__item">CRICKET • FOOTBALL • TENNIS • NBA • F1 • GOLF • OLYMPICS • BASEBALL • HOCKEY • RUGBY • BOXING • MOTOGP • SQUASH • </div>
-            <div class="ticker__item">CRICKET • FOOTBALL • TENNIS • NBA • F1 • GOLF • OLYMPICS • BASEBALL • HOCKEY • RUGBY • BOXING • MOTOGP • SQUASH • </div>
+    <div class="ticker-container">
+        <div class="ticker-wrap"><div class="ticker">CRICKET • FOOTBALL • TENNIS • NBA • F1 • GOLF • OLYMPICS • BASEBALL • HOCKEY • RUGBY • BOXING • MOTOGP • SQUASH •</div></div>
+        <div class="ticker-wrap" style="border-top: 1px solid rgba(0,0,0,0.1); margin-top: 2px;">
+            <div class="ticker" style="animation-direction: reverse; animation-duration: 35s;">CRICKET • FOOTBALL • TENNIS • NBA • F1 • GOLF • OLYMPICS • BASEBALL • HOCKEY • RUGBY • BOXING • MOTOGP • SQUASH •</div>
         </div>
     </div>
 
     <header>
         <nav>
             <div class="logo">7 ISLANDS</div>
-            <ul>
-                <li><a href="#collection">The Collection</a></li>
-                <li><a href="#celebrities">Celebrity Highlights</a></li>
-                <li><a href="#contact">Contact</a></li>
+            <div class="menu-toggle" id="mobile-menu">
+                <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#latest">Latest</a></li>
+                <li><a href="#collection">100+ Sports</a></li>
+                <li><a href="#celebrities">Celebrities</a></li>
             </ul>
         </nav>
     </header>
 
     <section class="hero">
-        <div class="hero-overlay"></div>
         <div class="hero-content">
-            <span class="sub-heading">WORLD CLASS MEMORABILIA</span>
-            <h1>CRICKET <span class="gold-text">HISTORY</span> LIVES HERE.</h1>
-            <p>Home to the world's most extensive cricket collection, featuring 100+ global sports artifacts.</p>
-            <a href="#collection" class="btn-gold">Explore the Vault</a>
+            <h1>CRICKET <span class="gold-text">HISTORY</span></h1>
+            <p>The world's premier collection of 100+ global sports.</p>
+            <a href="#collection" class="btn-gold">Enter the Vault</a>
         </div>
     </section>
 
-    <section id="celebrities" class="celebrities">
+    <section id="latest" class="latest-section">
         <div class="section-title">
-            <h2>CELEBRITY <span class="gold-text">VISITS</span></h2>
+            <h2>NEW <span class="gold-text">ARRIVALS</span></h2>
             <div class="stadium-line"></div>
         </div>
-        <div class="celeb-container">
-            <div class="celeb-video-box">
-                <video id="celebVideo" controls poster="https://via.placeholder.com/1200x600/111/D4AF37?text=Celebrity+Highlight+Video">
-                    <source src="" type="video/mp4">
-                </video>
-                <div class="celeb-overlay">
-                    <h3>Legendary Visits</h3>
-                    <p>Capturing moments when icons meet history.</p>
-                </div>
+        <div class="latest-grid">
+            <div class="latest-item marquee-item">
+                <img src="https://via.placeholder.com/800x600/1a0a2e/D4AF37?text=Signed+Bat" alt="Latest Cricket">
+                <div class="item-tag">New: Signed 2011 WC Bat</div>
+            </div>
+            <div class="latest-item marquee-item">
+                <img src="https://via.placeholder.com/800x600/1a0a2e/D4AF37?text=Vintage+Jersey" alt="Latest Football">
+                <div class="item-tag">New: Pelé Signed Jersey</div>
             </div>
         </div>
     </section>
 
     <section id="collection" class="gallery">
         <div class="section-title">
-            <h2>THE <span class="gold-text">100+</span> SPORTS VAULT</h2>
-            <p>Browsing through a century of global sports excellence.</p>
+            <h2>THE <span class="gold-text">100+</span> VAULT</h2>
         </div>
-        
-        <div class="sport-grid" id="sportGrid">
-            </div>
+        <div class="sport-grid" id="sportGrid"></div>
     </section>
-
-    <footer>
-        <p>&copy; 2026 7 Islands Memorabilia. All Rights Reserved.</p>
-    </footer>
 
     <script src="script.js"></script>
 </body>
