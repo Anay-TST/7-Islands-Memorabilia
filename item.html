@@ -30,6 +30,11 @@
             <h2 class="section-title">RELATED <span class="gold-text">ITEMS</span></h2>
             <div class="sport-grid" id="relatedGrid"></div>
         </div>
+
+        <div id="encounterSection" style="display: none; margin-top: 4rem; border-top: 1px solid rgba(212,175,55,0.2); padding-top: 4rem;">
+            <h2 class="section-title">BEHIND THE <span class="gold-text">SIGNATURE</span></h2>
+            <div class="sport-grid" id="encounterGrid"></div>
+        </div>
     </div>
 
     <script src="script.js"></script>
@@ -41,10 +46,8 @@
         function zoomImage(e, container) {
             const img = container.querySelector('img');
             const rect = container.getBoundingClientRect();
-            
             const x = ((e.clientX - rect.left) / rect.width) * 100;
             const y = ((e.clientY - rect.top) / rect.height) * 100;
-            
             img.style.transformOrigin = `${x}% ${y}%`;
             img.style.transform = 'scale(2.5)';
         }
@@ -54,7 +57,6 @@
             img.style.transformOrigin = 'center center';
             img.style.transform = 'scale(1)';
         }
-        // -----------------------
 
         async function loadDetail() {
             if (!itemTitle) return;
@@ -71,75 +73,53 @@
                 const {result} = await resp.json();
 
                 if (result) {
-                    // --- DYNAMIC SEO PAGE TITLE ---
+                    // SEO PAGE TITLE
                     const athletes = result.athleteNames ? result.athleteNames.join(', ') : '';
                     const sports = result.sportNames ? result.sportNames.join(', ') : '';
                     const type = result.itemType || '';
-                    
                     const titleParts = [athletes, sports, type].filter(Boolean).join(' - ');
-                    document.title = titleParts 
-                        ? `${titleParts} | 7 Islands Memorabilia` 
-                        : `${result.title} | 7 Islands Memorabilia`;
+                    document.title = titleParts ? `${titleParts} | 7 Islands Memorabilia` : `${result.title} | 7 Islands Memorabilia`;
                     
-                    // --- BREADCRUMBS LOGIC ---
+                    // BREADCRUMBS
                     const primarySport = result.sportNames && result.sportNames.length > 0 ? result.sportNames[0] : null;
                     let breadcrumbHTML = `<a href="index.html" style="color:var(--gold); text-decoration:none;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">The Vault</a> <span style="margin: 0 10px; opacity: 0.4; color: white;">/</span> `;
-                    
                     if (primarySport) {
                         breadcrumbHTML += `<a href="filter.html?sport=${encodeURIComponent(primarySport)}" style="color:var(--gold); text-decoration:none;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">${primarySport}</a> <span style="margin: 0 10px; opacity: 0.4; color: white;">/</span> `;
                     }
-                    
                     breadcrumbHTML += `<span style="color:white; opacity: 0.7;">${result.title}</span>`;
                     document.getElementById('breadcrumb').innerHTML = breadcrumbHTML;
-                    // -------------------------
 
-                    // Build Metadata with pure <a> tags
+                    // METADATA
                     let metaHTML = "";
-                    if(result.venueName) {
-                        metaHTML += `<p>📍 <strong style="color:white;">Venue:</strong> <a href="filter.html?venue=${encodeURIComponent(result.venueName)}" style="color:var(--gold); text-decoration:none;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">${result.venueName} ${result.venueLoc ? '(' + result.venueLoc + ')' : ''}</a></p>`;
-                    }
-                    if(result.teamNames && result.teamNames.length > 0) {
-                        metaHTML += `<p>👥 <strong style="color:white;">Teams:</strong> ${result.teamNames.map(t => `<a href="filter.html?team=${encodeURIComponent(t)}" style="color:var(--gold); text-decoration:none;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">${t}</a>`).join(', ')}</p>`;
-                    }
-                    if(result.coaProvider) {
-                        metaHTML += `<p>🛡️ <strong style="color:white;">Authentication:</strong> ${result.coaProvider}</p>`;
-                    }
-                    if(result.serialNumber) {
-                        metaHTML += `<p>🆔 <strong style="color:white;">Serial:</strong> ${result.serialNumber}</p>`;
-                    }
+                    if(result.venueName) metaHTML += `<p>📍 <strong style="color:white;">Venue:</strong> <a href="filter.html?venue=${encodeURIComponent(result.venueName)}" style="color:var(--gold); text-decoration:none;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">${result.venueName} ${result.venueLoc ? '(' + result.venueLoc + ')' : ''}</a></p>`;
+                    if(result.teamNames && result.teamNames.length > 0) metaHTML += `<p>👥 <strong style="color:white;">Teams:</strong> ${result.teamNames.map(t => `<a href="filter.html?team=${encodeURIComponent(t)}" style="color:var(--gold); text-decoration:none;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">${t}</a>`).join(', ')}</p>`;
+                    if(result.coaProvider) metaHTML += `<p>🛡️ <strong style="color:white;">Authentication:</strong> ${result.coaProvider}</p>`;
+                    if(result.serialNumber) metaHTML += `<p>🆔 <strong style="color:white;">Serial:</strong> ${result.serialNumber}</p>`;
 
                     document.getElementById('itemDetail').innerHTML = `
                         <div class="detail-grid">
-                            <div class="detail-image" 
-                                 style="position: relative; overflow: hidden; border: 2px solid var(--gold); border-radius: 10px; cursor: crosshair; background: #000;"
-                                 onmousemove="zoomImage(event, this)"
-                                 onmouseleave="resetZoom(this)">
+                            <div class="detail-image" style="position: relative; overflow: hidden; border: 2px solid var(--gold); border-radius: 10px; cursor: crosshair; background: #000;" onmousemove="zoomImage(event, this)" onmouseleave="resetZoom(this)">
                                 <img src="${result.imageUrl}" alt="${result.title}" style="width: 100%; display: block; transition: transform 0.1s ease, transform-origin 0.1s ease;">
                                 ${result.isMatchWorn ? '<span style="position:absolute; top:20px; left:20px; background:#8B0000; color:white; padding:5px 15px; font-weight:900; border-radius:4px; border:1px solid var(--gold); letter-spacing:1px; z-index:10; pointer-events: none;">MATCH USED</span>' : ''}
                             </div>
-                            
                             <div class="detail-content">
                                 <p class="gold-text" style="font-weight:900; letter-spacing:1px; font-size:0.8rem; margin-bottom:10px;">
                                     ${result.itemType ? `<a href="filter.html?type=${encodeURIComponent(result.itemType)}" style="color:inherit; text-decoration:none;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">${result.itemType}</a>` : 'Archive'} 
                                     ${result.year ? `• <a href="filter.html?year=${encodeURIComponent(result.year)}" style="color:inherit; text-decoration:none;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">${result.year}</a>` : ''}
                                 </p>
                                 <h1 style="color:white; margin-top:5px; margin-bottom:5px;">${result.title}</h1>
-                                
                                 <div class="detail-athletes" style="margin-bottom:25px; margin-top:10px;">
                                     ${result.athleteNames ? result.athleteNames.map(a => `<a href="filter.html?athlete=${encodeURIComponent(a)}" style="color:var(--gold); font-size:1.3rem; font-weight:700; margin-right:15px; text-decoration:underline;" onmouseover="this.style.color='white'" onmouseout="this.style.color='var(--gold)'">${a}</a>`).join('') : ''}
                                 </div>
-                                
                                 ${metaHTML ? `<div class="detail-meta-box" style="color:var(--gold);">${metaHTML}</div>` : ''}
-                                
                                 ${result.description ? `<p class="detail-desc" style="line-height:1.8; opacity:0.85; margin-top:15px;">${result.description}</p>` : ''}
-                                
                                 <div class="tags-row" style="margin-top:30px; border-top:1px solid rgba(212,175,55,0.2); padding-top:20px;">
                                     ${result.sportNames ? result.sportNames.map(s => `<a href="filter.html?sport=${encodeURIComponent(s)}" class="clickable-tag" style="background:rgba(212,175,55,0.1); color:var(--gold); padding:6px 14px; border-radius:4px; font-size:0.75rem; font-weight:900; margin-right:8px; text-decoration:none; display:inline-block;" onmouseover="this.style.background='var(--gold)'; this.style.color='black'" onmouseout="this.style.background='rgba(212,175,55,0.1)'; this.style.color='var(--gold)'">${s}</a>`).join('') : ''}
                                 </div>
                             </div>
                         </div>`;
                     
-                    // Fetch Related Items
+                    // FETCH RELATED ITEMS
                     if (result.sportNames && result.sportNames.length > 0) {
                         const rQuery = encodeURIComponent(`*[_type == "memorabilia" && sports[0]->name == "${result.sportNames[0]}" && title != "${itemTitle}"][0...4]{
                             title, year, "imageUrl": image.asset->url, "itemType": itemType->name, "sportNames": sports[]->name, "athleteNames": sportsmen[]->name, "venueName": venue->name
@@ -149,6 +129,40 @@
                         if(related) {
                             const grid = document.getElementById('relatedGrid');
                             related.forEach(item => grid.appendChild(createCard(item)));
+                        }
+                    }
+
+                    // FETCH PERSONAL ENCOUNTERS (Photos with the Legends)
+                    if (result.athleteNames && result.athleteNames.length > 0) {
+                        const athleteArrayStr = JSON.stringify(result.athleteNames);
+                        const eQuery = encodeURIComponent(`*[_type == "encounter" && sportsman->name in ${athleteArrayStr}]{
+                            title, date, videoUrl, "imageUrl": image.asset->url
+                        }`);
+                        const eResp = await fetch(`https://dpcpc70i.api.sanity.io/v2021-10-21/data/query/production?query=${eQuery}`);
+                        const {result: encounters} = await eResp.json();
+                        
+                        if (encounters && encounters.length > 0) {
+                            const encSection = document.getElementById('encounterSection');
+                            const encGrid = document.getElementById('encounterGrid');
+                            encSection.style.display = 'block'; // Unhide the section
+                            
+                            encounters.forEach(enc => {
+                                const encCard = document.createElement('div');
+                                encCard.className = 'sport-card';
+                                encCard.style.cursor = 'default'; // No hover effect needed
+                                
+                                encCard.innerHTML = `
+                                    <div class="card-image-container" style="height: 300px; padding:0; border-bottom: 2px solid var(--gold);">
+                                        <img src="${enc.imageUrl}" alt="${enc.title}" style="width: 100%; height: 100%; object-fit: cover; padding: 0;">
+                                    </div>
+                                    <div class="card-info" style="text-align:center; padding: 1.5rem;">
+                                        <h3 style="color:var(--gold); font-size:1.1rem; margin-bottom:5px;">${enc.title}</h3>
+                                        ${enc.date ? `<p style="font-size:0.8rem; opacity:0.6; margin-bottom: 10px;">${enc.date}</p>` : ''}
+                                        ${enc.videoUrl ? `<a href="${enc.videoUrl}" target="_blank" style="display:inline-block; margin-top:5px; padding:6px 18px; border:1px solid var(--gold); color:white; background:var(--gold); text-decoration:none; border-radius:50px; font-size:0.8rem; font-weight:bold; color:black;">▶ Watch Video</a>` : ''}
+                                    </div>
+                                `;
+                                encGrid.appendChild(encCard);
+                            });
                         }
                     }
                 }

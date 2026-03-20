@@ -21,6 +21,14 @@
     
     <section class="section-padding" style="padding-top:2rem;">
         <h2 class="section-title" id="filterHeading" style="margin-bottom: 2rem; font-size: 1.5rem;">Loading Archive...</h2>
+        
+        <div id="encounterSection" style="display: none; margin-bottom: 4rem; padding-bottom: 3rem; border-bottom: 1px solid rgba(212,175,55,0.2);">
+            <h2 class="section-title" style="font-size: 1.5rem; text-align: left;">PERSONAL <span class="gold-text">ENCOUNTERS</span></h2>
+            <div class="sport-grid" id="encounterGrid"></div>
+        </div>
+
+        <h2 class="section-title" id="vaultHeading" style="font-size: 1.5rem; text-align: left; display: none;">THE <span class="gold-text">ARCHIVES</span></h2>
+        
         <div class="sport-grid" id="filterGrid"></div>
     </section>
 
@@ -31,7 +39,7 @@
         const val = params.get(type);
 
         if (type && val) {
-            document.title = `${val} Collection | 7 Islands Memorabilia`;
+            document.title = `${val} | 7 Islands Memorabilia`;
             
             // Format the heading nicely based on what the user clicked
             let label = type.toUpperCase();
@@ -40,8 +48,8 @@
             document.getElementById('filterHeading').innerHTML = `${label}: <span class="gold-text" style="font-size:2.5rem; display:block; margin-top:10px;">${val}</span>`;
 
             async function loadFiltered() {
+                // 1. FETCH MEMORABILIA ITEMS
                 let f = "";
-                // Maps the URL parameter back to the specific Sanity schema field
                 if(type === 'sport') f = `sports[]->name match "${val}"`;
                 if(type === 'athlete') f = `sportsmen[]->name match "${val}"`;
                 if(type === 'venue') f = `venue->name match "${val}"`;
@@ -59,11 +67,47 @@
                     
                     const grid = document.getElementById('filterGrid');
                     if(result && result.length > 0) {
+                        document.getElementById('vaultHeading').style.display = 'block';
                         result.forEach(item => grid.appendChild(createCard(item)));
                     } else {
-                        grid.innerHTML = `<p style="grid-column: 1/-1; text-align:center; opacity:0.5; padding:50px;">No archives found for this specific tag.</p>`;
+                        grid.innerHTML = `<p style="grid-column: 1/-1; text-align:left; opacity:0.5; padding:20px 0;">No archives found for this specific tag.</p>`;
                     }
                 } catch (e) { console.error("Filter Load Error", e); }
+
+                // 2. FETCH PERSONAL ENCOUNTERS (Only if viewing an Athlete's profile)
+                if (type === 'athlete') {
+                    const eQuery = encodeURIComponent(`*[_type == "encounter" && sportsman->name == "${val}"]{
+                        title, date, videoUrl, "imageUrl": image.asset->url
+                    }`);
+                    try {
+                        const eResp = await fetch(`https://dpcpc70i.api.sanity.io/v2021-10-21/data/query/production?query=${eQuery}`);
+                        const {result: encounters} = await eResp.json();
+                        
+                        if (encounters && encounters.length > 0) {
+                            const encSection = document.getElementById('encounterSection');
+                            const encGrid = document.getElementById('encounterGrid');
+                            encSection.style.display = 'block'; // Unhide the section
+                            
+                            encounters.forEach(enc => {
+                                const encCard = document.createElement('div');
+                                encCard.className = 'sport-card';
+                                encCard.style.cursor = 'default'; // No hover effect needed
+                                
+                                encCard.innerHTML = `
+                                    <div class="card-image-container" style="height: 300px; padding:0; border-bottom: 2px solid var(--gold);">
+                                        <img src="${enc.imageUrl}" alt="${enc.title}" style="width: 100%; height: 100%; object-fit: cover; padding: 0;">
+                                    </div>
+                                    <div class="card-info" style="text-align:center; padding: 1.5rem;">
+                                        <h3 style="color:var(--gold); font-size:1.1rem; margin-bottom:5px;">${enc.title}</h3>
+                                        ${enc.date ? `<p style="font-size:0.8rem; opacity:0.6; margin-bottom: 10px;">${enc.date}</p>` : ''}
+                                        ${enc.videoUrl ? `<a href="${enc.videoUrl}" target="_blank" style="display:inline-block; margin-top:5px; padding:6px 18px; border:1px solid var(--gold); color:white; background:var(--gold); text-decoration:none; border-radius:50px; font-size:0.8rem; font-weight:bold; color:black;">▶ Watch Video</a>` : ''}
+                                    </div>
+                                `;
+                                encGrid.appendChild(encCard);
+                            });
+                        }
+                    } catch (e) { console.error("Encounters Load Error", e); }
+                }
             }
             loadFiltered();
         } else {
