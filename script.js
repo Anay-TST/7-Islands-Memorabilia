@@ -46,11 +46,11 @@ function createCard(item) {
     card.innerHTML = `
         <div class="card-image-container">
             <img src="${item.imageUrl}" alt="${item.title}">
-            <span class="type-badge">${item.itemTypeName || ''}</span>
+            ${item.itemTypeName ? `<span class="type-badge clickable" onclick="goToFilter('type','${item.itemTypeName}')">${item.itemTypeName}</span>` : ''}
         </div>
         <div class="card-info">
             <div class="tags-row">
-                <span class="year-label">${item.year || ''}</span>
+                ${item.year ? `<span class="year-label">${item.year}</span>` : ''}
                 ${item.sportNames ? item.sportNames.map(s => `<span class="clickable-tag clickable" onclick="goToFilter('sport','${s}')">${s}</span>`).join('') : ''}
             </div>
             <h3>${item.title}</h3>
@@ -76,16 +76,5 @@ function setupFilters() {
         };
     });
 }
-
-// Search Logic
-document.getElementById('vaultSearch')?.addEventListener('input', (e) => {
-    const term = e.target.value.toLowerCase();
-    const filtered = allItems.filter(item => {
-        const names = item.athleteNames ? item.athleteNames.join(' ').toLowerCase() : '';
-        const sports = item.sportNames ? item.sportNames.join(' ').toLowerCase() : '';
-        return item.title.toLowerCase().includes(term) || names.includes(term) || sports.includes(term);
-    });
-    renderGrids(filtered);
-});
 
 document.addEventListener('DOMContentLoaded', loadVault);
