@@ -3,10 +3,9 @@ const DATASET = 'production';
 const BASE_URL = `https://${PROJECT_ID}.api.sanity.io/v2021-10-21/data/query/${DATASET}?query=`;
 
 const MAIN_QUERY = encodeURIComponent(`*[_type == "memorabilia"]{
-  title, year, "venueName": venue->name, "venueLoc": venue->location,
-  description, coaProvider, serialNumber, isMatchWorn,
-  "imageUrl": image.asset->url, "itemType": itemType->name,
-  "sportNames": sports[]->name, "athleteNames": sportsmen[]->name, "teamNames": teams[]->name, isLatest
+  title, year, "venueName": venue->name, "imageUrl": image.asset->url,
+  "itemType": itemType->name, "sportNames": sports[]->name,
+  "athleteNames": sportsmen[]->name, "teamNames": teams[]->name, isLatest
 }`);
 
 let allItems = [];
@@ -36,8 +35,10 @@ function renderGrid(gridId, items, shuffle = false) {
 function createCard(item) {
     const card = document.createElement('div');
     card.className = 'sport-card';
+    
+    // CRITICAL FIX: The main card click only triggers if you DON'T click a specific tag
     card.onclick = (e) => {
-        if (!e.target.classList.contains('clickable')) {
+        if (!e.target.closest('.clickable')) {
             window.location.href = `item.html?name=${encodeURIComponent(item.title)}`;
         }
     };
@@ -50,7 +51,7 @@ function createCard(item) {
         <div class="card-info">
             <div class="tags-row">
                 ${item.year ? `<span class="year-label clickable" onclick="goToFilter('year','${item.year}')">${item.year}</span>` : ''}
-                ${item.sportNames ? item.sportNames.map(s => `<span class="clickable-tag clickable" onclick="goToFilter('sport','${s}')" style="background:rgba(212,175,55,0.1); color:var(--gold); padding:2px 8px; border-radius:4px; font-size:0.65rem; font-weight:900; margin-right:5px;">${s}</span>`).join('') : ''}
+                ${item.sportNames ? item.sportNames.map(s => `<span class="clickable-tag clickable" onclick="goToFilter('sport','${s}')">${s}</span>`).join('') : ''}
             </div>
             <h3>${item.title}</h3>
             ${item.venueName ? `<p class="venue-text clickable" onclick="goToFilter('venue','${item.venueName}')">📍 ${item.venueName}</p>` : ''}
@@ -62,6 +63,8 @@ function createCard(item) {
 }
 
 function goToFilter(type, val) {
+    // This stops the event from "bubbling" up to the card's onclick
+    event.stopPropagation(); 
     window.location.href = `filter.html?${type}=${encodeURIComponent(val)}`;
 }
 

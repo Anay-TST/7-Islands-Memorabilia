@@ -1,4 +1,4 @@
-export default {
+export const sportsman = {
   name: 'sportsman',
   title: 'Sportsmen / Celebrities',
   type: 'document',
@@ -13,6 +13,12 @@ export default {
       title: 'Athlete Portrait',
       type: 'image',
       options: { hotspot: true },
+    },
+    {
+      name: 'sport',
+      title: 'Primary Sport',
+      type: 'reference',
+      to: [{ type: 'sport' }], // Links this athlete to your Sports list
     },
     {
       name: 'description',
