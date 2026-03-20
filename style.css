@@ -10,79 +10,142 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
-    background-color: var(--pitch-black);
-    background-image: radial-gradient(circle at top, var(--royal-purple), var(--pitch-black));
+    background: radial-gradient(circle at top, var(--royal-purple), var(--pitch-black));
+    background-color: var(--pitch-black); /* Fallback to prevent white BG */
+    background-attachment: fixed;
     color: white;
     font-family: 'Inter', sans-serif;
     overflow-x: hidden;
     line-height: 1.6;
+    min-height: 100vh;
 }
 
-/* --- Category Bar Fix --- */
+h1, h2, h3, .logo { font-family: 'Arvo', serif; font-weight: 900; }
+.gold-text { color: var(--gold); }
+
+/* --- Navigation & Ticker --- */
+.ticker-container { background: var(--gold); padding: 8px 0; width: 100%; position: relative; z-index: 2001; }
+.ticker { display: inline-block; animation: ticker 40s linear infinite; color: #000; font-weight: 900; font-size: 0.85rem; white-space: nowrap; }
+@keyframes ticker { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+
+header { 
+    background: rgba(0,0,0,0.95); 
+    position: sticky; 
+    top: 0; 
+    z-index: 2000; 
+    border-bottom: 1px solid rgba(212,175,55,0.2); 
+    backdrop-filter: blur(10px); 
+}
+nav { display: flex; justify-content: space-between; align-items: center; padding: 1rem 5%; max-width: 1400px; margin: 0 auto; }
+.logo { font-size: 1.5rem; color: var(--gold); cursor: pointer; text-decoration: none; display: block; }
+.nav-links { display: flex; list-style: none; gap: 2rem; }
+.nav-links a { text-decoration: none; color: white; font-weight: 700; font-size: 0.8rem; text-transform: uppercase; transition: 0.3s; }
+.nav-links a:hover, .nav-links a.active { color: var(--gold); }
+
+/* --- Hero & Search --- */
+.hero { padding: 4rem 5% 2rem; text-align: center; }
+.hero h1 { font-size: clamp(2.5rem, 8vw, 5rem); margin-bottom: 1.5rem; }
+
+.search-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    width: 95%;
+    max-width: 650px;
+    margin: 0 auto;
+}
+
+#vaultSearch, #celebSearch { 
+    flex-grow: 1;
+    padding: 15px 30px; 
+    background: #000; 
+    border: 2px solid var(--gold); 
+    border-radius: 50px; 
+    color: white; 
+    outline: none;
+    font-size: 1rem;
+}
+.action-btn { background: var(--glass); border: 1px solid var(--gold); color: var(--gold); padding: 12px 20px; border-radius: 50px; cursor: pointer; font-weight: 700; font-size: 0.8rem; text-transform: uppercase; display: flex; align-items: center; gap: 8px; }
+.action-btn:hover { background: var(--gold); color: black; }
+
+/* --- Category Bar (Aligned perfectly) --- */
 .category-bar { 
     background: rgba(0,0,0,0.4); 
-    padding: 1.5rem 0; 
+    padding: 1.2rem 0; 
     border-bottom: 1px solid rgba(212,175,55,0.1); 
     display: flex;
     justify-content: center;
     overflow-x: auto;
     scrollbar-width: none;
 }
+.category-bar::-webkit-scrollbar { display: none; }
+
 .filter-container { 
     display: flex; 
-    gap: 15px; 
-    padding: 0 20px;
-    align-items: center;
-    width: max-content;
+    gap: 12px; 
+    padding: 0 5%; 
+    margin: 0 auto;
 }
 .filter-btn { 
     background: var(--glass); 
     border: 1px solid rgba(212,175,55,0.3); 
     color: white; 
-    padding: 10px 20px; 
+    padding: 10px 22px; 
     border-radius: 50px; 
     cursor: pointer; 
     font-weight: 700; 
     display: flex;
     align-items: center;
-    justify-content: center;
     gap: 8px;
+    white-space: nowrap;
     transition: 0.3s;
 }
-.filter-btn.active { background: var(--gold); color: black; border-color: var(--gold); }
+.filter-btn.active, .filter-btn:hover { background: var(--gold); color: black; border-color: var(--gold); }
 
-/* --- Search Bar Container --- */
-.search-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
-    width: 90%;
-    max-width: 600px;
-    margin: 1.5rem auto;
-}
-#vaultSearch {
-    flex: 1;
-    padding: 12px 25px;
-    border-radius: 30px;
-    border: 1px solid var(--gold);
-    background: #000;
-    color: #fff;
-    outline: none;
-}
+/* --- Grid & Cards (Fixed Image Sizes) --- */
+.section-padding { padding: 4rem 5%; max-width: 1400px; margin: 0 auto; }
+.section-title { text-align: center; margin-bottom: 3rem; font-size: 2rem; letter-spacing: 2px; }
+.sport-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; }
 
-/* --- Card Hierarchy --- */
 .sport-card { 
-    background: var(--glass); 
-    border: 1px solid rgba(212,175,55,0.1); 
-    border-radius: 15px; 
-    overflow: hidden; 
-    cursor: pointer;
-    transition: 0.3s;
+    background: var(--glass); border: 1px solid rgba(212,175,55,0.1); 
+    border-radius: 15px; overflow: hidden; transition: 0.3s ease; display: flex; flex-direction: column;
 }
-.card-image-container { height: 300px; background: #000; display: flex; align-items: center; justify-content: center; position: relative; }
-.card-image-container img { max-width: 100%; max-height: 100%; object-fit: contain; padding: 10px; }
+.sport-card:hover { transform: translateY(-10px); border-color: var(--gold); box-shadow: 0 10px 40px rgba(212,175,55,0.2); }
 
-.athlete-link { color: var(--gold); font-weight: 700; cursor: pointer; margin-right: 10px; }
-.athlete-link:hover { text-decoration: underline; }
-.clickable-tag { background: rgba(212,175,55,0.1); color: var(--gold); padding: 3px 8px; border-radius: 4px; font-size: 0.65rem; cursor: pointer; }
+.card-image-container { position: relative; height: 300px; background: #000; display: flex; align-items: center; justify-content: center; border-bottom: 2px solid var(--gold); overflow: hidden; }
+.card-image-container img { max-width: 100%; max-height: 100%; object-fit: contain; padding: 15px; transition: 0.5s; }
+.card-image-container:hover img { transform: scale(1.05); }
+
+.card-info { padding: 1.5rem; flex-grow: 1; }
+.tags-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+
+/* Tag Styling */
+.year-label { color: rgba(255,255,255,0.4); font-size: 0.7rem; font-weight: 900; }
+.year-label:hover { color: var(--gold); }
+.type-badge { position: absolute; top: 15px; right: 15px; background: var(--gold); color: black; padding: 4px 10px; font-size: 0.6rem; font-weight: 900; border-radius: 4px; z-index: 5; }
+
+.clickable-tag { background: rgba(212,175,55,0.1); color: var(--gold); padding: 4px 10px; border-radius: 4px; font-size: 0.65rem; font-weight: 900; transition: 0.3s; }
+.clickable-tag:hover { background: var(--gold); color: black; }
+
+.venue-text { font-size: 0.75rem; color: var(--gold); text-transform: uppercase; margin-bottom: 8px; }
+.venue-text:hover { text-decoration: underline; color: white; }
+
+.athlete-name { color: var(--gold); font-weight: 700; font-size: 0.9rem; margin-right: 10px; display: inline-block; transition: 0.2s; }
+.athlete-name:hover { text-decoration: underline; color: white; }
+
+/* --- Detail Page --- */
+.detail-view-container { padding: 4rem 5%; max-width: 1200px; margin: 0 auto; }
+.detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 50px; align-items: start; }
+.detail-image { border: 2px solid var(--gold); border-radius: 10px; overflow: hidden; box-shadow: 0 0 40px var(--gold-glow); }
+.detail-image img { width: 100%; display: block; transition: transform 0.5s ease; cursor: zoom-in; }
+.detail-image:hover img { transform: scale(1.4); }
+
+.detail-meta-box { background: rgba(255,255,255,0.05); padding: 20px; border-left: 4px solid var(--gold); margin: 25px 0; border-radius: 0 10px 10px 0; }
+.detail-meta-box p { margin: 8px 0; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; }
+
+@media (max-width: 900px) {
+    .detail-grid { grid-template-columns: 1fr; }
+    .filter-container { justify-content: flex-start; margin: 0; }
+}

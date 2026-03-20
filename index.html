@@ -15,12 +15,13 @@
         <nav>
             <div class="logo" onclick="window.location.href='index.html'">7 ISLANDS</div>
             <ul class="nav-links">
-                <li><a href="index.html">The Vault</a></li>
+                <li><a href="index.html" class="active">The Vault</a></li>
                 <li><a href="celebrities.html">Legends</a></li>
                 <li><a href="#latest">Latest</a></li>
             </ul>
         </nav>
     </header>
+    
     <section class="hero">
         <h1>WORLD <span class="gold-text">HISTORY</span></h1>
         <div class="search-container">
@@ -28,6 +29,7 @@
             <button id="clearSearch" class="action-btn" style="display:none;">✕ Clear</button>
         </div>
     </section>
+    
     <div class="category-bar">
         <div class="filter-container">
             <button class="filter-btn active" data-sport="all">🏆 All</button>
@@ -36,14 +38,17 @@
             <button class="filter-btn" data-sport="Basketball">🏀 NBA</button>
         </div>
     </div>
+    
     <section id="latest" class="section-padding">
         <h2 class="section-title">NEW <span class="gold-text">ARRIVALS</span></h2>
         <div class="sport-grid" id="latestGrid"></div>
     </section>
+    
     <section id="collection" class="section-padding">
         <h2 class="section-title">THE <span class="gold-text">100+</span> VAULT</h2>
         <div class="sport-grid" id="sportGrid"></div>
     </section>
+    
     <script src="script.js"></script>
 </body>
 </html>

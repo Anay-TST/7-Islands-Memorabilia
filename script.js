@@ -36,39 +36,28 @@ function createCard(item) {
     const card = document.createElement('div');
     card.className = 'sport-card';
 
-    // The main card now only redirects if you click background area
-    card.onclick = (e) => {
-        window.location.href = `item.html?name=${encodeURIComponent(item.title)}`;
-    };
-
+    // FIX: The card itself has NO onclick. 
+    // The image and title have the item.html link. The tags have the filter.html link + stopPropagation.
     card.innerHTML = `
-        <div class="card-image-container">
+        <div class="card-image-container" onclick="window.location.href='item.html?name=${encodeURIComponent(item.title)}'" style="cursor:pointer;">
             <img src="${item.imageUrl}" alt="${item.title}">
-            ${item.itemType ? `<span class="type-badge">${item.itemType}</span>` : ''}
+            ${item.itemType ? `<span class="type-badge" onclick="event.stopPropagation(); goToFilter('type','${item.itemType}')">${item.itemType}</span>` : ''}
         </div>
         <div class="card-info">
             <div class="tags-row">
-                ${item.year ? `<span class="year-label">${item.year}</span>` : ''}
-                ${item.sportNames ? item.sportNames.map(s => `
-                    <span class="clickable-tag" onclick="handleTagClick(event, 'sport','${s}')">${s}</span>
-                `).join('') : ''}
+                ${item.year ? `<span class="year-label" onclick="event.stopPropagation(); goToFilter('year','${item.year}')" style="cursor:pointer;">${item.year}</span>` : ''}
+                ${item.sportNames ? item.sportNames.map(s => `<span class="clickable-tag" onclick="event.stopPropagation(); goToFilter('sport','${s}')">${s}</span>`).join('') : ''}
             </div>
-            <h3>${item.title}</h3>
-            ${item.venueName ? `
-                <p class="venue-text" onclick="handleTagClick(event, 'venue','${item.venueName}')">📍 ${item.venueName}</p>
-            ` : ''}
+            <h3 onclick="window.location.href='item.html?name=${encodeURIComponent(item.title)}'" style="cursor:pointer;">${item.title}</h3>
+            ${item.venueName ? `<p class="venue-text" onclick="event.stopPropagation(); goToFilter('venue','${item.venueName}')" style="cursor:pointer;">📍 ${item.venueName}</p>` : ''}
             <div class="athlete-row">
-                ${item.athleteNames ? item.athleteNames.map(a => `
-                    <span class="athlete-link" onclick="handleTagClick(event, 'athlete','${a}')">${a}</span>
-                `).join('') : ''}
+                ${item.athleteNames ? item.athleteNames.map(a => `<span class="athlete-name" onclick="event.stopPropagation(); goToFilter('athlete','${a}')">${a}</span>`).join('') : ''}
             </div>
         </div>`;
     return card;
 }
 
-// CRITICAL FIX: Stops the click from reaching the parent card
-function handleTagClick(e, type, val) {
-    e.stopPropagation(); 
+function goToFilter(type, val) {
     window.location.href = `filter.html?${type}=${encodeURIComponent(val)}`;
 }
 
@@ -92,11 +81,13 @@ function setupSearch() {
     searchInput.addEventListener('input', (e) => {
         const term = e.target.value.toLowerCase();
         if(clearBtn) clearBtn.style.display = term.length > 0 ? "flex" : "none";
+
         const filtered = allItems.filter(item => {
             const title = (item.title || "").toLowerCase();
             const athletes = (item.athleteNames || []).join(" ").toLowerCase();
             const sports = (item.sportNames || []).join(" ").toLowerCase();
-            return title.includes(term) || athletes.includes(term) || sports.includes(term);
+            const year = (item.year || "").toLowerCase();
+            return title.includes(term) || athletes.includes(term) || sports.includes(term) || year.includes(term);
         });
         renderGrid('sportGrid', filtered, true);
     });
