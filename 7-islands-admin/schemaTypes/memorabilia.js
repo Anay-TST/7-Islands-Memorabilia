@@ -11,7 +11,12 @@ export const memorabilia = {
       to: [{ type: 'itemType' }] 
     },
     { name: 'year', title: 'Year of Origin', type: 'string', description: 'e.g., 2011' },
-    { name: 'venue', title: 'Venue / Stadium', type: 'string', description: 'e.g., Wankhede Stadium, Mumbai' },
+    { 
+      name: 'venue', 
+      title: 'Venue / Stadium', 
+      type: 'reference', // CHANGED FROM 'string' TO 'reference'
+      to: [{ type: 'venue' }] 
+    },
     { 
       name: 'isMatchWorn', 
       title: 'Match Worn / Match Used?', 
