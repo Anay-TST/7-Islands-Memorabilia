@@ -8,19 +8,16 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
     <div class="ticker-container">
-        <div class="ticker-wrap">
-            <div class="ticker">CRICKET • FOOTBALL • TENNIS • NBA • F1 • GOLF • OLYMPICS • BASEBALL • HOCKEY • RUGBY • BOXING • MOTOGP • SQUASH •</div>
-        </div>
+        <div class="ticker-wrap"><div class="ticker">CRICKET • FOOTBALL • TENNIS • NBA • F1 • GOLF • OLYMPICS • BASEBALL • HOCKEY • RUGBY • BOXING • MOTOGP • SQUASH •</div></div>
     </div>
 
     <header>
         <nav>
-            <div class="logo">7 ISLANDS</div>
+            <div class="logo" onclick="window.location.href='index.html'">7 ISLANDS</div>
             <ul class="nav-links">
                 <li><a href="#latest">Latest</a></li>
-                <li><a href="#collection">100+ Sports</a></li>
+                <li><a href="#collection">100+ Vault</a></li>
             </ul>
         </nav>
     </header>
@@ -28,9 +25,8 @@
     <section class="hero">
         <div class="hero-content">
             <h1>WORLD <span class="gold-text">HISTORY</span></h1>
-            <p>The premier collection of 100+ global sports and legends.</p>
             <div class="search-box">
-                <input type="text" id="vaultSearch" placeholder="Search by Athlete, Sport, or Type...">
+                <input type="text" id="vaultSearch" placeholder="Search Athlete, Sport, Team, or Year...">
             </div>
         </div>
     </section>
@@ -55,13 +51,7 @@
         <div class="sport-grid" id="sportGrid"></div>
     </section>
 
-    <div id="lightbox" class="lightbox">
-        <span class="close-lightbox">&times;</span>
-        <img class="lightbox-content" id="lightbox-img">
-        <div id="lightbox-caption"></div>
-    </div>
-
-    <button id="backToTop" class="back-to-top"><span class="arrow">↑</span></button>
+    <button id="backToTop" class="back-to-top"><span class="arrow">↑</span><span class="text">TOP</span></button>
 
     <script src="script.js"></script>
 </body>

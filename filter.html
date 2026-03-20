@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"><title>Collection | 7 Islands</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header><nav><div class="logo" onclick="window.location.href='index.html'">7 ISLANDS</div></nav></header>
+    <section class="section-padding">
+        <h2 class="section-title" id="filterHeading">Loading...</h2>
+        <div class="sport-grid" id="filterGrid"></div>
+    </section>
+    <script src="script.js"></script>
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const type = params.keys().next().value;
+        const val = params.get(type);
+        document.getElementById('filterHeading').innerHTML = `${type.toUpperCase()}: <span class="gold-text">${val}</span>`;
+
+        async function loadFiltered() {
+            let f = "";
+            if(type === 'sport') f = `sports[]->name match "${val}"`;
+            if(type === 'athlete') f = `sportsmen[]->name match "${val}"`;
+            if(type === 'team') f = `teams[]->name match "${val}"`;
+            if(type === 'venue') f = `venue->name match "${val}"`;
+
+            const query = encodeURIComponent(`*[_type == "memorabilia" && ${f}]{
+                title, year, "venueName": venue->name, "imageUrl": image.asset->url,
+                "itemTypeName": itemType->name, "sportNames": sports[]->name, "athleteNames": sportsmen[]->name
+            }`);
+            const resp = await fetch(`https://dpcpc70i.api.sanity.io/v2021-10-21/data/query/production?query=${query}`);
+            const {result} = await resp.json();
+            const grid = document.getElementById('filterGrid');
+            result.forEach(item => grid.appendChild(createCard(item)));
+        }
+        loadFiltered();
+    </script>
+</body>
+</html>
