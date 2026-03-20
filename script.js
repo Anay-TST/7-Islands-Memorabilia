@@ -16,13 +16,12 @@ async function loadVault() {
         const { result } = await response.json();
         allItems = result || [];
         
-        // Initial Renders
         if(document.getElementById('latestGrid')) renderGrid('latestGrid', allItems.filter(i => i.isLatest));
         if(document.getElementById('sportGrid')) renderGrid('sportGrid', allItems, true);
         
         setupFilters();
         setupSearch();
-    } catch (e) { console.error("Vault Load Error:", e); }
+    } catch (e) { console.error("Data Load Error:", e); }
 }
 
 function renderGrid(gridId, items, shuffle = false) {
@@ -37,30 +36,39 @@ function createCard(item) {
     const card = document.createElement('div');
     card.className = 'sport-card';
 
-    // We use innerHTML and standard <a> tags for the main link 
-    // to prevent the "redirect to legends" bug.
+    // The main card now only redirects if you click background area
+    card.onclick = (e) => {
+        window.location.href = `item.html?name=${encodeURIComponent(item.title)}`;
+    };
+
     card.innerHTML = `
-        <a href="item.html?name=${encodeURIComponent(item.title)}" class="card-image-link">
+        <div class="card-image-container">
             <img src="${item.imageUrl}" alt="${item.title}">
             ${item.itemType ? `<span class="type-badge">${item.itemType}</span>` : ''}
-        </a>
+        </div>
         <div class="card-info">
             <div class="tags-row">
                 ${item.year ? `<span class="year-label">${item.year}</span>` : ''}
-                ${item.sportNames ? item.sportNames.map(s => `<span class="clickable-tag" onclick="goToFilter('sport','${s}')">${s}</span>`).join('') : ''}
+                ${item.sportNames ? item.sportNames.map(s => `
+                    <span class="clickable-tag" onclick="handleTagClick(event, 'sport','${s}')">${s}</span>
+                `).join('') : ''}
             </div>
-            <h3 style="cursor:pointer" onclick="window.location.href='item.html?name=${encodeURIComponent(item.title)}'">${item.title}</h3>
-            ${item.venueName ? `<p class="venue-text" style="font-size:0.75rem; color:var(--gold); cursor:pointer;" onclick="goToFilter('venue','${item.venueName}')">📍 ${item.venueName}</p>` : ''}
+            <h3>${item.title}</h3>
+            ${item.venueName ? `
+                <p class="venue-text" onclick="handleTagClick(event, 'venue','${item.venueName}')">📍 ${item.venueName}</p>
+            ` : ''}
             <div class="athlete-row">
-                ${item.athleteNames ? item.athleteNames.map(a => `<span class="athlete-link" onclick="goToFilter('athlete','${a}')">${a}</span>`).join('') : ''}
+                ${item.athleteNames ? item.athleteNames.map(a => `
+                    <span class="athlete-link" onclick="handleTagClick(event, 'athlete','${a}')">${a}</span>
+                `).join('') : ''}
             </div>
         </div>`;
     return card;
 }
 
-function goToFilter(type, val) {
-    // STOP the click from bubbling up to the card
-    if (event) event.stopPropagation();
+// CRITICAL FIX: Stops the click from reaching the parent card
+function handleTagClick(e, type, val) {
+    e.stopPropagation(); 
     window.location.href = `filter.html?${type}=${encodeURIComponent(val)}`;
 }
 
@@ -84,7 +92,6 @@ function setupSearch() {
     searchInput.addEventListener('input', (e) => {
         const term = e.target.value.toLowerCase();
         if(clearBtn) clearBtn.style.display = term.length > 0 ? "flex" : "none";
-
         const filtered = allItems.filter(item => {
             const title = (item.title || "").toLowerCase();
             const athletes = (item.athleteNames || []).join(" ").toLowerCase();
