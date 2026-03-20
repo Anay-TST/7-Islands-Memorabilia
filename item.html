@@ -20,6 +20,8 @@
     </header>
 
     <div class="detail-view-container">
+        <div id="breadcrumb" style="margin-bottom: 20px; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;"></div>
+        
         <div id="itemDetail">
             <p style="text-align: center; padding: 50px;">Loading Archive Data...</p>
         </div>
@@ -40,13 +42,11 @@
             const img = container.querySelector('img');
             const rect = container.getBoundingClientRect();
             
-            // Calculate cursor position as a percentage
             const x = ((e.clientX - rect.left) / rect.width) * 100;
             const y = ((e.clientY - rect.top) / rect.height) * 100;
             
-            // Move the transform origin to the cursor and scale up
             img.style.transformOrigin = `${x}% ${y}%`;
-            img.style.transform = 'scale(2.5)'; // Adjust this number for more/less zoom
+            img.style.transform = 'scale(2.5)';
         }
 
         function resetZoom(container) {
@@ -71,7 +71,7 @@
                 const {result} = await resp.json();
 
                 if (result) {
-                    // DYNAMIC SEO PAGE TITLE
+                    // --- DYNAMIC SEO PAGE TITLE ---
                     const athletes = result.athleteNames ? result.athleteNames.join(', ') : '';
                     const sports = result.sportNames ? result.sportNames.join(', ') : '';
                     const type = result.itemType || '';
@@ -81,6 +81,18 @@
                         ? `${titleParts} | 7 Islands Memorabilia` 
                         : `${result.title} | 7 Islands Memorabilia`;
                     
+                    // --- BREADCRUMBS LOGIC ---
+                    const primarySport = result.sportNames && result.sportNames.length > 0 ? result.sportNames[0] : null;
+                    let breadcrumbHTML = `<a href="index.html" style="color:var(--gold); text-decoration:none;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">The Vault</a> <span style="margin: 0 10px; opacity: 0.4; color: white;">/</span> `;
+                    
+                    if (primarySport) {
+                        breadcrumbHTML += `<a href="filter.html?sport=${encodeURIComponent(primarySport)}" style="color:var(--gold); text-decoration:none;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">${primarySport}</a> <span style="margin: 0 10px; opacity: 0.4; color: white;">/</span> `;
+                    }
+                    
+                    breadcrumbHTML += `<span style="color:white; opacity: 0.7;">${result.title}</span>`;
+                    document.getElementById('breadcrumb').innerHTML = breadcrumbHTML;
+                    // -------------------------
+
                     // Build Metadata with pure <a> tags
                     let metaHTML = "";
                     if(result.venueName) {
@@ -111,7 +123,7 @@
                                     ${result.itemType ? `<a href="filter.html?type=${encodeURIComponent(result.itemType)}" style="color:inherit; text-decoration:none;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">${result.itemType}</a>` : 'Archive'} 
                                     ${result.year ? `• <a href="filter.html?year=${encodeURIComponent(result.year)}" style="color:inherit; text-decoration:none;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">${result.year}</a>` : ''}
                                 </p>
-                                <h1 style="color:white;">${result.title}</h1>
+                                <h1 style="color:white; margin-top:5px; margin-bottom:5px;">${result.title}</h1>
                                 
                                 <div class="detail-athletes" style="margin-bottom:25px; margin-top:10px;">
                                     ${result.athleteNames ? result.athleteNames.map(a => `<a href="filter.html?athlete=${encodeURIComponent(a)}" style="color:var(--gold); font-size:1.3rem; font-weight:700; margin-right:15px; text-decoration:underline;" onmouseover="this.style.color='white'" onmouseout="this.style.color='var(--gold)'">${a}</a>`).join('') : ''}
