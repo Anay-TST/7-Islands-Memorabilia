@@ -17,6 +17,7 @@ async function loadVault() {
         allItems = result || [];
         if(document.getElementById('sportGrid')) renderGrids(allItems);
         setupFilters();
+        setupSearch();
     } catch (e) { console.error("Data Load Error:", e); }
 }
 
@@ -50,7 +51,7 @@ function createCard(item) {
         </div>
         <div class="card-info">
             <div class="tags-row">
-                ${item.year ? `<span class="year-label">${item.year}</span>` : ''}
+                ${item.year ? `<span class="year-label clickable" onclick="goToFilter('year','${item.year}')">${item.year}</span>` : ''}
                 ${item.sportNames ? item.sportNames.map(s => `<span class="clickable-tag clickable" onclick="goToFilter('sport','${s}')">${s}</span>`).join('') : ''}
             </div>
             <h3>${item.title}</h3>
@@ -75,6 +76,34 @@ function setupFilters() {
             renderGrids(sport === 'all' ? allItems : allItems.filter(i => i.sportNames?.includes(sport)));
         };
     });
+}
+
+function setupSearch() {
+    const searchInput = document.getElementById('vaultSearch');
+    const clearBtn = document.getElementById('clearSearch');
+    if(!searchInput) return;
+
+    searchInput.addEventListener('input', (e) => {
+        const term = e.target.value.toLowerCase();
+        if(clearBtn) clearBtn.style.display = term.length > 0 ? "flex" : "none";
+
+        const filtered = allItems.filter(item => {
+            const title = (item.title || "").toLowerCase();
+            const athletes = (item.athleteNames || []).join(" ").toLowerCase();
+            const sports = (item.sportNames || []).join(" ").toLowerCase();
+            const year = (item.year || "").toLowerCase();
+            return title.includes(term) || athletes.includes(term) || sports.includes(term) || year.includes(term);
+        });
+        renderGrids(filtered);
+    });
+
+    if (clearBtn) {
+        clearBtn.addEventListener('click', () => {
+            searchInput.value = "";
+            clearBtn.style.display = "none";
+            renderGrids(allItems);
+        });
+    }
 }
 
 document.addEventListener('DOMContentLoaded', loadVault);

@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Detail | 7 Islands</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loading... | 7 Islands</title>
     <link href="https://fonts.googleapis.com/css2?family=Arvo:700&family=Inter:wght@400;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
@@ -23,24 +24,30 @@
         async function loadDetail() {
             const query = encodeURIComponent(`*[_type == "memorabilia" && title == "${itemTitle}"][0]{
                 title, year, "venueName": venue->name, description, coaProvider, serialNumber,
-                "imageUrl": image.asset->url, "itemType": itemType->name, "sportNames": sports[]->name, "athleteNames": sportsmen[]->name, "teamNames": teams[]->name
+                "imageUrl": image.asset->url, "itemType": itemType->name, "sportNames": sports[]->name, 
+                "athleteNames": sportsmen[]->name, "teamNames": teams[]->name
             }`);
             const resp = await fetch(`https://dpcpc70i.api.sanity.io/v2021-10-21/data/query/production?query=${query}`);
             const {result} = await resp.json();
 
             if (result) {
-                // Logic to only show fields if they have value
+                // Dynamic SEO
+                document.title = `${result.title} | 7 Islands Vault`;
+                
                 let metaHTML = "";
                 if(result.venueName) metaHTML += `<p class="clickable" onclick="goToFilter('venue','${result.venueName}')">📍 <strong>Venue:</strong> ${result.venueName}</p>`;
+                if(result.teamNames) metaHTML += `<p>👥 <strong>Teams:</strong> ${result.teamNames.map(t => `<span class="clickable" onclick="goToFilter('team','${t}')">${t}</span>`).join(', ')}</p>`;
                 if(result.coaProvider) metaHTML += `<p>🛡️ <strong>Auth:</strong> ${result.coaProvider}</p>`;
                 if(result.serialNumber) metaHTML += `<p>🆔 <strong>Serial:</strong> ${result.serialNumber}</p>`;
-                if(result.teamNames) metaHTML += `<p>👥 <strong>Teams:</strong> ${result.teamNames.join(', ')}</p>`;
 
                 document.getElementById('itemDetail').innerHTML = `
                     <div class="detail-grid">
-                        <div class="detail-image"><img src="${result.imageUrl}"></div>
+                        <div class="detail-image"><img src="${result.imageUrl}" alt="${result.title}"></div>
                         <div class="detail-content">
-                            <p class="gold-text">${result.itemType || ''} ${result.year ? '• ' + result.year : ''}</p>
+                            <p class="gold-text">
+                                <span class="clickable" onclick="goToFilter('type','${result.itemType}')">${result.itemType || ''}</span> 
+                                ${result.year ? `• <span class="clickable" onclick="goToFilter('year','${result.year}')">${result.year}</span>` : ''}
+                            </p>
                             <h1>${result.title}</h1>
                             <div class="detail-athletes">
                                 ${result.athleteNames ? result.athleteNames.map(a => `<span class="clickable" onclick="goToFilter('athlete','${a}')">${a}</span>`).join(', ') : ''}
@@ -53,7 +60,7 @@
                         </div>
                     </div>`;
                 
-                // Load Related
+                // Related logic
                 const rQuery = encodeURIComponent(`*[_type == "memorabilia" && sports[0]->name == "${result.sportNames[0]}" && title != "${itemTitle}"][0...4]{
                     title, year, "imageUrl": image.asset->url, "itemTypeName": itemType->name, "sportNames": sports[]->name, "athleteNames": sportsmen[]->name
                 }`);
