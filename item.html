@@ -35,6 +35,27 @@
         const params = new URLSearchParams(window.location.search);
         const itemTitle = params.get('name');
 
+        // --- SPOT ZOOM LOGIC ---
+        function zoomImage(e, container) {
+            const img = container.querySelector('img');
+            const rect = container.getBoundingClientRect();
+            
+            // Calculate cursor position as a percentage
+            const x = ((e.clientX - rect.left) / rect.width) * 100;
+            const y = ((e.clientY - rect.top) / rect.height) * 100;
+            
+            // Move the transform origin to the cursor and scale up
+            img.style.transformOrigin = `${x}% ${y}%`;
+            img.style.transform = 'scale(2.5)'; // Adjust this number for more/less zoom
+        }
+
+        function resetZoom(container) {
+            const img = container.querySelector('img');
+            img.style.transformOrigin = 'center center';
+            img.style.transform = 'scale(1)';
+        }
+        // -----------------------
+
         async function loadDetail() {
             if (!itemTitle) return;
 
@@ -50,7 +71,7 @@
                 const {result} = await resp.json();
 
                 if (result) {
-                    // --- DYNAMIC SEO PAGE TITLE ---
+                    // DYNAMIC SEO PAGE TITLE
                     const athletes = result.athleteNames ? result.athleteNames.join(', ') : '';
                     const sports = result.sportNames ? result.sportNames.join(', ') : '';
                     const type = result.itemType || '';
@@ -59,7 +80,6 @@
                     document.title = titleParts 
                         ? `${titleParts} | 7 Islands Memorabilia` 
                         : `${result.title} | 7 Islands Memorabilia`;
-                    // ------------------------------
                     
                     // Build Metadata with pure <a> tags
                     let metaHTML = "";
@@ -78,10 +98,14 @@
 
                     document.getElementById('itemDetail').innerHTML = `
                         <div class="detail-grid">
-                            <div class="detail-image">
-                                <img src="${result.imageUrl}" alt="${result.title}">
-                                ${result.isMatchWorn ? '<span style="position:absolute; top:20px; left:20px; background:#8B0000; color:white; padding:5px 15px; font-weight:900; border-radius:4px; border:1px solid var(--gold); letter-spacing:1px; z-index:10;">MATCH USED</span>' : ''}
+                            <div class="detail-image" 
+                                 style="position: relative; overflow: hidden; border: 2px solid var(--gold); border-radius: 10px; cursor: crosshair; background: #000;"
+                                 onmousemove="zoomImage(event, this)"
+                                 onmouseleave="resetZoom(this)">
+                                <img src="${result.imageUrl}" alt="${result.title}" style="width: 100%; display: block; transition: transform 0.1s ease, transform-origin 0.1s ease;">
+                                ${result.isMatchWorn ? '<span style="position:absolute; top:20px; left:20px; background:#8B0000; color:white; padding:5px 15px; font-weight:900; border-radius:4px; border:1px solid var(--gold); letter-spacing:1px; z-index:10; pointer-events: none;">MATCH USED</span>' : ''}
                             </div>
+                            
                             <div class="detail-content">
                                 <p class="gold-text" style="font-weight:900; letter-spacing:1px; font-size:0.8rem; margin-bottom:10px;">
                                     ${result.itemType ? `<a href="filter.html?type=${encodeURIComponent(result.itemType)}" style="color:inherit; text-decoration:none;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">${result.itemType}</a>` : 'Archive'} 
@@ -103,7 +127,7 @@
                             </div>
                         </div>`;
                     
-                    // Fetch Related Items (Based on the first sport)
+                    // Fetch Related Items
                     if (result.sportNames && result.sportNames.length > 0) {
                         const rQuery = encodeURIComponent(`*[_type == "memorabilia" && sports[0]->name == "${result.sportNames[0]}" && title != "${itemTitle}"][0...4]{
                             title, year, "imageUrl": image.asset->url, "itemType": itemType->name, "sportNames": sports[]->name, "athleteNames": sportsmen[]->name, "venueName": venue->name
