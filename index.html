@@ -29,27 +29,40 @@
 
     <section class="hero">
         <div class="hero-content">
-            <h1>THE WORLD'S <span class="gold-text">VAULT</span></h1>
-            <p>A premier collection of 100+ global sports and legends.</p>
-            <div class="search-container">
-                <input type="text" id="vaultSearch" placeholder="Search by Sport, Athlete, or Item (e.g. Kohli, World Cup)...">
+            <h1>WORLD <span class="gold-text">HISTORY</span></h1>
+            <p>The premier collection of 100+ global sports and legends.</p>
+            <div class="search-box">
+                <input type="text" id="vaultSearch" placeholder="Search by Athlete, Sport, or Item...">
             </div>
         </div>
     </section>
 
-    <section id="latest" class="latest-section">
-        <div class="section-title">
-            <h2>NEW <span class="gold-text">ARRIVALS</span></h2>
+    <div class="category-bar">
+        <div class="filter-container">
+            <button class="filter-btn active" data-sport="all">🏆 All</button>
+            <button class="filter-btn" data-sport="Cricket">🏏 Cricket</button>
+            <button class="filter-btn" data-sport="Football">⚽ Football</button>
+            <button class="filter-btn" data-sport="F1 Racing">🏎️ F1</button>
+            <button class="filter-btn" data-sport="Basketball">🏀 NBA</button>
+            <button class="filter-btn" data-sport="Tennis">🎾 Tennis</button>
         </div>
+    </div>
+
+    <section id="latest" class="latest-section">
+        <div class="section-title"><h2>NEW <span class="gold-text">ARRIVALS</span></h2></div>
         <div class="sport-grid" id="latestGrid"></div>
     </section>
 
     <section id="collection" class="gallery">
-        <div class="section-title">
-            <h2>THE <span class="gold-text">100+</span> VAULT</h2>
-        </div>
+        <div class="section-title"><h2>THE <span class="gold-text">100+</span> VAULT</h2></div>
         <div class="sport-grid" id="sportGrid"></div>
     </section>
+
+    <div id="lightbox" class="lightbox">
+        <span class="close-lightbox">&times;</span>
+        <img class="lightbox-content" id="lightbox-img">
+        <div id="lightbox-caption"></div>
+    </div>
 
     <script src="script.js"></script>
 </body>

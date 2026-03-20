@@ -4,10 +4,15 @@ export const memorabilia = {
   type: 'document',
   fields: [
     { name: 'title', title: 'Item Title', type: 'string' },
-    { name: 'description', title: 'Item Description', type: 'text' }, 
-    { name: 'sport', title: 'Sport', type: 'reference', to: [{ type: 'sport' }] },
+    { name: 'description', title: 'Item Description', type: 'text' },
     { 
-      name: 'sportsmen', // Changed to plural
+      name: 'sports', // Changed to plural
+      title: 'Associated Sports', 
+      type: 'array', 
+      of: [{ type: 'reference', to: [{ type: 'sport' }] }] 
+    },
+    { 
+      name: 'sportsmen', 
       title: 'Signatures / Athletes', 
       type: 'array', 
       of: [{ type: 'reference', to: [{ type: 'sportsman' }] }] 
