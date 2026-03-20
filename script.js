@@ -36,10 +36,9 @@ function createCard(item) {
     const card = document.createElement('div');
     card.className = 'sport-card';
 
-    // The precise URL for the item page
     const itemUrl = `item.html?name=${encodeURIComponent(item.title)}`;
 
-    // Using pure HTML <a> tags instead of Javascript onclick guarantees the browser routes correctly.
+    // Pure HTML linking. Image goes to item.html. Tags go to filter.html. No javascript conflicts.
     card.innerHTML = `
         <a href="${itemUrl}" style="display: block; height: 300px; background: #000; position: relative; border-bottom: 2px solid var(--gold); text-decoration: none; overflow: hidden;">
             <img src="${item.imageUrl}" alt="${item.title}" style="width: 100%; height: 100%; object-fit: contain; padding: 15px; transition: 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">

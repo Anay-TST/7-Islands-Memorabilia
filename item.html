@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vault Item | 7 Islands</title>
+    <title>Vault Item | 7 Islands Memorabilia</title>
     <link href="https://fonts.googleapis.com/css2?family=Arvo:700&family=Inter:wght@400;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
@@ -50,7 +50,16 @@
                 const {result} = await resp.json();
 
                 if (result) {
-                    document.title = `${result.title} | 7 Islands Vault`;
+                    // --- DYNAMIC SEO PAGE TITLE ---
+                    const athletes = result.athleteNames ? result.athleteNames.join(', ') : '';
+                    const sports = result.sportNames ? result.sportNames.join(', ') : '';
+                    const type = result.itemType || '';
+                    
+                    const titleParts = [athletes, sports, type].filter(Boolean).join(' - ');
+                    document.title = titleParts 
+                        ? `${titleParts} | 7 Islands Memorabilia` 
+                        : `${result.title} | 7 Islands Memorabilia`;
+                    // ------------------------------
                     
                     let metaHTML = "";
                     if(result.venueName) metaHTML += `<p style="cursor:pointer;" onclick="goToFilter('venue','${result.venueName}')">📍 <strong style="color:white;">Venue:</strong> ${result.venueName} ${result.venueLoc ? '(' + result.venueLoc + ')' : ''}</p>`;
