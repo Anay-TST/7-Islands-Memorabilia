@@ -72,14 +72,12 @@
                 const {result} = await resp.json();
 
                 if (result) {
-                    // SEO PAGE TITLE
                     const athletes = result.athleteNames ? result.athleteNames.join(', ') : '';
                     const sports = result.sportNames ? result.sportNames.join(', ') : '';
                     const type = result.itemType || '';
                     const titleParts = [athletes, sports, type].filter(Boolean).join(' - ');
                     document.title = titleParts ? `${titleParts} | 7 Islands Memorabilia` : `${result.title} | 7 Islands Memorabilia`;
                     
-                    // BREADCRUMBS
                     const primarySport = result.sportNames && result.sportNames.length > 0 ? result.sportNames[0] : null;
                     let breadcrumbHTML = `<a href="index.html" style="color:var(--gold); text-decoration:none;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">The Vault</a> <span style="margin: 0 10px; opacity: 0.4; color: white;">/</span> `;
                     if (primarySport) {
@@ -88,7 +86,6 @@
                     breadcrumbHTML += `<span style="color:white; opacity: 0.7;">${result.title}</span>`;
                     document.getElementById('breadcrumb').innerHTML = breadcrumbHTML;
 
-                    // METADATA
                     let metaHTML = "";
                     if(result.venueName) metaHTML += `<p>📍 <strong style="color:white;">Venue:</strong> <a href="filter.html?venue=${encodeURIComponent(result.venueName)}" style="color:var(--gold); text-decoration:none;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">${result.venueName} ${result.venueLoc ? '(' + result.venueLoc + ')' : ''}</a></p>`;
                     if(result.teamNames && result.teamNames.length > 0) metaHTML += `<p>👥 <strong style="color:white;">Teams:</strong> ${result.teamNames.map(t => `<a href="filter.html?team=${encodeURIComponent(t)}" style="color:var(--gold); text-decoration:none;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">${t}</a>`).join(', ')}</p>`;
@@ -118,7 +115,6 @@
                             </div>
                         </div>`;
                     
-                    // FETCH RELATED ITEMS
                     if (result.sportNames && result.sportNames.length > 0) {
                         const rQuery = encodeURIComponent(`*[_type == "memorabilia" && sports[0]->name == "${result.sportNames[0]}" && title != "${itemTitle}"][0...4]{
                             title, year, "imageUrl": image.asset->url, "itemType": itemType->name, "sportNames": sports[]->name, "athleteNames": sportsmen[]->name, "venueName": venue->name
@@ -131,12 +127,10 @@
                         }
                     }
 
-                    // FETCH PERSONAL ENCOUNTERS
                     if (result.athleteNames && result.athleteNames.length > 0) {
                         const athleteArrayStr = JSON.stringify(result.athleteNames);
-                        // UPDATED QUERY TO FETCH DESCRIPTION AND SPORTNAME
                         const eQuery = encodeURIComponent(`*[_type == "encounter" && sportsman->name in ${athleteArrayStr}]{
-                            title, date, description, videoUrl, "imageUrl": image.asset->url, "sportName": sport->name
+                            title, date, description, videoUrl, "videoFileUrl": videoFile.asset->url, "imageUrl": image.asset->url, "sportName": sport->name
                         }`);
                         const eResp = await fetch(`https://dpcpc70i.api.sanity.io/v2021-10-21/data/query/production?query=${eQuery}`);
                         const {result: encounters} = await eResp.json();
@@ -151,17 +145,23 @@
                                 encCard.className = 'sport-card';
                                 encCard.style.cursor = 'default'; 
                                 
-                                // UPDATED CARD TO SHOW DESCRIPTION & SPORT BADGE
+                                let mediaHTML = '';
+                                if (enc.videoFileUrl) {
+                                    mediaHTML = `<video controls style="width:100%; max-height:220px; border-radius:8px; border:1px solid var(--gold); margin-top:10px; outline:none; background:#000;"><source src="${enc.videoFileUrl}" type="video/mp4">Your browser does not support videos.</video>`;
+                                } else if (enc.videoUrl) {
+                                    mediaHTML = `<a href="${enc.videoUrl}" target="_blank" style="display:inline-block; margin-top:10px; padding:6px 18px; border:1px solid var(--gold); color:black; background:var(--gold); text-decoration:none; border-radius:50px; font-size:0.8rem; font-weight:bold;">▶ Watch Video</a>`;
+                                }
+
                                 encCard.innerHTML = `
                                     <div class="card-image-container" style="height: 300px; padding:0; border-bottom: 2px solid var(--gold); position: relative;">
-                                        <img src="${enc.imageUrl}" alt="${enc.title}" style="width: 100%; height: 100%; object-fit: cover; padding: 0;">
+                                        <img src="${enc.imageUrl || 'https://via.placeholder.com/400x300/050505/D4AF37?text=Encounter'}" alt="${enc.title}" style="width: 100%; height: 100%; object-fit: cover; padding: 0;">
                                         ${enc.sportName ? `<span style="position: absolute; top: 15px; right: 15px; background: var(--gold); color: black; padding: 4px 10px; font-size: 0.6rem; font-weight: 900; border-radius: 4px; z-index: 10;">${enc.sportName}</span>` : ''}
                                     </div>
                                     <div class="card-info" style="text-align:center; padding: 1.5rem;">
                                         <h3 style="color:var(--gold); font-size:1.1rem; margin-bottom:5px;">${enc.title}</h3>
                                         ${enc.date ? `<p style="font-size:0.8rem; opacity:0.6; margin-bottom: 10px;">${enc.date}</p>` : ''}
-                                        ${enc.description ? `<p style="font-size:0.85rem; line-height:1.6; opacity:0.85; margin-bottom: 15px;">${enc.description}</p>` : ''}
-                                        ${enc.videoUrl ? `<a href="${enc.videoUrl}" target="_blank" style="display:inline-block; margin-top:5px; padding:6px 18px; border:1px solid var(--gold); color:white; background:var(--gold); text-decoration:none; border-radius:50px; font-size:0.8rem; font-weight:bold; color:black;">▶ Watch Video</a>` : ''}
+                                        ${enc.description ? `<p style="font-size:0.85rem; line-height:1.6; opacity:0.85; margin-bottom: 10px;">${enc.description}</p>` : ''}
+                                        ${mediaHTML}
                                     </div>
                                 `;
                                 encGrid.appendChild(encCard);

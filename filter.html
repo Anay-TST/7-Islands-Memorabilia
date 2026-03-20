@@ -22,14 +22,13 @@
     <section class="section-padding" style="padding-top:2rem;">
         <h2 class="section-title" id="filterHeading" style="margin-bottom: 2rem; font-size: 1.5rem;">Loading Archive...</h2>
         
-        <div id="encounterSection" style="display: none; margin-bottom: 4rem; padding-bottom: 3rem; border-bottom: 1px solid rgba(212,175,55,0.2);">
+        <h2 class="section-title" id="vaultHeading" style="font-size: 1.5rem; text-align: left; display: none;">THE <span class="gold-text">ARCHIVES</span></h2>
+        <div class="sport-grid" id="filterGrid" style="margin-bottom: 4rem;"></div>
+
+        <div id="encounterSection" style="display: none; padding-top: 3rem; border-top: 1px solid rgba(212,175,55,0.2);">
             <h2 class="section-title" style="font-size: 1.5rem; text-align: left;">PERSONAL <span class="gold-text">ENCOUNTERS</span></h2>
             <div class="sport-grid" id="encounterGrid"></div>
         </div>
-
-        <h2 class="section-title" id="vaultHeading" style="font-size: 1.5rem; text-align: left; display: none;">THE <span class="gold-text">ARCHIVES</span></h2>
-        
-        <div class="sport-grid" id="filterGrid"></div>
     </section>
 
     <script src="script.js"></script>
@@ -47,7 +46,7 @@
             document.getElementById('filterHeading').innerHTML = `${label}: <span class="gold-text" style="font-size:2.5rem; display:block; margin-top:10px;">${val}</span>`;
 
             async function loadFiltered() {
-                // 1. FETCH MEMORABILIA ITEMS
+                // 1. FETCH MEMORABILIA ITEMS (The Archives)
                 let f = "";
                 if(type === 'sport') f = `sports[]->name match "${val}"`;
                 if(type === 'athlete') f = `sportsmen[]->name match "${val}"`;
@@ -75,9 +74,9 @@
 
                 // 2. FETCH PERSONAL ENCOUNTERS
                 if (type === 'athlete') {
-                    // UPDATED QUERY TO FETCH DESCRIPTION AND SPORTNAME
+                    // Pulls the new 'videoFile' url!
                     const eQuery = encodeURIComponent(`*[_type == "encounter" && sportsman->name == "${val}"]{
-                        title, date, description, videoUrl, "imageUrl": image.asset->url, "sportName": sport->name
+                        title, date, description, videoUrl, "videoFileUrl": videoFile.asset->url, "imageUrl": image.asset->url, "sportName": sport->name
                     }`);
                     try {
                         const eResp = await fetch(`https://dpcpc70i.api.sanity.io/v2021-10-21/data/query/production?query=${eQuery}`);
@@ -93,17 +92,24 @@
                                 encCard.className = 'sport-card';
                                 encCard.style.cursor = 'default'; 
                                 
-                                // UPDATED HTML FOR ENCOUNTERS
+                                // Video Logic: If file exists, embed player. Else if URL exists, show button.
+                                let mediaHTML = '';
+                                if (enc.videoFileUrl) {
+                                    mediaHTML = `<video controls style="width:100%; max-height:220px; border-radius:8px; border:1px solid var(--gold); margin-top:10px; outline:none; background:#000;"><source src="${enc.videoFileUrl}" type="video/mp4">Your browser does not support videos.</video>`;
+                                } else if (enc.videoUrl) {
+                                    mediaHTML = `<a href="${enc.videoUrl}" target="_blank" style="display:inline-block; margin-top:10px; padding:6px 18px; border:1px solid var(--gold); color:black; background:var(--gold); text-decoration:none; border-radius:50px; font-size:0.8rem; font-weight:bold;">▶ Watch Video</a>`;
+                                }
+
                                 encCard.innerHTML = `
                                     <div class="card-image-container" style="height: 300px; padding:0; border-bottom: 2px solid var(--gold); position: relative;">
-                                        <img src="${enc.imageUrl}" alt="${enc.title}" style="width: 100%; height: 100%; object-fit: cover; padding: 0;">
+                                        <img src="${enc.imageUrl || 'https://via.placeholder.com/400x300/050505/D4AF37?text=Encounter'}" alt="${enc.title}" style="width: 100%; height: 100%; object-fit: cover; padding: 0;">
                                         ${enc.sportName ? `<span style="position: absolute; top: 15px; right: 15px; background: var(--gold); color: black; padding: 4px 10px; font-size: 0.6rem; font-weight: 900; border-radius: 4px; z-index: 10;">${enc.sportName}</span>` : ''}
                                     </div>
                                     <div class="card-info" style="text-align:center; padding: 1.5rem;">
                                         <h3 style="color:var(--gold); font-size:1.1rem; margin-bottom:5px;">${enc.title}</h3>
                                         ${enc.date ? `<p style="font-size:0.8rem; opacity:0.6; margin-bottom: 10px;">${enc.date}</p>` : ''}
-                                        ${enc.description ? `<p style="font-size:0.85rem; line-height:1.6; opacity:0.85; margin-bottom: 15px;">${enc.description}</p>` : ''}
-                                        ${enc.videoUrl ? `<a href="${enc.videoUrl}" target="_blank" style="display:inline-block; margin-top:5px; padding:6px 18px; border:1px solid var(--gold); color:white; background:var(--gold); text-decoration:none; border-radius:50px; font-size:0.8rem; font-weight:bold; color:black;">▶ Watch Video</a>` : ''}
+                                        ${enc.description ? `<p style="font-size:0.85rem; line-height:1.6; opacity:0.85; margin-bottom: 10px;">${enc.description}</p>` : ''}
+                                        ${mediaHTML}
                                     </div>
                                 `;
                                 encGrid.appendChild(encCard);

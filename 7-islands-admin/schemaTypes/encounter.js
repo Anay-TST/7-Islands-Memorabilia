@@ -11,15 +11,22 @@ export const encounter = {
     },
     { 
       name: 'image', 
-      title: 'Photo with Legend', 
+      title: 'Cover Photo', 
       type: 'image', 
       options: { hotspot: true } 
     },
+    {
+      name: 'videoFile',
+      title: 'Upload Video File',
+      type: 'file',
+      options: { accept: 'video/*' },
+      description: 'Upload a video file directly from your device (.mp4, .mov, etc).'
+    },
     { 
       name: 'videoUrl', 
-      title: 'Video Link (Optional)', 
+      title: 'Or Video Link', 
       type: 'url', 
-      description: 'Paste a YouTube or Instagram video link here if you have one.' 
+      description: 'Paste a YouTube or Instagram link here if the file is too large.' 
     },
     {
       name: 'sportsman',
@@ -31,8 +38,7 @@ export const encounter = {
       name: 'sport',
       title: 'Associated Sport',
       type: 'reference',
-      to: [{ type: 'sport' }],
-      description: 'Tag the sport this legend belongs to.'
+      to: [{ type: 'sport' }]
     },
     { 
       name: 'date', 
@@ -42,8 +48,7 @@ export const encounter = {
     {
       name: 'description',
       title: 'The Story / Description',
-      type: 'text',
-      description: 'Tell the story behind this photo or meeting.'
+      type: 'text'
     }
   ]
 }
