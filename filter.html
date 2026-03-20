@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Collection | 7 Islands</title>
+    <title>Collection | 7 Islands Memorabilia</title>
     <link href="https://fonts.googleapis.com/css2?family=Arvo:700&family=Inter:wght@400;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
@@ -20,7 +20,7 @@
     </header>
     
     <section class="section-padding" style="padding-top:2rem;">
-        <h2 class="section-title" id="filterHeading" style="margin-bottom: 2rem; font-size: 1.5rem;">Loading...</h2>
+        <h2 class="section-title" id="filterHeading" style="margin-bottom: 2rem; font-size: 1.5rem;">Loading Archive...</h2>
         <div class="sport-grid" id="filterGrid"></div>
     </section>
 
@@ -31,11 +31,17 @@
         const val = params.get(type);
 
         if (type && val) {
-            document.title = `${val} Collection | 7 Islands`;
-            document.getElementById('filterHeading').innerHTML = `${type.toUpperCase()}: <span class="gold-text" style="font-size:2.5rem; display:block; margin-top:10px;">${val}</span>`;
+            document.title = `${val} Collection | 7 Islands Memorabilia`;
+            
+            // Format the heading nicely based on what the user clicked
+            let label = type.toUpperCase();
+            if(type === 'athlete') label = "LEGEND";
+            
+            document.getElementById('filterHeading').innerHTML = `${label}: <span class="gold-text" style="font-size:2.5rem; display:block; margin-top:10px;">${val}</span>`;
 
             async function loadFiltered() {
                 let f = "";
+                // Maps the URL parameter back to the specific Sanity schema field
                 if(type === 'sport') f = `sports[]->name match "${val}"`;
                 if(type === 'athlete') f = `sportsmen[]->name match "${val}"`;
                 if(type === 'venue') f = `venue->name match "${val}"`;
@@ -44,8 +50,9 @@
                 if(type === 'year') f = `year match "${val}"`; 
                 
                 const query = encodeURIComponent(`*[_type == "memorabilia" && ${f}]{
-                    title, year, "venueName": venue->name, "imageUrl": image.asset->url, "itemType": itemType->name, "sportNames": sports[]->name, "athleteNames": sportsmen[]->name
+                    title, year, "venueName": venue->name, "imageUrl": image.asset->url, "itemType": itemType->name, "sportNames": sports[]->name, "athleteNames": sportsmen[]->name, "teamNames": teams[]->name
                 }`);
+                
                 try {
                     const resp = await fetch(`https://dpcpc70i.api.sanity.io/v2021-10-21/data/query/production?query=${query}`);
                     const {result} = await resp.json();
@@ -54,11 +61,13 @@
                     if(result && result.length > 0) {
                         result.forEach(item => grid.appendChild(createCard(item)));
                     } else {
-                        grid.innerHTML = `<p style="grid-column: 1/-1; text-align:center; opacity:0.5; padding:50px;">No items found for this filter.</p>`;
+                        grid.innerHTML = `<p style="grid-column: 1/-1; text-align:center; opacity:0.5; padding:50px;">No archives found for this specific tag.</p>`;
                     }
                 } catch (e) { console.error("Filter Load Error", e); }
             }
             loadFiltered();
+        } else {
+            document.getElementById('filterHeading').innerHTML = "No Category Selected";
         }
     </script>
 </body>
