@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Collector Reviews | 7 Islands Memorabilia</title>
+    <link href="https://fonts.googleapis.com/css2?family=Arvo:700&family=Inter:wght@400;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="navbar-placeholder"></div>
+
+    <section class="hero">
+        <h1>THE <span class="gold-text">FEEDBACK</span></h1>
+        <p style="opacity:0.6; margin-top:10px;">Words from the world of legends and collectors.</p>
+    </section>
+
+    <div class="section-padding">
+        <div class="sport-grid" id="testimonialGrid">
+            </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        async function loadTestimonials() {
+            const query = encodeURIComponent(`*[_type == "testimonial"] | order(_createdAt desc) {
+                name, role, quote,
+                "videoFileUrl": videoFile.asset->url,
+                "imageUrl": image.asset->url
+            }`);
+            const url = `https://dpcpc70i.api.sanity.io/v2021-10-21/data/query/production?query=${query}`;
+            
+            try {
+                const resp = await fetch(url);
+                const { result } = await resp.json();
+                renderTestimonials(result || []);
+            } catch (e) { console.error("Testimonial Load Error:", e); }
+        }
+
+        function renderTestimonials(list) {
+            const grid = document.getElementById('testimonialGrid');
+            grid.innerHTML = '';
+            
+            list.forEach(t => {
+                const card = document.createElement('div');
+                card.className = 'sport-card';
+                card.style.cursor = 'default';
+
+                let topMediaHTML = '';
+                let containerStyle = 'height: 300px;';
+
+                if (t.videoFileUrl) {
+                    topMediaHTML = `<video controls playsinline style="width: 100%; height: auto; max-height: 500px; object-fit: contain; background: #000; outline: none; border: none; display: block;"><source src="${t.videoFileUrl}">Your browser does not support the video player.</video>`;
+                    containerStyle = 'height: auto; max-height: 500px;';
+                } else {
+                    topMediaHTML = `<img src="${t.imageUrl || 'https://via.placeholder.com/400x300/050505/D4AF37?text=7+Islands'}" style="width: 100%; height: 100%; object-fit: cover; display: block;">`;
+                }
+
+                let quoteHTML = '';
+                if (t.quote) {
+                    const cleanQuote = t.quote.replace(/"/g, '&quot;');
+                    if (t.quote.length > 150) {
+                        const shortQuote = t.quote.substring(0, 150) + '...';
+                        quoteHTML = `<div style="font-size:0.9rem; font-style:italic; line-height:1.6; opacity:0.85; margin-bottom: 15px;">
+                            <span class="q-short">"${shortQuote}"</span>
+                            <span class="q-full" style="display:none;">"${cleanQuote}"</span>
+                            <span onclick="this.parentElement.querySelector('.q-short').style.display='none'; this.parentElement.querySelector('.q-full').style.display='inline'; this.style.display='none';" style="color:var(--gold); font-weight:bold; cursor:pointer; margin-left:5px;">See More</span>
+                        </div>`;
+                    } else {
+                        quoteHTML = `<p style="font-size:0.9rem; font-style:italic; line-height:1.6; opacity:0.85; margin-bottom: 15px;">"${t.quote}"</p>`;
+                    }
+                }
+
+                card.innerHTML = `
+                    <div class="card-image-container" style="${containerStyle} padding:0; border-bottom: 2px solid var(--gold); position: relative; overflow:hidden; background: #000;">
+                        ${topMediaHTML}
+                    </div>
+                    <div class="card-info" style="text-align:center; padding: 1.5rem;">
+                        <h3 class="gold-text" style="font-size:1.2rem; margin-bottom:5px;">${t.name}</h3>
+                        <p style="font-size:0.75rem; text-transform:uppercase; letter-spacing:1px; opacity:0.5; margin-bottom:15px;">${t.role || 'Collector'}</p>
+                        ${quoteHTML}
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        loadTestimonials();
+    </script>
+</body>
+</html>
