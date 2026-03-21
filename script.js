@@ -21,16 +21,20 @@ async function loadNavbar() {
     } catch (e) { console.error("Error loading navbar:", e); }
 }
 
-// --- HOME PAGE RANDOM HIGHLIGHTS ---
-async function loadHomeHighlights() {
+// --- HOME PAGE RANDOM HIGHLIGHTS & SPORTS ICONS ---
+async function loadHomeContent() {
     const tDisplay = document.getElementById('testimonial-display');
     const eDisplay = document.getElementById('encounter-display');
-    if (!tDisplay || !eDisplay) return;
-
+    const sIcons = document.getElementById('sports-icons-row');
+    
     const query = encodeURIComponent(`{
         "testimonials": *[_type == "testimonial"]{ name, role, quote },
-        "encounters": *[_type == "encounter"] | order(date desc)[0...15]{ 
+        "encounters": *[_type == "encounter"] | order(date desc)[0...10]{ 
             title, "imageUrl": image.asset->url, "videoFileUrl": videoFile.asset->url
+        },
+        "sports": *[_type == "sport"] | order(name asc) {
+            name,
+            "itemCount": count(*[_type == "memorabilia" && references(^._id)])
         }
     }`);
 
@@ -38,7 +42,21 @@ async function loadHomeHighlights() {
         const resp = await fetch(BASE_URL + query);
         const { result } = await resp.json();
 
-        if (result.testimonials?.length > 0) {
+        // Load Sports Icons
+        if (sIcons && result.sports) {
+            sIcons.innerHTML = result.sports.map(s => `
+                <a href="filter.html?sport=${encodeURIComponent(s.name)}" style="text-decoration:none; text-align:center; min-width:60px;">
+                    <div style="background: rgba(212,175,55,0.1); width:50px; height:50px; border-radius:50%; display:flex; align-items:center; justify-content:center; border:1px solid var(--gold); margin: 0 auto 8px; transition:0.3s;" onmouseover="this.style.background='var(--gold)';" onmouseout="this.style.background='rgba(212,175,55,0.1)';">
+                        <span style="font-size:1.2rem;">${getEmoji(s.name)}</span>
+                    </div>
+                    <p style="font-size:0.6rem; color:var(--gold); font-weight:900; text-transform:uppercase; margin:0;">${s.name}</p>
+                    <p style="font-size:0.5rem; opacity:0.5; margin:0; color:white;">${s.itemCount}</p>
+                </a>
+            `).join('');
+        }
+
+        // Random Testimonial
+        if (tDisplay && result.testimonials?.length > 0) {
             const t = result.testimonials[Math.floor(Math.random() * result.testimonials.length)];
             tDisplay.innerHTML = `
                 <p style="font-style: italic; font-size: 0.85rem; line-height: 1.5; color: #ccc; margin-bottom:10px;">"${t.quote.substring(0, 100)}..."</p>
@@ -46,7 +64,8 @@ async function loadHomeHighlights() {
             `;
         }
 
-        if (result.encounters?.length > 0) {
+        // Random Encounter
+        if (eDisplay && result.encounters?.length > 0) {
             const enc = result.encounters[Math.floor(Math.random() * result.encounters.length)];
             const media = enc.videoFileUrl 
                 ? `<video muted playsinline autoplay loop style="width:100%; height:100%; object-fit:cover;"><source src="${enc.videoFileUrl}"></video>`
@@ -61,7 +80,12 @@ async function loadHomeHighlights() {
                 </a>
             `;
         }
-    } catch (e) { console.error("Highlights Error:", e); }
+    } catch (e) { console.error("Home Content Error:", e); }
+}
+
+function getEmoji(sport) {
+    const emojis = { 'Cricket': '🏏', 'Football': '⚽', 'Basketball': '🏀', 'NBA': '🏀', 'F1': '🏎️', 'Tennis': '🎾', 'Golf': '⛳', 'Boxing': '🥊' };
+    return emojis[sport] || '🏆';
 }
 
 // --- VAULT LOGIC ---
@@ -80,7 +104,6 @@ async function loadVault() {
         allItems = result || [];
         if(document.getElementById('latestGrid')) renderGrid('latestGrid', allItems.filter(i => i.isLatest));
         if(document.getElementById('sportGrid')) renderGrid('sportGrid', allItems, true);
-        setupFilters();
         setupSearch();
     } catch (e) { console.error("Data Load Error:", e); }
 }
@@ -115,18 +138,6 @@ function createCard(item) {
     return card;
 }
 
-function setupFilters() {
-    document.querySelectorAll('.filter-btn').forEach(btn => {
-        btn.onclick = () => {
-            document.querySelector('.filter-btn.active')?.classList.remove('active');
-            btn.classList.add('active');
-            const sport = btn.getAttribute('data-sport');
-            const filtered = (sport === 'all' ? allItems : allItems.filter(i => i.sportNames?.includes(sport)));
-            renderGrid('sportGrid', filtered, true);
-        };
-    });
-}
-
 function setupSearch() {
     const searchInput = document.getElementById('vaultSearch');
     if(!searchInput) return;
@@ -145,5 +156,5 @@ function setupSearch() {
 document.addEventListener('DOMContentLoaded', () => {
     loadNavbar();
     loadVault();
-    loadHomeHighlights();
+    loadHomeContent();
 });
