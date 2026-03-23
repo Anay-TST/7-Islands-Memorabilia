@@ -2,174 +2,80 @@ const PROJECT_ID = 'dpcpc70i';
 const DATASET = 'production';
 const BASE_URL = `https://${PROJECT_ID}.api.sanity.io/v2021-10-21/data/query/${DATASET}?query=`;
 
-// --- DYNAMIC NAVBAR LOADER ---
-async function loadNavbar() {
-    const placeholder = document.getElementById('navbar-placeholder');
-    if (!placeholder) return;
-    try {
-        const response = await fetch('navbar.html');
-        const navHtml = await response.text();
-        placeholder.innerHTML = navHtml;
-        const currentPage = window.location.pathname.split('/').pop() || 'index.html';
-        const navLinks = document.querySelectorAll('.nav-links .nav-item');
-        navLinks.forEach(link => {
-            const linkHref = link.getAttribute('href');
-            if (linkHref === currentPage || (currentPage === '' && linkHref === 'index.html')) {
-                link.classList.add('active');
-            }
-        });
-    } catch (e) { console.error("Error loading navbar:", e); }
-}
-
-// --- SPORT EMOJI MAPPING ---
 function getEmoji(sport) {
-    const emojis = { 
-        'Cricket': '🏏', 'Football': '⚽', 'Basketball': '🏀', 
-        'F1': '🏎️', 'Tennis': '🎾', 'Golf': '⛳', 'Boxing': '🥊',
-        'NBA': '🏀', 'Baseball': '⚾', 'Hockey': '🏒', 'Rugby': '🏉'
-    };
+    const emojis = { 'Cricket': '🏏', 'Football': '⚽', 'Tennis': '🎾', 'NBA': '🏀', 'Basketball': '🏀', 'F1': '🏎️', 'Golf': '⛳' };
     return emojis[sport] || '🏆';
 }
 
-// --- HOME PAGE CONTENT (Icons, Testimonials, Recent Meetings) ---
 async function loadHomeContent() {
-    const tDisplay = document.getElementById('testimonial-display');
-    const eDisplay = document.getElementById('encounter-display');
-    const sIcons = document.getElementById('sports-icons-row');
-    
-    if (!tDisplay && !eDisplay && !sIcons) return;
-
     const query = encodeURIComponent(`{
-        "testimonials": *[_type == "testimonial"]{ name, role, quote },
-        "encounters": *[_type == "encounter"] | order(date desc)[0...5]{ 
-            title, "imageUrl": image.asset->url, "videoFileUrl": videoFile.asset->url
-        },
-        "sports": *[_type == "sport"] | order(name asc) {
-            name,
-            "itemCount": count(*[_type == "memorabilia" && references(^._id)])
-        }
+        "testimonials": *[_type == "testimonial"]{ name, quote },
+        "encounters": *[_type == "encounter"] | order(date desc)[0...5]{ title, "imageUrl": image.asset->url, "videoFileUrl": videoFile.asset->url },
+        "sports": *[_type == "sport"] | order(name asc) { name, "itemCount": count(*[_type == "memorabilia" && references(^._id)]) }
     }`);
 
     try {
         const resp = await fetch(BASE_URL + query);
         const { result } = await resp.json();
 
-        // 1. Load Sports Icons with Counts
-        if (sIcons && result.sports) {
-            sIcons.innerHTML = result.sports.map(s => `
-                <a href="filter.html?sport=${encodeURIComponent(s.name)}" style="text-decoration:none; text-align:center; min-width:65px;">
-                    <div style="background: rgba(212,175,55,0.1); width:55px; height:55px; border-radius:50%; display:flex; align-items:center; justify-content:center; border:1px solid var(--gold); margin: 0 auto 8px; transition:0.3s;" class="icon-circle">
-                        <span style="font-size:1.3rem;">${getEmoji(s.name)}</span>
-                    </div>
-                    <p style="font-size:0.6rem; color:var(--gold); font-weight:900; text-transform:uppercase; margin:0;">${s.name}</p>
-                    <p style="font-size:0.5rem; opacity:0.5; margin:0; color:white;">${s.itemCount}</p>
-                </a>
-            `).join('');
+        // 1. Sports Icons
+        const iconRow = document.getElementById('sports-icons-row');
+        if (iconRow && result.sports) {
+            iconRow.innerHTML = result.sports.map(s => `
+                <a href="filter.html?sport=${encodeURIComponent(s.name)}" style="text-decoration:none; text-align:center;">
+                    <div class="icon-circle"><span>${getEmoji(s.name)}</span></div>
+                    <p style="font-size:0.6rem; color:var(--gold); font-weight:900; margin-top:5px;">${s.name.toUpperCase()}</p>
+                    <p style="font-size:0.5rem; opacity:0.5; color:white;">${s.itemCount}</p>
+                </a>`).join('');
         }
 
-        // 2. Random Testimonial
-        if (tDisplay && result.testimonials?.length > 0) {
+        // 2. Sidebar Randomizers
+        if (result.testimonials?.length > 0) {
             const t = result.testimonials[Math.floor(Math.random() * result.testimonials.length)];
-            tDisplay.innerHTML = `
-                <p style="font-style: italic; font-size: 0.85rem; line-height: 1.5; color: #ccc; margin-bottom:10px;">"${t.quote.substring(0, 100)}..."</p>
-                <h4 class="gold-text" style="font-size: 0.8rem; text-transform: uppercase;">— ${t.name}</h4>
-            `;
+            document.getElementById('testimonial-display').innerHTML = `
+                <p style="font-style:italic; font-size:0.85rem; color:#ccc;">"${t.quote}"</p>
+                <h4 class="gold-text" style="font-size:0.75rem; margin-top:8px;">— ${t.name}</h4>`;
         }
 
-        // 3. Recent Meetings Spotlight
-        if (eDisplay && result.encounters?.length > 0) {
-            const enc = result.encounters[Math.floor(Math.random() * result.encounters.length)];
-            const media = enc.videoFileUrl 
-                ? `<video muted playsinline autoplay loop style="width:100%; height:100%; object-fit:cover;"><source src="${enc.videoFileUrl}"></video>`
-                : `<img src="${enc.imageUrl}" style="width:100%; height:100%; object-fit:cover;">`;
-            
-            eDisplay.innerHTML = `
-                <a href="encounters.html" style="text-decoration:none; color:inherit;">
-                    <div style="height:120px; overflow:hidden; border-radius:8px; margin-bottom:10px; border:1px solid rgba(212,175,55,0.2); background:#000;">
-                        ${media}
-                    </div>
-                    <h3 style="font-size:0.8rem; color:var(--gold); text-transform: uppercase; letter-spacing:1px;">${enc.title}</h3>
-                </a>
-            `;
+        if (result.encounters?.length > 0) {
+            const e = result.encounters[Math.floor(Math.random() * result.encounters.length)];
+            const media = e.videoFileUrl ? `<video muted playsinline autoplay loop style="width:100%; border-radius:8px;"><source src="${e.videoFileUrl}"></video>` : `<img src="${e.imageUrl}" style="width:100%; border-radius:8px;">`;
+            document.getElementById('encounter-display').innerHTML = `<div style="margin-top:10px;">${media}<p style="font-size:0.8rem; margin-top:8px; font-weight:700;">${e.title}</p></div>`;
         }
-    } catch (e) { console.error("Home Content Error:", e); }
+    } catch (err) { console.error("Data Load Error:", err); }
 }
-
-// --- VAULT GRID LOGIC ---
-const MAIN_QUERY = encodeURIComponent(`*[_type == "memorabilia"]{
-  title, year, "venueName": venue->name, "imageUrl": image.asset->url,
-  "itemType": itemType->name, "sportNames": sports[]->name,
-  "athleteNames": sportsmen[]->name, "teamNames": teams[]->name, isLatest
-}`);
-
-let allItems = [];
 
 async function loadVault() {
+    const query = encodeURIComponent(`*[_type == "memorabilia"]{ title, "imageUrl": image.asset->url, "itemType": itemType->name, "sportNames": sports[]->name, isLatest }`);
     try {
-        const response = await fetch(BASE_URL + MAIN_QUERY);
-        const { result } = await response.json();
-        allItems = result || [];
-
-        // DYNAMIC VAULT COUNT UPDATE
-        const vaultTitle = document.querySelector('#collection .section-title');
-        if (vaultTitle && allItems.length > 0) {
-            vaultTitle.innerHTML = `THE <span class="gold-text">${allItems.length}+</span> VAULT`;
+        const resp = await fetch(BASE_URL + query);
+        const { result } = await resp.json();
+        
+        // Update 100+ Count
+        const countTitle = document.querySelector('#collection .section-title');
+        if (countTitle && result.length) {
+            countTitle.innerHTML = `THE <span class="gold-text">${result.length}+</span> VAULT`;
         }
 
-        if(document.getElementById('latestGrid')) renderGrid('latestGrid', allItems.filter(i => i.isLatest));
-        if(document.getElementById('sportGrid')) renderGrid('sportGrid', allItems, true);
-        setupSearch();
-    } catch (e) { console.error("Vault Load Error:", e); }
+        // Render Grids (simplified render logic)
+        const render = (id, items) => {
+            const grid = document.getElementById(id);
+            if (!grid) return;
+            grid.innerHTML = items.map(i => `
+                <div class="sport-card">
+                    <img src="${i.imageUrl}" style="width:100%; height:200px; object-fit:cover; padding:10px;">
+                    <div style="padding:15px;">
+                        <h3 style="font-size:1rem;">${i.title}</h3>
+                        <p class="gold-text" style="font-size:0.8rem;">${(i.sportNames || []).join(', ')}</p>
+                    </div>
+                </div>`).join('');
+        };
+        render('latestGrid', result.filter(i => i.isLatest));
+        render('sportGrid', result);
+    } catch (err) { console.error("Vault Error:", err); }
 }
 
-function renderGrid(gridId, items, shuffle = false) {
-    const grid = document.getElementById(gridId);
-    if (!grid) return;
-    grid.innerHTML = '';
-    const displayItems = shuffle ? [...items].sort(() => 0.5 - Math.random()) : items;
-    displayItems.forEach(item => grid.appendChild(createCard(item)));
-}
-
-function createCard(item) {
-    const card = document.createElement('div');
-    card.className = 'sport-card';
-    const itemUrl = `item.html?name=${encodeURIComponent(item.title)}`;
-    card.innerHTML = `
-        <a href="${itemUrl}" style="display: block; height: 300px; background: #000; position: relative; border-bottom: 2px solid var(--gold); text-decoration: none; overflow: hidden;">
-            <img src="${item.imageUrl}" alt="${item.title}" style="width: 100%; height: 100%; object-fit: contain; padding: 15px; transition: 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
-            ${item.itemType ? `<span style="position: absolute; top: 15px; right: 15px; background: var(--gold); color: black; padding: 4px 10px; font-size: 0.6rem; font-weight: 900; border-radius: 4px;">${item.itemType}</span>` : ''}
-        </a>
-        <div class="card-info" style="padding: 1.5rem;">
-            <div class="tags-row" style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px;">
-                ${item.year ? `<a href="filter.html?year=${encodeURIComponent(item.year)}" style="color: rgba(255,255,255,0.4); font-size: 0.75rem; font-weight: 900; text-decoration: none;">${item.year}</a>` : ''}
-                ${item.sportNames ? item.sportNames.map(s => `<a href="filter.html?sport=${encodeURIComponent(s)}" style="background: rgba(212,175,55,0.1); color: var(--gold); padding: 4px 10px; border-radius: 4px; font-size: 0.65rem; font-weight: 900; text-decoration: none;">${s}</a>`).join('') : ''}
-            </div>
-            <h3 style="margin-bottom: 10px; font-size: 1.1rem; line-height: 1.3;"><a href="${itemUrl}" style="color: white; text-decoration: none;">${item.title}</a></h3>
-            <div class="athlete-row">
-                ${item.athleteNames ? item.athleteNames.map(a => `<a href="filter.html?athlete=${encodeURIComponent(a)}" style="color: var(--gold); font-weight: 700; font-size: 0.85rem; text-decoration: none;">${a}</a>`).join('') : ''}
-            </div>
-        </div>`;
-    return card;
-}
-
-function setupSearch() {
-    const searchInput = document.getElementById('vaultSearch');
-    if(!searchInput) return;
-    searchInput.addEventListener('input', (e) => {
-        const term = e.target.value.toLowerCase();
-        const filtered = allItems.filter(item => {
-            const title = (item.title || "").toLowerCase();
-            const athletes = (item.athleteNames || []).join(" ").toLowerCase();
-            const sports = (item.sportNames || []).join(" ").toLowerCase();
-            return title.includes(term) || athletes.includes(term) || sports.includes(term);
-        });
-        renderGrid('sportGrid', filtered, true);
-    });
-}
-
-// --- MASTER INIT ---
 document.addEventListener('DOMContentLoaded', () => {
-    loadNavbar();
-    loadVault();
     loadHomeContent();
+    loadVault();
 });
