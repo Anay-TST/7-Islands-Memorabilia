@@ -7,17 +7,19 @@ function getEmoji(sport) {
     return emojis[sport] || '🏆';
 }
 
-// Global function to expand testimonial text
+// Function to expand the testimonial quote
 window.expandQuote = function() {
     document.getElementById('t-quote-short').style.display = 'none';
     document.getElementById('t-quote-full').style.display = 'block';
 };
 
 async function loadHomeContent() {
+    // Fetches Sports, Encounters, Testimonials, AND the Top 6 Legends by item count
     const query = encodeURIComponent(`{
         "testimonials": *[_type == "testimonial"]{ name, quote, "vUrl": videoFile.asset->url, "iUrl": image.asset->url },
         "encounters": *[_type == "encounter"] | order(date desc)[0...5]{ title, "imageUrl": image.asset->url, "videoFileUrl": videoFile.asset->url },
-        "sports": *[_type == "sport"] | order(name asc) { name, "itemCount": count(*[_type == "memorabilia" && references(^._id)]) }
+        "sports": *[_type == "sport"] | order(name asc) { name, "itemCount": count(*[_type == "memorabilia" && references(^._id)]) },
+        "legends": *[_type == "sportsman"] { name, "itemCount": count(*[_type == "memorabilia" && references(^._id)]) } | order(itemCount desc)[0...6]
     }`);
 
     try {
@@ -35,9 +37,23 @@ async function loadHomeContent() {
                 </a>`).join('');
         }
 
-        // 2. Random Testimonials with "See More" toggle
+        // 2. Top Legends Icons
+        const legendsRow = document.getElementById('legends-icons-row');
+        if (legendsRow && result.legends) {
+            legendsRow.innerHTML = result.legends.map(l => {
+                // Generate initials for the legend (e.g., Sachin Tendulkar -> ST)
+                const initials = l.name.split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase();
+                return `
+                <a href="filter.html?athlete=${encodeURIComponent(l.name)}" style="text-decoration:none; text-align:center; min-width: 60px;">
+                    <div class="icon-circle" style="background:rgba(212,175,55,0.05); color:var(--gold); font-family:'Arvo', serif; font-size:1.2rem;">${initials}</div>
+                    <p style="font-size:0.6rem; color:var(--gold); font-weight:900; margin-top:5px; max-width: 60px; line-height: 1.2; margin-left: auto; margin-right: auto;">${l.name.toUpperCase()}</p>
+                    <p style="font-size:0.5rem; opacity:0.5; color:white;">${l.itemCount} ITEMS</p>
+                </a>`;
+            }).join('');
+        }
+
+        // 3. Testimonials (With "See More" logic)
         if (result.testimonials?.length > 0) {
-            // Picks a random testimonial every time the page loads
             const t = result.testimonials[Math.floor(Math.random() * result.testimonials.length)];
             
             let mediaHtml = '';
@@ -47,10 +63,9 @@ async function loadHomeContent() {
                 mediaHtml = `<img src="${t.iUrl}" class="sidebar-media" alt="Testimonial">`;
             }
 
-            // Truncate logic
-            const isLong = t.quote.length > 55;
-            const shortQuote = isLong ? t.quote.substring(0, 55) + "..." : t.quote;
-            const seeMoreBtn = isLong ? `<span style="color:var(--gold); cursor:pointer; font-weight:900; margin-left:5px;" onclick="expandQuote()">See More</span>` : '';
+            const isLong = t.quote.length > 60;
+            const shortQuote = isLong ? t.quote.substring(0, 60) + "..." : t.quote;
+            const seeMoreBtn = isLong ? `<span style="color:var(--gold); cursor:pointer; font-weight:900; margin-left:5px; text-decoration: underline;" onclick="expandQuote()">See More</span>` : '';
 
             document.getElementById('testimonial-display').innerHTML = `
                 ${mediaHtml}
@@ -63,9 +78,8 @@ async function loadHomeContent() {
                 <h4 class="gold-text" style="font-size:0.75rem; margin-top:8px;">— ${t.name}</h4>`;
         }
 
-        // 3. Random Encounters
+        // 4. Encounters
         if (result.encounters?.length > 0) {
-            // Picks a random encounter every time the page loads
             const e = result.encounters[Math.floor(Math.random() * result.encounters.length)];
             const media = e.videoFileUrl ? `<video muted playsinline autoplay loop style="width:100%; border-radius:8px;"><source src="${e.videoFileUrl}"></video>` : `<img src="${e.imageUrl}" style="width:100%; border-radius:8px;">`;
             document.getElementById('encounter-display').innerHTML = `<div style="margin-top:10px;">${media}<p style="font-size:0.8rem; margin-top:8px; font-weight:700;">${e.title}</p></div>`;
@@ -79,13 +93,12 @@ async function loadVault() {
         const resp = await fetch(BASE_URL + query);
         const { result } = await resp.json();
         
-        // Update 100+ Count
-        const countTitle = document.querySelector('#collection .section-title');
+        // Update Dynamic Count
+        const countTitle = document.getElementById('dynamic-vault-count');
         if (countTitle && result.length) {
-            countTitle.innerHTML = `THE <span class="gold-text">${result.length}+</span> VAULT`;
+            countTitle.innerHTML = `${result.length}+ VAULT`;
         }
 
-        // Render Grids
         const render = (id, items) => {
             const grid = document.getElementById(id);
             if (!grid) return;

@@ -1,130 +1,124 @@
-const PROJECT_ID = 'dpcpc70i';
-const DATASET = 'production';
-const BASE_URL = `https://${PROJECT_ID}.api.sanity.io/v2021-10-21/data/query/${DATASET}?query=`;
-
-function getEmoji(sport) {
-    const emojis = { 'Cricket': '🏏', 'Football': '⚽', 'Tennis': '🎾', 'NBA': '🏀', 'Basketball': '🏀', 'F1': '🏎️', 'Golf': '⛳' };
-    return emojis[sport] || '🏆';
+/* --- MASTER THEME --- */
+:root {
+    --gold: #D4AF37;
+    --royal-purple: #1a0a2e;
+    --pitch-black: #050505;
+    --glass: rgba(255, 255, 255, 0.03);
+    --gold-glow: rgba(212, 175, 55, 0.3);
 }
 
-// Function to expand the testimonial quote
-window.expandQuote = function() {
-    document.getElementById('t-quote-short').style.display = 'none';
-    document.getElementById('t-quote-full').style.display = 'block';
-};
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
-async function loadHomeContent() {
-    // Fetches Sports, Encounters, Testimonials, AND the Top 6 Legends by item count
-    const query = encodeURIComponent(`{
-        "testimonials": *[_type == "testimonial"]{ name, quote, "vUrl": videoFile.asset->url, "iUrl": image.asset->url },
-        "encounters": *[_type == "encounter"] | order(date desc)[0...5]{ title, "imageUrl": image.asset->url, "videoFileUrl": videoFile.asset->url },
-        "sports": *[_type == "sport"] | order(name asc) { name, "itemCount": count(*[_type == "memorabilia" && references(^._id)]) },
-        "legends": *[_type == "sportsman"] { name, "itemCount": count(*[_type == "memorabilia" && references(^._id)]) } | order(itemCount desc)[0...6]
-    }`);
-
-    try {
-        const resp = await fetch(BASE_URL + query);
-        const { result } = await resp.json();
-
-        // 1. Sports Icons
-        const iconRow = document.getElementById('sports-icons-row');
-        if (iconRow && result.sports) {
-            iconRow.innerHTML = result.sports.map(s => `
-                <a href="filter.html?sport=${encodeURIComponent(s.name)}" style="text-decoration:none; text-align:center;">
-                    <div class="icon-circle"><span>${getEmoji(s.name)}</span></div>
-                    <p style="font-size:0.6rem; color:var(--gold); font-weight:900; margin-top:5px;">${s.name.toUpperCase()}</p>
-                    <p style="font-size:0.5rem; opacity:0.5; color:white;">${s.itemCount}</p>
-                </a>`).join('');
-        }
-
-        // 2. Top Legends Icons
-        const legendsRow = document.getElementById('legends-icons-row');
-        if (legendsRow && result.legends) {
-            legendsRow.innerHTML = result.legends.map(l => {
-                // Generate initials for the legend (e.g., Sachin Tendulkar -> ST)
-                const initials = l.name.split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase();
-                return `
-                <a href="filter.html?athlete=${encodeURIComponent(l.name)}" style="text-decoration:none; text-align:center; min-width: 60px;">
-                    <div class="icon-circle" style="background:rgba(212,175,55,0.05); color:var(--gold); font-family:'Arvo', serif; font-size:1.2rem;">${initials}</div>
-                    <p style="font-size:0.6rem; color:var(--gold); font-weight:900; margin-top:5px; max-width: 60px; line-height: 1.2; margin-left: auto; margin-right: auto;">${l.name.toUpperCase()}</p>
-                    <p style="font-size:0.5rem; opacity:0.5; color:white;">${l.itemCount} ITEMS</p>
-                </a>`;
-            }).join('');
-        }
-
-        // 3. Testimonials (With "See More" logic)
-        if (result.testimonials?.length > 0) {
-            const t = result.testimonials[Math.floor(Math.random() * result.testimonials.length)];
-            
-            let mediaHtml = '';
-            if (t.vUrl) {
-                mediaHtml = `<video class="sidebar-media" autoplay muted loop playsinline><source src="${t.vUrl}"></video>`;
-            } else if (t.iUrl) {
-                mediaHtml = `<img src="${t.iUrl}" class="sidebar-media" alt="Testimonial">`;
-            }
-
-            const isLong = t.quote.length > 60;
-            const shortQuote = isLong ? t.quote.substring(0, 60) + "..." : t.quote;
-            const seeMoreBtn = isLong ? `<span style="color:var(--gold); cursor:pointer; font-weight:900; margin-left:5px; text-decoration: underline;" onclick="expandQuote()">See More</span>` : '';
-
-            document.getElementById('testimonial-display').innerHTML = `
-                ${mediaHtml}
-                <div id="t-quote-short" style="font-style:italic; font-size:0.85rem; color:#ccc; line-height:1.4;">
-                    "${shortQuote}" ${seeMoreBtn}
-                </div>
-                <div id="t-quote-full" style="display:none; font-style:italic; font-size:0.85rem; color:#ccc; line-height:1.4;">
-                    "${t.quote}"
-                </div>
-                <h4 class="gold-text" style="font-size:0.75rem; margin-top:8px;">— ${t.name}</h4>`;
-        }
-
-        // 4. Encounters
-        if (result.encounters?.length > 0) {
-            const e = result.encounters[Math.floor(Math.random() * result.encounters.length)];
-            const media = e.videoFileUrl ? `<video muted playsinline autoplay loop style="width:100%; border-radius:8px;"><source src="${e.videoFileUrl}"></video>` : `<img src="${e.imageUrl}" style="width:100%; border-radius:8px;">`;
-            document.getElementById('encounter-display').innerHTML = `<div style="margin-top:10px;">${media}<p style="font-size:0.8rem; margin-top:8px; font-weight:700;">${e.title}</p></div>`;
-        }
-    } catch (err) { console.error("Data Load Error:", err); }
+body {
+    background-color: var(--pitch-black) !important;
+    background-image: radial-gradient(circle at top, var(--royal-purple), var(--pitch-black)) !important;
+    background-attachment: fixed;
+    color: white;
+    font-family: 'Inter', sans-serif;
+    line-height: 1.6;
+    margin: 0;
 }
 
-async function loadVault() {
-    const query = encodeURIComponent(`*[_type == "memorabilia"]{ title, "imageUrl": image.asset->url, "itemType": itemType->name, "sportNames": sports[]->name, isLatest }`);
-    try {
-        const resp = await fetch(BASE_URL + query);
-        const { result } = await resp.json();
-        
-        // Update Dynamic Count
-        const countTitle = document.getElementById('dynamic-vault-count');
-        if (countTitle && result.length) {
-            countTitle.innerHTML = `${result.length}+ VAULT`;
-        }
+h1, h2, h3 { font-family: 'Arvo', serif; font-weight: 900; }
+.gold-text { color: var(--gold); }
 
-        const render = (id, items) => {
-            const grid = document.getElementById(id);
-            if (!grid) return;
-            
-            const isSmall = id === 'sportGrid';
-            const imgHeight = isSmall ? '150px' : '220px';
-            const titleSize = isSmall ? '0.85rem' : '1rem';
+/* --- Navbar --- */
+header { 
+    background: rgba(0,0,0,0.95); 
+    position: sticky; 
+    top: 0; 
+    z-index: 2000; 
+    border-bottom: 1px solid rgba(212,175,55,0.2); 
+    backdrop-filter: blur(10px); 
+}
+nav { 
+    display: flex; justify-content: space-between; align-items: center; 
+    padding: 1rem 5%; max-width: 1400px; margin: 0 auto; 
+}
+.logo { font-size: 1.5rem; color: var(--gold); cursor: pointer; text-decoration: none; font-family: 'Arvo', serif; font-weight: 900; }
+.nav-links { display: flex; list-style: none; gap: 2rem; }
+.nav-links a { text-decoration: none; color: white; font-weight: 700; font-size: 0.8rem; text-transform: uppercase; transition: 0.3s; }
+.nav-links a:hover, .nav-links a.active { color: var(--gold); }
 
-            grid.innerHTML = items.map(i => `
-                <div class="sport-card">
-                    <div style="background:#000; width:100%; height:${imgHeight}; display:flex; align-items:center; justify-content:center;">
-                        <img src="${i.imageUrl}" style="max-width:100%; max-height:100%; object-fit:contain; padding:10px;">
-                    </div>
-                    <div style="padding:15px;">
-                        <h3 style="font-size:${titleSize}; margin-bottom: 5px;">${i.title}</h3>
-                        <p class="gold-text" style="font-size:0.8rem;">${(i.sportNames || []).join(', ')}</p>
-                    </div>
-                </div>`).join('');
-        };
-        
-        render('latestGrid', result.filter(i => i.isLatest));
-        render('sportGrid', result);
-    } catch (err) { console.error("Vault Error:", err); }
+/* --- Layout Structure --- */
+.layout-wrapper {
+    display: flex;
+    gap: 50px;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 40px 5%;
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    loadHomeContent();
-    loadVault();
-});
+.main-content { flex: 3; }
+.sidebar-column { flex: 1; min-width: 320px; }
+
+.sidebar-sticky-wrap {
+    position: sticky;
+    top: 100px;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+/* --- Hero Intro & Icons --- */
+.hero-subtitle {
+    opacity: 0.6; margin-bottom: 2rem; font-weight: 700; 
+    letter-spacing: 2px; border-left: 2px solid var(--gold); padding-left: 15px;
+}
+
+#sports-icons-row { margin: 2rem 0; display: flex; gap: 20px; flex-wrap: wrap; }
+.icon-circle {
+    background: rgba(212, 175, 55, 0.1); width: 60px; height: 60px; 
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    border: 1px solid var(--gold); transition: 0.3s;
+}
+.icon-circle:hover { background: var(--gold); transform: scale(1.1); box-shadow: 0 0 20px var(--gold-glow); }
+.icon-circle:hover span { filter: brightness(0); }
+
+/* --- Search Bar --- */
+.search-container { width: 100%; max-width: 500px; margin-bottom: 20px; }
+#vaultSearch {
+    width: 100%; padding: 15px 25px; background: rgba(0,0,0,0.5);
+    border: 2px solid var(--gold); border-radius: 50px; color: white; outline: none;
+}
+
+/* --- Sidebar Blocks --- */
+.sidebar-block {
+    background: var(--glass); border: 1px solid rgba(212, 175, 55, 0.1);
+    padding: 25px; border-radius: 15px; backdrop-filter: blur(10px);
+}
+.sidebar-label { color: var(--gold); text-transform: uppercase; font-size: 0.75rem; letter-spacing: 2px; margin-bottom: 15px; }
+
+/* --- Grids --- */
+.section-title { margin-bottom: 2rem; font-size: 1.8rem; text-transform: uppercase; text-align: left;}
+.sport-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; margin-bottom: 4rem; }
+.sport-card { background: var(--glass); border: 1px solid rgba(212, 175, 55, 0.1); border-radius: 12px; overflow: hidden; transition: 0.3s; }
+.sport-card:hover { transform: translateY(-8px); border-color: var(--gold); }
+
+/* --- NEW ARRIVALS: 3 IN A ROW FORCE --- */
+#latestGrid { grid-template-columns: repeat(3, 1fr); }
+
+/* --- SMALL GRID FOR VAULT --- */
+.sport-grid.small-grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; }
+
+/* --- SIDEBAR MEDIA FIXES --- */
+.sidebar-media { width: 100%; border-radius: 8px; margin-bottom: 12px; border: 1px solid rgba(212, 175, 55, 0.2); object-fit: cover; }
+
+/* --- Ticker Placeholders --- */
+.ticker-container { background: var(--gold); color: black; padding: 10px 0; overflow: hidden; }
+.ticker { display: inline-block; white-space: nowrap; animation: move 30s linear infinite; font-weight: 900; }
+@keyframes move { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
+
+/* --- Responsive --- */
+@media (max-width: 1024px) {
+    .layout-wrapper { flex-direction: column; }
+    .sidebar-column { width: 100%; }
+}
+@media (max-width: 900px) {
+    #latestGrid { grid-template-columns: repeat(2, 1fr); }
+    .nav-links { gap: 1rem; }
+}
+@media (max-width: 600px) {
+    #latestGrid { grid-template-columns: 1fr; }
+    .nav-links { display: none; /* Add a hamburger menu later if needed */ }
+}
