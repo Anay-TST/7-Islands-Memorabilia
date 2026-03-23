@@ -74,12 +74,11 @@
                             </div>
                         </div>`;
 
-                    // Related Items: Athlete first, then Type
                     let rQuery = "";
                     if (result.athleteNames && result.athleteNames.length > 0) {
-                        rQuery = encodeURIComponent(`*[_type == "memorabilia" && "${result.athleteNames[0]}" in sportsmen[]->name && title != "${itemTitle}"][0...6]{ title, "imageUrl": image.asset->url, "athleteNames": sportsmen[]->name }`);
+                        rQuery = encodeURIComponent(`*[_type == "memorabilia" && "${result.athleteNames[0]}" in sportsmen[]->name && title != "${itemTitle}"][0...6]{ title, "imageUrl": image.asset->url, "athleteNames": sportsmen[]->name, "sportNames": sports[]->name }`);
                     } else if (result.itemType) {
-                        rQuery = encodeURIComponent(`*[_type == "memorabilia" && itemType->name == "${result.itemType}" && title != "${itemTitle}"][0...6]{ title, "imageUrl": image.asset->url, "athleteNames": sportsmen[]->name }`);
+                        rQuery = encodeURIComponent(`*[_type == "memorabilia" && itemType->name == "${result.itemType}" && title != "${itemTitle}"][0...6]{ title, "imageUrl": image.asset->url, "athleteNames": sportsmen[]->name, "sportNames": sports[]->name }`);
                     }
 
                     if (rQuery) {
@@ -95,7 +94,10 @@
                                         </div>
                                         <div style="padding:15px; flex-grow:1;">
                                             <h3 style="font-size:0.9rem; margin-bottom: 5px;">${i.title}</h3>
-                                            <p class="gold-text" style="font-size:0.7rem; font-weight:900;">${(i.athleteNames || []).join(', ').toUpperCase()}</p>
+                                            <p class="gold-text" style="font-size:0.7rem; font-weight:900;">
+                                                ${(i.athleteNames || []).join(', ').toUpperCase()}<br>
+                                                <span style="opacity:0.6; font-size:0.6rem;">${(i.sportNames || []).join(', ').toUpperCase()}</span>
+                                            </p>
                                         </div>
                                     </a>
                                 </div>`).join('');

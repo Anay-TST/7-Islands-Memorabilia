@@ -76,7 +76,10 @@
                             </div>
                             <div style="padding:15px; flex-grow:1;">
                                 <h3 style="font-size:1rem; margin-bottom: 5px;">${i.title}</h3>
-                                <p class="gold-text" style="font-size:0.8rem; font-weight:900;">${(i.athleteNames || []).join(', ').toUpperCase()}</p>
+                                <p class="gold-text" style="font-size:0.8rem; font-weight:900;">
+                                    ${(i.athleteNames || []).join(', ').toUpperCase()}<br>
+                                    <span style="opacity:0.6; font-size:0.65rem;">${(i.sportNames || []).join(', ').toUpperCase()}</span>
+                                </p>
                             </div>
                         </a>
                     </div>`).join('');

@@ -4,9 +4,7 @@ const BASE_URL = `https://${PROJECT_ID}.api.sanity.io/v2021-10-21/data/query/${D
 
 let allItems = []; 
 
-// --- COMPONENTS LOADER (Navbar & Footer) ---
 async function loadComponents() {
-    // Navbar
     const navPlaceholder = document.getElementById('navbar-placeholder');
     if (navPlaceholder) {
         try {
@@ -21,14 +19,12 @@ async function loadComponents() {
         } catch (e) { console.error("Navbar Error:", e); }
     }
 
-    // Footer & Visitor Counter
     const footPlaceholder = document.getElementById('footer-placeholder');
     if (footPlaceholder) {
         try {
             const footResp = await fetch('footer.html');
             footPlaceholder.innerHTML = await footResp.text();
             
-            // Visitor Logic
             let count = localStorage.getItem('siteVisitors');
             if (!count) { count = 9500 + Math.floor(Math.random() * 20); } 
             else { count = parseInt(count) + 1; }
@@ -58,13 +54,12 @@ function getEmoji(sport) {
 }
 
 window.expandQuote = function(event) {
-    event.preventDefault(); // Stop sidebar click
+    event.preventDefault(); 
     const container = event.target.parentElement;
     container.querySelector('.t-quote-short').style.display = 'none';
     container.querySelector('.t-quote-full').style.display = 'block';
 };
 
-// --- DYNAMIC TICKER (INFINITE LOOP FIX) ---
 async function loadTicker() {
     try {
         const query = encodeURIComponent(`*[_type in ["sport", "sportsman"]]{name}`);
@@ -73,7 +68,6 @@ async function loadTicker() {
         if (result && result.length > 0) {
             const names = result.map(i => i.name).filter(Boolean);
             const shuffled = shuffleArray(names);
-            // Repeat the string 4 times to ensure CSS translateX(-50%) creates a seamless loop
             const baseStr = shuffled.join(' • ') + ' • ';
             const infiniteStr = baseStr + baseStr + baseStr + baseStr;
             
@@ -226,6 +220,24 @@ function setupFullVaultSearch() {
     const latestFilter = document.getElementById('latestFilter');
     
     if(!searchInput && !sportFilter && !latestFilter) return;
+
+    // DYNAMICALLY FILL THE SPORT DROPDOWN
+    if (sportFilter && allItems.length > 0) {
+        const uniqueSports = new Set();
+        allItems.forEach(item => {
+            if (item.sportNames) {
+                item.sportNames.forEach(s => uniqueSports.add(s));
+            }
+        });
+        
+        sportFilter.innerHTML = '<option value="">All Sports</option>';
+        Array.from(uniqueSports).sort().forEach(sport => {
+            const opt = document.createElement('option');
+            opt.value = sport;
+            opt.textContent = sport;
+            sportFilter.appendChild(opt);
+        });
+    }
 
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('filter') === 'latest' && latestFilter) {
