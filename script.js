@@ -2,6 +2,16 @@ const PROJECT_ID = 'dpcpc70i';
 const DATASET = 'production';
 const BASE_URL = `https://${PROJECT_ID}.api.sanity.io/v2021-10-21/data/query/${DATASET}?query=`;
 
+// --- ADDED NAVBAR BACK IN ---
+async function loadNavbar() {
+    const placeholder = document.getElementById('navbar-placeholder');
+    if (!placeholder) return;
+    try {
+        const response = await fetch('navbar.html');
+        placeholder.innerHTML = await response.text();
+    } catch (e) { console.error("Error loading navbar:", e); }
+}
+
 function getEmoji(sport) {
     const emojis = { 'Cricket': '🏏', 'Football': '⚽', 'Tennis': '🎾', 'NBA': '🏀', 'Basketball': '🏀', 'F1': '🏎️', 'Golf': '⛳' };
     return emojis[sport] || '🏆';
@@ -29,7 +39,7 @@ async function loadHomeContent() {
                 </a>`).join('');
         }
 
-        // 2. Sidebar Randomizers (Testimonials & Encounters)
+        // 2. Testimonials (ADDED "SEE MORE" LINK)
         if (result.testimonials?.length > 0) {
             const t = result.testimonials[Math.floor(Math.random() * result.testimonials.length)];
             
@@ -42,10 +52,12 @@ async function loadHomeContent() {
 
             document.getElementById('testimonial-display').innerHTML = `
                 ${mediaHtml}
-                <p style="font-style:italic; font-size:0.85rem; color:#ccc;">"${t.quote}"</p>
-                <h4 class="gold-text" style="font-size:0.75rem; margin-top:8px;">— ${t.name}</h4>`;
+                <p style="font-style:italic; font-size:0.85rem; color:#ccc; line-height:1.4;">"${t.quote}"</p>
+                <h4 class="gold-text" style="font-size:0.75rem; margin-top:8px;">— ${t.name}</h4>
+                <a href="testimonials.html" style="display:inline-block; margin-top:12px; font-size:0.75rem; font-weight:900; text-transform:uppercase; color:var(--gold); border-bottom:1px solid var(--gold); text-decoration:none;">See More</a>`;
         }
 
+        // 3. Encounters
         if (result.encounters?.length > 0) {
             const e = result.encounters[Math.floor(Math.random() * result.encounters.length)];
             const media = e.videoFileUrl ? `<video muted playsinline autoplay loop style="width:100%; border-radius:8px;"><source src="${e.videoFileUrl}"></video>` : `<img src="${e.imageUrl}" style="width:100%; border-radius:8px;">`;
@@ -66,7 +78,7 @@ async function loadVault() {
             countTitle.innerHTML = `THE <span class="gold-text">${result.length}+</span> VAULT`;
         }
 
-        // Render Grids with contain and dynamic sizing
+        // Render Grids
         const render = (id, items) => {
             const grid = document.getElementById(id);
             if (!grid) return;
@@ -93,6 +105,7 @@ async function loadVault() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    loadNavbar(); // Brings back your top navigation!
     loadHomeContent();
     loadVault();
 });

@@ -76,6 +76,17 @@ h1, h2, h3 { font-family: 'Arvo', serif; font-weight: 900; }
 .sport-card { background: var(--glass); border: 1px solid rgba(212, 175, 55, 0.1); border-radius: 12px; overflow: hidden; transition: 0.3s; }
 .sport-card:hover { transform: translateY(-8px); border-color: var(--gold); }
 
+/* --- NEW ARRIVALS: 3 IN A ROW FORCE --- */
+#latestGrid {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+/* --- SMALL GRID FOR VAULT & FULL IMAGE FIXES --- */
+.sport-grid.small-grid { 
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); 
+    gap: 15px; 
+}
+
 /* --- Instagram --- */
 .insta-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 4rem; }
 .insta-post img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; }
@@ -85,17 +96,6 @@ h1, h2, h3 { font-family: 'Arvo', serif; font-weight: 900; }
 .ticker { display: inline-block; white-space: nowrap; animation: move 30s linear infinite; font-weight: 900; }
 @keyframes move { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
 
-@media (max-width: 1024px) {
-    .layout-wrapper { flex-direction: column; }
-    .sidebar-column { width: 100%; }
-}
-
-/* --- SMALL GRID FOR VAULT & FULL IMAGE FIXES --- */
-.sport-grid.small-grid { 
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); 
-    gap: 15px; 
-}
-
 /* --- SIDEBAR MEDIA FIXES --- */
 .sidebar-media { 
     width: 100%; 
@@ -103,4 +103,16 @@ h1, h2, h3 { font-family: 'Arvo', serif; font-weight: 900; }
     margin-bottom: 12px; 
     border: 1px solid rgba(212, 175, 55, 0.2); 
     object-fit: cover;
+}
+
+/* --- Responsive --- */
+@media (max-width: 1024px) {
+    .layout-wrapper { flex-direction: column; }
+    .sidebar-column { width: 100%; }
+}
+@media (max-width: 900px) {
+    #latestGrid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 600px) {
+    #latestGrid { grid-template-columns: 1fr; }
 }
