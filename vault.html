@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>7 Islands Memorabilia | Full Collection</title>
+    <link href="https://fonts.googleapis.com/css2?family=Arvo:700&family=Inter:wght@400;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="ticker-container">
+        <div class="ticker-wrap"><div class="ticker">CRICKET • FOOTBALL • TENNIS • NBA • F1 • GOLF • OLYMPICS • BASEBALL • HOCKEY • RUGBY • BOXING • MOTOGP • SQUASH •</div></div>
+    </div>
+    
+    <header>
+        <nav>
+            <div class="logo" style="cursor: pointer;" onclick="window.location.href='index.html'">7 Islands Memorabilia</div>
+            <ul class="nav-links">
+                <li><a href="index.html" class="nav-item">The Vault</a></li>
+                <li><a href="sports.html" class="nav-item">Sports</a></li>
+                <li><a href="celebrities.html" class="nav-item">Legends</a></li>
+                <li><a href="encounters.html" class="nav-item">Encounters</a></li>
+                <li><a href="testimonials.html" class="nav-item">Reviews</a></li> 
+                <li><a href="index.html#latest" class="nav-item">Latest</a></li>
+            </ul>
+        </nav>
+    </header>
+    
+    <div class="section-padding" style="max-width: 1400px; margin: 0 auto; padding-top: 60px;">
+        <h1 class="section-title" style="text-align: center; font-size: 2.5rem; margin-bottom: 10px;">THE <span class="gold-text">FULL VAULT</span></h1>
+        <p style="text-align: center; opacity: 0.6; font-weight: 700; letter-spacing: 2px; margin-bottom: 40px;">BROWSE THE ENTIRE ARCHIVE</p>
+
+        <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; margin-bottom: 50px; align-items: center;">
+            <input type="text" id="fullVaultSearch" placeholder="Search Legend, Sport, or Year..." style="padding: 15px 25px; background: rgba(0,0,0,0.5); border: 2px solid var(--gold); border-radius: 50px; color: white; outline: none; width: 100%; max-width: 450px;">
+            
+            <select id="sportFilter" style="padding: 15px 25px; background: rgba(0,0,0,0.5); border: 2px solid var(--gold); border-radius: 50px; color: white; outline: none; cursor: pointer; font-family: 'Inter', sans-serif;">
+                <option value="">All Sports</option>
+                <option value="Cricket">Cricket</option>
+                <option value="Football">Football</option>
+                <option value="Tennis">Tennis</option>
+                <option value="Basketball">Basketball (NBA)</option>
+                <option value="F1">Formula 1</option>
+                <option value="Golf">Golf</option>
+                <option value="Boxing">Boxing</option>
+            </select>
+
+            <label style="color: var(--gold); font-size: 0.9rem; font-weight: 700; display: flex; align-items: center; gap: 8px; cursor: pointer; background: rgba(0,0,0,0.5); padding: 13px 25px; border: 2px solid var(--gold); border-radius: 50px;">
+                <input type="checkbox" id="latestFilter" style="accent-color: var(--gold); width: 16px; height: 16px; cursor: pointer;">
+                Latest Arrivals Only
+            </label>
+        </div>
+
+        <div class="sport-grid six-grid" id="fullVaultGrid"></div>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>

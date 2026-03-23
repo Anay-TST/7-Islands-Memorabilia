@@ -14,7 +14,7 @@
     
     <header>
         <nav>
-            <div class="logo" style="cursor: pointer;" onclick="window.location.href='index.html'">7 ISLANDS</div>
+            <div class="logo" style="cursor: pointer;" onclick="window.location.href='index.html'">7 Islands Memorabilia</div>
             <ul class="nav-links">
                 <li><a href="index.html" class="nav-item active">The Vault</a></li>
                 <li><a href="sports.html" class="nav-item">Sports</a></li>
@@ -37,8 +37,7 @@
                     <input type="text" id="vaultSearch" placeholder="Search Legend, Sport, or Year...">
                 </div>
 
-                <div id="sports-icons-row">
-                    </div>
+                <div id="sports-icons-row"></div>
             </div>
 
             <hr class="section-divider">
@@ -46,6 +45,9 @@
             <section id="latest">
                 <h2 class="section-title">NEW <span class="gold-text">ARRIVALS</span></h2>
                 <div class="sport-grid" id="latestGrid"></div>
+                <div style="text-align: center; margin-top: 30px;">
+                    <a href="vault.html?filter=latest" class="see-more-btn">See All New Arrivals</a>
+                </div>
             </section>
             
             <hr class="section-divider">
@@ -53,14 +55,16 @@
             <section id="collection">
                 <h2 class="section-title">THE <span class="gold-text" id="dynamic-vault-count">VAULT</span></h2>
                 <div class="sport-grid small-grid" id="sportGrid"></div>
+                <div id="see-more-container" style="text-align: center; margin-top: 40px;">
+                    <a href="vault.html" class="see-more-btn">Explore Full Collection</a>
+                </div>
             </section>
 
             <hr class="section-divider">
 
             <section id="top-legends">
                 <h2 class="section-title">TOP <span class="gold-text">LEGENDS</span></h2>
-                <div id="legends-icons-row" style="display: flex; gap: 20px; flex-wrap: wrap;">
-                    </div>
+                <div id="legends-icons-row" style="display: flex; gap: 20px; flex-wrap: wrap;"></div>
             </section>
 
             <hr class="section-divider">
