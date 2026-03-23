@@ -49,24 +49,24 @@ async function loadHomeContent() {
         const resp = await fetch(BASE_URL + query);
         const { result } = await resp.json();
 
-        // 1. Sports Icons (Hidden if 0 items)
+        // 1. Sports Icons (FIXED: Now links to filter.html?sport=...)
         const iconRow = document.getElementById('sports-icons-row');
         if (iconRow && result.sports) {
             iconRow.innerHTML = result.sports.map(s => `
-                <a href="sports.html?sport=${encodeURIComponent(s.name)}" style="text-decoration:none; text-align:center;">
+                <a href="filter.html?sport=${encodeURIComponent(s.name)}" style="text-decoration:none; text-align:center;">
                     <div class="icon-circle"><span>${getEmoji(s.name)}</span></div>
                     <p style="font-size:0.6rem; color:var(--gold); font-weight:900; margin-top:5px;">${s.name.toUpperCase()}</p>
                     <p style="font-size:0.5rem; opacity:0.5; color:white;">${s.itemCount}</p>
                 </a>`).join('');
         }
 
-        // 2. Top Legends Icons (Hidden if 0 items)
+        // 2. Top Legends Icons (FIXED: Now links to filter.html?athlete=...)
         const legendsRow = document.getElementById('legends-icons-row');
         if (legendsRow && result.legends) {
             legendsRow.innerHTML = result.legends.map(l => {
                 const initials = l.name.split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase();
                 return `
-                <a href="celebrities.html?legend=${encodeURIComponent(l.name)}" style="text-decoration:none; text-align:center; min-width: 60px;">
+                <a href="filter.html?athlete=${encodeURIComponent(l.name)}" style="text-decoration:none; text-align:center; min-width: 60px;">
                     <div class="icon-circle" style="background:rgba(212,175,55,0.05); color:var(--gold); font-family:'Arvo', serif; font-size:1.2rem;">${initials}</div>
                     <p style="font-size:0.6rem; color:var(--gold); font-weight:900; margin-top:5px; max-width: 60px; line-height: 1.2; margin-left: auto; margin-right: auto;">${l.name.toUpperCase()}</p>
                     <p style="font-size:0.5rem; opacity:0.5; color:white;">${l.itemCount} ITEMS</p>
@@ -146,7 +146,7 @@ function setupSearch() {
             return title.includes(term) || athletes.includes(term) || sports.includes(term) || year.includes(term);
         });
         
-        renderGrid('sportGrid', filtered); // Updates the 100+ Vault live
+        renderGrid('sportGrid', filtered); // Updates the Vault live
     });
 }
 
