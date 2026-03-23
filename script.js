@@ -63,7 +63,7 @@ async function loadHomeContent() {
         const iconRow = document.getElementById('sports-icons-row');
         if (iconRow && result.sports) {
             iconRow.innerHTML = result.sports.map(s => `
-                <a href="filter.html?sport=${encodeURIComponent(s.name)}" style="text-decoration:none; text-align:center;">
+                <a href="sports.html?sport=${encodeURIComponent(s.name)}" style="text-decoration:none; text-align:center;">
                     <div class="icon-circle"><span>${getEmoji(s.name)}</span></div>
                     <p style="font-size:0.6rem; color:var(--gold); font-weight:900; margin-top:5px;">${s.name.toUpperCase()}</p>
                     <p style="font-size:0.5rem; opacity:0.5; color:white;">${s.itemCount}</p>
@@ -75,7 +75,7 @@ async function loadHomeContent() {
             legendsRow.innerHTML = result.legends.map(l => {
                 const initials = l.name.split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase();
                 return `
-                <a href="filter.html?athlete=${encodeURIComponent(l.name)}" style="text-decoration:none; text-align:center; min-width: 60px;">
+                <a href="celebrities.html?legend=${encodeURIComponent(l.name)}" style="text-decoration:none; text-align:center; min-width: 60px;">
                     <div class="icon-circle" style="background:rgba(212,175,55,0.05); color:var(--gold); font-family:'Arvo', serif; font-size:1.2rem;">${initials}</div>
                     <p style="font-size:0.6rem; color:var(--gold); font-weight:900; margin-top:5px; max-width: 60px; line-height: 1.2; margin-left: auto; margin-right: auto;">${l.name.toUpperCase()}</p>
                     <p style="font-size:0.5rem; opacity:0.5; color:white;">${l.itemCount} ITEMS</p>
@@ -123,9 +123,9 @@ async function loadVault() {
             renderGrid('latestGrid', allItems.filter(i => i.isLatest).slice(0, 3));
         }
 
-        // HOME PAGE VAULT
+        // HOME PAGE VAULT: Limit to exactly 8 random items (2 rows of 4)
         if (document.getElementById('sportGrid')) {
-            renderGrid('sportGrid', shuffleArray([...allItems]).slice(0, 10));
+            renderGrid('sportGrid', shuffleArray([...allItems]).slice(0, 8));
         }
 
         // VAULT PAGE (vault.html)
@@ -145,7 +145,7 @@ function setupSearch() {
     searchInput.addEventListener('input', (e) => {
         const term = e.target.value.toLowerCase();
         if(term === '') {
-            renderGrid('sportGrid', shuffleArray([...allItems]).slice(0, 10));
+            renderGrid('sportGrid', shuffleArray([...allItems]).slice(0, 8)); // Return to 8 on clear
             if(seeMoreBtn) seeMoreBtn.style.display = 'block';
         } else {
             const filtered = allItems.filter(item => {
@@ -155,7 +155,7 @@ function setupSearch() {
                 const year = (item.year || "").toString().toLowerCase();
                 return title.includes(term) || athletes.includes(term) || sports.includes(term) || year.includes(term);
             });
-            renderGrid('sportGrid', filtered);
+            renderGrid('sportGrid', filtered); // Show all search results dynamically
             if(seeMoreBtn) seeMoreBtn.style.display = 'none';
         }
     });
@@ -192,7 +192,6 @@ function setupFullVaultSearch() {
             return matchesSearch && matchesSport && matchesLatest;
         });
         
-        // Pass the filtered array to the vault page grid
         renderGrid('fullVaultGrid', filtered);
     }
 
@@ -200,7 +199,6 @@ function setupFullVaultSearch() {
     if(sportFilter) sportFilter.addEventListener('change', filterFullVault);
     if(latestFilter) latestFilter.addEventListener('change', filterFullVault);
 
-    // Initial render
     filterFullVault();
 }
 

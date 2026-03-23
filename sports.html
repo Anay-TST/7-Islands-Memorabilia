@@ -8,19 +8,29 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="navbar-placeholder"></div>
+    <header>
+        <nav>
+            <div class="logo" style="cursor: pointer;" onclick="window.location.href='index.html'">7 Islands Memorabilia</div>
+            <ul class="nav-links">
+                <li><a href="index.html" class="nav-item">The Vault</a></li>
+                <li><a href="sports.html" class="nav-item active">Sports</a></li>
+                <li><a href="celebrities.html" class="nav-item">Legends</a></li>
+                <li><a href="encounters.html" class="nav-item">Encounters</a></li>
+                <li><a href="testimonials.html" class="nav-item">Reviews</a></li> 
+                <li><a href="index.html#latest" class="nav-item">Latest</a></li>
+            </ul>
+        </nav>
+    </header>
 
-    <section class="hero">
-        <h1>THE <span class="gold-text">SPORTS</span></h1>
-        <div class="search-container">
-            <input type="text" id="sportSearch" placeholder="Search for a Sport...">
-            <button id="clearSportSearch" class="action-btn" style="display:none;">✕ Clear</button>
-        </div>
-    </section>
+    <div class="section-padding" style="max-width: 1400px; margin: 0 auto; padding-top: 60px;">
+        <h1 class="section-title" style="text-align: center; font-size: 2.5rem; margin-bottom: 10px;">THE <span class="gold-text">SPORTS</span></h1>
+        <p style="text-align: center; opacity: 0.6; font-weight: 700; letter-spacing: 2px; margin-bottom: 40px;">BROWSE BY CATEGORY</p>
 
-    <div class="section-padding">
-        <div class="sport-grid" id="sportCategoryGrid">
+        <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; margin-bottom: 50px;">
+            <input type="text" id="sportSearch" placeholder="Search for a Sport..." style="padding: 15px 25px; background: rgba(0,0,0,0.5); border: 2px solid var(--gold); border-radius: 50px; color: white; outline: none; width: 100%; max-width: 500px;">
         </div>
+
+        <div class="sport-grid six-grid" id="sportCategoryGrid"></div>
     </div>
 
     <script src="script.js"></script>
@@ -28,8 +38,8 @@
         let allSports = [];
 
         async function loadSports() {
-            // Updated to fetch a fallback image from the memorabilia vault!
-            const query = encodeURIComponent(`*[_type == "sport"] | order(name asc) {
+            // Only fetch sports that have items
+            const query = encodeURIComponent(`*[_type == "sport" && count(*[_type == "memorabilia" && references(^._id)]) > 0] | order(name asc) {
                 name,
                 "imageUrl": image.asset->url,
                 "fallbackImg": *[_type == "memorabilia" && references(^._id)][0].image.asset->url,
@@ -54,7 +64,6 @@
                 const card = document.createElement('div');
                 card.className = 'sport-card';
                 
-                // Prioritize Official Sport Image -> Then Memorabilia Image -> Then Text Placeholder
                 const displayImg = sport.imageUrl || sport.fallbackImg || `https://via.placeholder.com/400x300/050505/D4AF37?text=${encodeURIComponent(sport.name)}`;
                 const filterUrl = `filter.html?sport=${encodeURIComponent(sport.name)}`;
 
@@ -77,23 +86,13 @@
 
         function setupSportSearch() {
             const searchInput = document.getElementById('sportSearch');
-            const clearBtn = document.getElementById('clearSportSearch');
             if (!searchInput) return;
 
             searchInput.addEventListener('input', (e) => {
                 const term = e.target.value.toLowerCase();
-                if (clearBtn) clearBtn.style.display = term.length > 0 ? "flex" : "none";
                 const filtered = allSports.filter(s => s.name.toLowerCase().includes(term));
                 renderSports(filtered);
             });
-
-            if (clearBtn) {
-                clearBtn.addEventListener('click', () => {
-                    searchInput.value = "";
-                    clearBtn.style.display = "none";
-                    renderSports(allSports);
-                });
-            }
         }
 
         loadSports();

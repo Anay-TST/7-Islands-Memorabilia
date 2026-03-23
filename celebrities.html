@@ -8,19 +8,29 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="navbar-placeholder"></div>
+    <header>
+        <nav>
+            <div class="logo" style="cursor: pointer;" onclick="window.location.href='index.html'">7 Islands Memorabilia</div>
+            <ul class="nav-links">
+                <li><a href="index.html" class="nav-item">The Vault</a></li>
+                <li><a href="sports.html" class="nav-item">Sports</a></li>
+                <li><a href="celebrities.html" class="nav-item active">Legends</a></li>
+                <li><a href="encounters.html" class="nav-item">Encounters</a></li>
+                <li><a href="testimonials.html" class="nav-item">Reviews</a></li> 
+                <li><a href="index.html#latest" class="nav-item">Latest</a></li>
+            </ul>
+        </nav>
+    </header>
 
-    <section class="hero">
-        <h1>THE <span class="gold-text">LEGENDS</span></h1>
-        <div class="search-container">
-            <input type="text" id="celebSearch" placeholder="Search for a Legend...">
-            <button id="clearCelebSearch" class="action-btn" style="display:none;">✕ Clear</button>
-        </div>
-    </section>
+    <div class="section-padding" style="max-width: 1400px; margin: 0 auto; padding-top: 60px;">
+        <h1 class="section-title" style="text-align: center; font-size: 2.5rem; margin-bottom: 10px;">THE <span class="gold-text">LEGENDS</span></h1>
+        <p style="text-align: center; opacity: 0.6; font-weight: 700; letter-spacing: 2px; margin-bottom: 40px;">THE ICONS OF WORLD SPORT</p>
 
-    <div class="section-padding">
-        <div class="sport-grid" id="celebGrid">
+        <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; margin-bottom: 50px;">
+            <input type="text" id="celebSearch" placeholder="Search for a Legend..." style="padding: 15px 25px; background: rgba(0,0,0,0.5); border: 2px solid var(--gold); border-radius: 50px; color: white; outline: none; width: 100%; max-width: 500px;">
         </div>
+
+        <div class="sport-grid six-grid" id="celebGrid"></div>
     </div>
 
     <script src="script.js"></script>
@@ -28,7 +38,8 @@
         let allCelebrities = [];
 
         async function loadCelebrities() {
-            const query = encodeURIComponent(`*[_type == "sportsman"] | order(name asc) {
+            // Only fetch legends that actually have items
+            const query = encodeURIComponent(`*[_type == "sportsman" && count(*[_type == "memorabilia" && references(^._id)]) > 0] | order(name asc) {
                 name,
                 description,
                 "encounterImg": *[_type == "encounter" && references(^._id)][0].image.asset->url,
@@ -60,13 +71,12 @@
                 card.innerHTML = `
                     <a href="${profileUrl}" style="text-decoration: none; display: flex; flex-direction: column; height: 100%;">
                         <div class="card-image-container" style="height:250px; border-bottom: 2px solid var(--gold); overflow: hidden; background: #000; display: flex; align-items: center; justify-content: center;">
-                            <img src="${displayImg}" alt="${celeb.name}" style="object-fit:contain; padding: 15px; width:100%; height: 100%; transition: transform 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                            <img src="${displayImg}" alt="${celeb.name}" style="object-fit:cover; width:100%; height: 100%; transition: transform 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
                         </div>
                         <div class="card-info" style="text-align:center; padding: 1.5rem; flex-grow: 1;">
                             <h3 class="gold-text" style="margin-bottom:10px; font-size: 1.2rem;">${celeb.name}</h3>
-                            <p style="font-size:0.85rem; margin-bottom:15px; opacity:0.8; color: white;">${celeb.description || 'Explore the curated archive of this legendary figure.'}</p>
                             <div style="display:inline-block; background:rgba(212,175,55,0.1); color:var(--gold); padding:6px 16px; border-radius:50px; font-size:0.75rem; font-weight:900; text-transform: uppercase;">
-                                ${celeb.itemCount} ${celeb.itemCount === 1 ? 'MEMORABILIA' : 'MEMORABILIAS'}
+                                ${celeb.itemCount} ${celeb.itemCount === 1 ? 'MEMORABILIA' : 'MEMORABILIA'}
                             </div>
                         </div>
                     </a>
@@ -77,23 +87,13 @@
 
         function setupCelebSearch() {
             const searchInput = document.getElementById('celebSearch');
-            const clearBtn = document.getElementById('clearCelebSearch');
             if (!searchInput) return;
 
             searchInput.addEventListener('input', (e) => {
                 const term = e.target.value.toLowerCase();
-                if (clearBtn) clearBtn.style.display = term.length > 0 ? "flex" : "none";
                 const filtered = allCelebrities.filter(c => c.name.toLowerCase().includes(term));
                 renderCelebrities(filtered);
             });
-
-            if (clearBtn) {
-                clearBtn.addEventListener('click', () => {
-                    searchInput.value = "";
-                    clearBtn.style.display = "none";
-                    renderCelebrities(allCelebrities);
-                });
-            }
         }
 
         loadCelebrities();

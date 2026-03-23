@@ -8,14 +8,24 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="navbar-placeholder"></div>
+    <header>
+        <nav>
+            <div class="logo" style="cursor: pointer;" onclick="window.location.href='index.html'">7 Islands Memorabilia</div>
+            <ul class="nav-links">
+                <li><a href="index.html" class="nav-item">The Vault</a></li>
+                <li><a href="sports.html" class="nav-item">Sports</a></li>
+                <li><a href="celebrities.html" class="nav-item">Legends</a></li>
+                <li><a href="encounters.html" class="nav-item">Encounters</a></li>
+                <li><a href="testimonials.html" class="nav-item active">Reviews</a></li> 
+                <li><a href="index.html#latest" class="nav-item">Latest</a></li>
+            </ul>
+        </nav>
+    </header>
 
-    <section class="hero">
-        <h1>THE <span class="gold-text">FEEDBACK</span></h1>
-        <p style="opacity:0.6; margin-top:10px;">Words from the world of legends and collectors.</p>
-    </section>
+    <div class="section-padding" style="max-width: 1400px; margin: 0 auto; padding-top: 60px;">
+        <h1 class="section-title" style="text-align: center; font-size: 2.5rem; margin-bottom: 10px;">THE <span class="gold-text">FEEDBACK</span></h1>
+        <p style="text-align: center; opacity: 0.6; font-weight: 700; letter-spacing: 2px; margin-bottom: 50px;">WORDS FROM THE WORLD OF LEGENDS AND COLLECTORS</p>
 
-    <div class="section-padding">
         <div class="sport-grid" id="testimonialGrid">
             </div>
     </div>
@@ -47,24 +57,24 @@
                 card.style.cursor = 'default';
 
                 let topMediaHTML = '';
-                let containerStyle = 'height: 300px;';
-
+                
+                // Allow videos to play with sound via controls
                 if (t.videoFileUrl) {
-                    topMediaHTML = `<video controls playsinline style="width: 100%; height: auto; max-height: 500px; object-fit: contain; background: #000; outline: none; border: none; display: block;"><source src="${t.videoFileUrl}">Your browser does not support the video player.</video>`;
-                    containerStyle = 'height: auto; max-height: 500px;';
+                    topMediaHTML = `<video controls playsinline style="width: 100%; height: 280px; object-fit: cover; background: #000; outline: none; border: none; display: block;"><source src="${t.videoFileUrl}">Your browser does not support the video player.</video>`;
                 } else {
-                    topMediaHTML = `<img src="${t.imageUrl || 'https://via.placeholder.com/400x300/050505/D4AF37?text=7+Islands'}" style="width: 100%; height: 100%; object-fit: cover; display: block;">`;
+                    topMediaHTML = `<img src="${t.imageUrl || 'https://via.placeholder.com/400x280/050505/D4AF37?text=7+Islands'}" style="width: 100%; height: 280px; object-fit: cover; display: block;">`;
                 }
 
                 let quoteHTML = '';
                 if (t.quote) {
                     const cleanQuote = t.quote.replace(/"/g, '&quot;');
-                    if (t.quote.length > 150) {
-                        const shortQuote = t.quote.substring(0, 150) + '...';
-                        quoteHTML = `<div style="font-size:0.9rem; font-style:italic; line-height:1.6; opacity:0.85; margin-bottom: 15px;">
+                    if (t.quote.length > 120) {
+                        const shortQuote = t.quote.substring(0, 120) + '...';
+                        quoteHTML = `
+                        <div style="font-size:0.9rem; font-style:italic; line-height:1.6; opacity:0.85; margin-bottom: 15px;">
                             <span class="q-short">"${shortQuote}"</span>
                             <span class="q-full" style="display:none;">"${cleanQuote}"</span>
-                            <span onclick="this.parentElement.querySelector('.q-short').style.display='none'; this.parentElement.querySelector('.q-full').style.display='inline'; this.style.display='none';" style="color:var(--gold); font-weight:bold; cursor:pointer; margin-left:5px;">See More</span>
+                            <span onclick="this.parentElement.querySelector('.q-short').style.display='none'; this.parentElement.querySelector('.q-full').style.display='inline'; this.style.display='none';" style="color:var(--gold); font-weight:bold; cursor:pointer; margin-left:5px; text-decoration:underline;">See More</span>
                         </div>`;
                     } else {
                         quoteHTML = `<p style="font-size:0.9rem; font-style:italic; line-height:1.6; opacity:0.85; margin-bottom: 15px;">"${t.quote}"</p>`;
@@ -72,7 +82,7 @@
                 }
 
                 card.innerHTML = `
-                    <div class="card-image-container" style="${containerStyle} padding:0; border-bottom: 2px solid var(--gold); position: relative; overflow:hidden; background: #000;">
+                    <div class="card-image-container" style="padding:0; border-bottom: 2px solid var(--gold); position: relative; overflow:hidden; background: #000;">
                         ${topMediaHTML}
                     </div>
                     <div class="card-info" style="text-align:center; padding: 1.5rem;">
