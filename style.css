@@ -60,6 +60,15 @@ nav {
     gap: 25px;
 }
 
+/* --- Uniform Section Dividers --- */
+.section-divider {
+    border: 0;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--gold), transparent);
+    margin: 3.5rem 0;
+    opacity: 0.4;
+}
+
 /* --- Hero Intro & Icons --- */
 .hero-subtitle {
     opacity: 0.6; margin-bottom: 2rem; font-weight: 700; 
@@ -91,7 +100,7 @@ nav {
 
 /* --- Grids --- */
 .section-title { margin-bottom: 2rem; font-size: 1.8rem; text-transform: uppercase; text-align: left;}
-.sport-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; margin-bottom: 4rem; }
+.sport-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; }
 .sport-card { background: var(--glass); border: 1px solid rgba(212, 175, 55, 0.1); border-radius: 12px; overflow: hidden; transition: 0.3s; }
 .sport-card:hover { transform: translateY(-8px); border-color: var(--gold); }
 
@@ -120,5 +129,5 @@ nav {
 }
 @media (max-width: 600px) {
     #latestGrid { grid-template-columns: 1fr; }
-    .nav-links { display: none; /* Add a hamburger menu later if needed */ }
+    .nav-links { display: none; }
 }

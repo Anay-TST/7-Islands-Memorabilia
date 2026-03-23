@@ -14,7 +14,6 @@ window.expandQuote = function() {
 };
 
 async function loadHomeContent() {
-    // Fetches Sports, Encounters, Testimonials, AND the Top 6 Legends by item count
     const query = encodeURIComponent(`{
         "testimonials": *[_type == "testimonial"]{ name, quote, "vUrl": videoFile.asset->url, "iUrl": image.asset->url },
         "encounters": *[_type == "encounter"] | order(date desc)[0...5]{ title, "imageUrl": image.asset->url, "videoFileUrl": videoFile.asset->url },
@@ -41,7 +40,6 @@ async function loadHomeContent() {
         const legendsRow = document.getElementById('legends-icons-row');
         if (legendsRow && result.legends) {
             legendsRow.innerHTML = result.legends.map(l => {
-                // Generate initials for the legend (e.g., Sachin Tendulkar -> ST)
                 const initials = l.name.split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase();
                 return `
                 <a href="filter.html?athlete=${encodeURIComponent(l.name)}" style="text-decoration:none; text-align:center; min-width: 60px;">
@@ -52,13 +50,14 @@ async function loadHomeContent() {
             }).join('');
         }
 
-        // 3. Testimonials (With "See More" logic)
+        // 3. Testimonials (With Sound Controls & "See More" logic)
         if (result.testimonials?.length > 0) {
             const t = result.testimonials[Math.floor(Math.random() * result.testimonials.length)];
             
             let mediaHtml = '';
             if (t.vUrl) {
-                mediaHtml = `<video class="sidebar-media" autoplay muted loop playsinline><source src="${t.vUrl}"></video>`;
+                // ADDED controls and REMOVED muted so sound can be played
+                mediaHtml = `<video class="sidebar-media" controls autoplay playsinline><source src="${t.vUrl}"></video>`;
             } else if (t.iUrl) {
                 mediaHtml = `<img src="${t.iUrl}" class="sidebar-media" alt="Testimonial">`;
             }
