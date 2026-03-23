@@ -37,19 +37,19 @@ function renderGrid(id, items) {
 }
 
 async function loadHomeContent() {
-    // Both sports and legends are now sorted by the number of items they have!
+    // Only fetch Sports and Legends if their item count is strictly GREATER THAN 0
     const query = encodeURIComponent(`{
         "testimonials": *[_type == "testimonial"]{ name, quote, "vUrl": videoFile.asset->url, "iUrl": image.asset->url },
         "encounters": *[_type == "encounter"] | order(date desc)[0...5]{ title, "imageUrl": image.asset->url, "videoFileUrl": videoFile.asset->url },
-        "sports": *[_type == "sport"] { name, "itemCount": count(*[_type == "memorabilia" && references(^._id)]) } | order(itemCount desc),
-        "legends": *[_type == "sportsman"] { name, "itemCount": count(*[_type == "memorabilia" && references(^._id)]) } | order(itemCount desc)[0...6]
+        "sports": *[_type == "sport" && count(*[_type == "memorabilia" && references(^._id)]) > 0] { name, "itemCount": count(*[_type == "memorabilia" && references(^._id)]) } | order(itemCount desc),
+        "legends": *[_type == "sportsman" && count(*[_type == "memorabilia" && references(^._id)]) > 0] { name, "itemCount": count(*[_type == "memorabilia" && references(^._id)]) } | order(itemCount desc)[0...6]
     }`);
 
     try {
         const resp = await fetch(BASE_URL + query);
         const { result } = await resp.json();
 
-        // 1. Sports Icons (Links to sports.html)
+        // 1. Sports Icons (Hidden if 0 items)
         const iconRow = document.getElementById('sports-icons-row');
         if (iconRow && result.sports) {
             iconRow.innerHTML = result.sports.map(s => `
@@ -60,7 +60,7 @@ async function loadHomeContent() {
                 </a>`).join('');
         }
 
-        // 2. Top Legends Icons (Links to celebrities.html)
+        // 2. Top Legends Icons (Hidden if 0 items)
         const legendsRow = document.getElementById('legends-icons-row');
         if (legendsRow && result.legends) {
             legendsRow.innerHTML = result.legends.map(l => {
@@ -109,7 +109,6 @@ async function loadHomeContent() {
 }
 
 async function loadVault() {
-    // Added year and athleteNames to the query so the search bar has things to find
     const query = encodeURIComponent(`*[_type == "memorabilia"]{ title, year, "imageUrl": image.asset->url, "itemType": itemType->name, "sportNames": sports[]->name, "athleteNames": sportsmen[]->name, isLatest }`);
     try {
         const resp = await fetch(BASE_URL + query);
@@ -138,7 +137,6 @@ function setupSearch() {
     searchInput.addEventListener('input', (e) => {
         const term = e.target.value.toLowerCase();
         
-        // Filter the items based on title, athlete, sport, or year
         const filtered = allItems.filter(item => {
             const title = (item.title || "").toLowerCase();
             const athletes = (item.athleteNames || []).join(" ").toLowerCase();
@@ -148,8 +146,7 @@ function setupSearch() {
             return title.includes(term) || athletes.includes(term) || sports.includes(term) || year.includes(term);
         });
         
-        // Render only the filtered items in the Vault section
-        renderGrid('sportGrid', filtered);
+        renderGrid('sportGrid', filtered); // Updates the 100+ Vault live
     });
 }
 
