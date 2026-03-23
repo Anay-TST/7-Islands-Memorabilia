@@ -1,52 +1,67 @@
-/* --- Hero Split & Sidebar --- */
-.hero-split {
+/* --- Global Layout Wrapper --- */
+.layout-wrapper {
     display: flex;
-    min-height: 65vh;
-    padding: 60px 5% 40px;
     gap: 50px;
-    align-items: center;
-    max-width: 1400px;
-    margin: 0 auto;
+    align-items: flex-start; /* Prevents sidebar from stretching weirdly */
 }
-.hero-left { flex: 2; }
-.hero-subtitle {
-    opacity: 0.6; margin-bottom: 2rem; font-weight: 700; 
-    letter-spacing: 2px; border-left: 2px solid var(--gold); padding-left: 15px;
+
+.main-content {
+    flex: 3; /* Takes up 75% of the width */
 }
-.hero-sidebar {
-    flex: 1; display: flex; flex-direction: column; gap: 20px;
-    background: rgba(255,255,255,0.02); padding: 30px;
-    border-radius: 20px; border: 1px solid rgba(212,175,55,0.1);
-    backdrop-filter: blur(10px); max-width: 400px;
+
+.sidebar-column {
+    flex: 1; /* Takes up 25% of the width */
+    min-width: 300px;
 }
-.sidebar-label {
-    font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2px;
-    color: var(--gold); margin-bottom: 15px; font-weight: 900;
+
+/* --- Sticky Sidebar Logic --- */
+.sidebar-sticky-wrap {
+    position: sticky;
+    top: 100px; /* Adjust based on your header height */
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
 }
+
+/* --- Hero Intro (Search & Icons) --- */
+.hero-intro {
+    margin-bottom: 3rem;
+}
+
+#sports-icons-row {
+    margin-top: 2rem;
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+/* --- Decorative Divider --- */
+.section-divider {
+    border: 0;
+    height: 1px;
+    background: linear-gradient(to right, var(--gold), transparent);
+    margin: 3rem 0;
+    opacity: 0.3;
+}
+
+/* --- Sidebar Styling --- */
 .sidebar-block {
-    padding-bottom: 20px; border-bottom: 1px solid rgba(212,175,55,0.1);
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(212, 175, 55, 0.1);
+    border-radius: 15px;
+    padding: 25px;
+    backdrop-filter: blur(10px);
 }
-.sidebar-block:last-child { border-bottom: none; }
 
-/* --- Sports Icons Row --- */
-#sports-icons-row { margin-top: 3rem; display: flex; gap: 25px; flex-wrap: wrap; }
-.icon-circle {
-    background: rgba(212,175,55,0.1); width: 55px; height: 55px; 
-    border-radius: 50%; display: flex; align-items: center; 
-    justify-content: center; border: 1px solid var(--gold); 
-    margin: 0 auto 8px; transition: 0.3s; cursor: pointer;
-}
-.icon-circle:hover { background: var(--gold); transform: scale(1.1); box-shadow: 0 0 15px var(--gold-glow); }
-.icon-circle:hover span { filter: brightness(0); }
-
-/* --- Instagram Feed --- */
-.insta-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-top: 30px; }
-.insta-post { aspect-ratio: 1/1; overflow: hidden; border-radius: 10px; border: 1px solid rgba(212,175,55,0.1); }
-.insta-post img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
-.insta-post:hover img { transform: scale(1.1); filter: brightness(1.2); }
-
-@media (max-width: 900px) {
-    .hero-split { flex-direction: column; padding-top: 40px; }
-    .hero-sidebar { max-width: 100%; width: 100%; }
-    .insta-grid { grid-template-columns: repeat(2, 1fr); }
+/* --- Mobile Responsiveness --- */
+@media (max-width: 1100px) {
+    .layout-wrapper {
+        flex-direction: column;
+    }
+    .sidebar-column {
+        width: 100%;
+    }
+    .sidebar-sticky-wrap {
+        position: static; /* Stack normally on mobile */
+    }
 }
