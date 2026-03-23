@@ -8,19 +8,7 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <header>
-        <nav>
-            <div class="logo" style="cursor: pointer;" onclick="window.location.href='index.html'">7 Islands Memorabilia</div>
-            <ul class="nav-links">
-                <li><a href="index.html" class="nav-item">The Vault</a></li>
-                <li><a href="sports.html" class="nav-item">Sports</a></li>
-                <li><a href="celebrities.html" class="nav-item">Legends</a></li>
-                <li><a href="encounters.html" class="nav-item">Encounters</a></li>
-                <li><a href="testimonials.html" class="nav-item">Reviews</a></li> 
-                <li><a href="index.html#latest" class="nav-item">Latest</a></li>
-            </ul>
-        </nav>
-    </header>
+    <div id="navbar-placeholder"></div>
 
     <div class="detail-view-container section-padding" style="max-width: 1400px; margin: 0 auto; padding-top: 40px;">
         <div id="breadcrumb" style="margin-bottom: 20px; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;"></div>
@@ -28,37 +16,12 @@
         <div id="itemDetail">
             <p style="text-align: center; padding: 50px; opacity: 0.5;">Loading Archive Data...</p>
         </div>
-        
-        <div class="related-section" style="margin-top: 4rem;">
-            <h2 class="section-title" style="text-align: left;">RELATED <span class="gold-text">ITEMS</span></h2>
-            <div class="sport-grid" id="relatedGrid"></div>
-        </div>
-
-        <div id="encounterSection" style="display: none; margin-top: 4rem; border-top: 1px solid rgba(212,175,55,0.2); padding-top: 4rem;">
-            <h2 class="section-title" style="text-align: left;">BEHIND THE <span class="gold-text">SIGNATURE</span></h2>
-            <div class="sport-grid" id="encounterGrid"></div>
-        </div>
     </div>
 
     <script src="script.js"></script>
     <script>
         const params = new URLSearchParams(window.location.search);
         const itemTitle = params.get('name');
-
-        function zoomImage(e, container) {
-            const img = container.querySelector('img');
-            const rect = container.getBoundingClientRect();
-            const x = ((e.clientX - rect.left) / rect.width) * 100;
-            const y = ((e.clientY - rect.top) / rect.height) * 100;
-            img.style.transformOrigin = `${x}% ${y}%`;
-            img.style.transform = 'scale(2.5)';
-        }
-
-        function resetZoom(container) {
-            const img = container.querySelector('img');
-            img.style.transformOrigin = 'center center';
-            img.style.transform = 'scale(1)';
-        }
 
         async function loadDetail() {
             if (!itemTitle) return;
@@ -76,126 +39,26 @@
 
                 if (result) {
                     const athletes = result.athleteNames ? result.athleteNames.join(', ') : '';
-                    const sports = result.sportNames ? result.sportNames.join(', ') : '';
-                    const type = result.itemType || '';
-                    const titleParts = [athletes, sports, type].filter(Boolean).join(' - ');
-                    document.title = titleParts ? `${titleParts} | 7 Islands Memorabilia` : `${result.title} | 7 Islands Memorabilia`;
+                    document.title = `${athletes} | 7 Islands Memorabilia`;
                     
-                    const primarySport = result.sportNames && result.sportNames.length > 0 ? result.sportNames[0] : null;
-                    let breadcrumbHTML = `<a href="index.html" style="color:var(--gold); text-decoration:none;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">The Vault</a> <span style="margin: 0 10px; opacity: 0.4; color: white;">/</span> `;
-                    if (primarySport) {
-                        breadcrumbHTML += `<a href="filter.html?sport=${encodeURIComponent(primarySport)}" style="color:var(--gold); text-decoration:none;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">${primarySport}</a> <span style="margin: 0 10px; opacity: 0.4; color: white;">/</span> `;
-                    }
+                    let breadcrumbHTML = `<a href="index.html" style="color:var(--gold); text-decoration:none;">Home</a> <span style="margin: 0 10px; opacity: 0.4;">/</span> `;
+                    breadcrumbHTML += `<a href="vault.html" style="color:var(--gold); text-decoration:none;">Vault</a> <span style="margin: 0 10px; opacity: 0.4;">/</span> `;
                     breadcrumbHTML += `<span style="color:white; opacity: 0.7;">${result.title}</span>`;
                     document.getElementById('breadcrumb').innerHTML = breadcrumbHTML;
 
-                    let metaHTML = "";
-                    if(result.venueName) metaHTML += `<p>📍 <strong style="color:white;">Venue:</strong> <a href="filter.html?venue=${encodeURIComponent(result.venueName)}" style="color:var(--gold); text-decoration:none;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">${result.venueName} ${result.venueLoc ? '(' + result.venueLoc + ')' : ''}</a></p>`;
-                    if(result.teamNames && result.teamNames.length > 0) metaHTML += `<p>👥 <strong style="color:white;">Teams:</strong> ${result.teamNames.map(t => `<a href="filter.html?team=${encodeURIComponent(t)}" style="color:var(--gold); text-decoration:none;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">${t}</a>`).join(', ')}</p>`;
-                    if(result.coaProvider) metaHTML += `<p>🛡️ <strong style="color:white;">Authentication:</strong> ${result.coaProvider}</p>`;
-                    if(result.serialNumber) metaHTML += `<p>🆔 <strong style="color:white;">Serial:</strong> ${result.serialNumber}</p>`;
-
                     document.getElementById('itemDetail').innerHTML = `
                         <div class="detail-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: start;">
-                            <div class="detail-image" style="position: relative; overflow: hidden; border: 2px solid var(--gold); border-radius: 10px; cursor: crosshair; background: #000;" onmousemove="zoomImage(event, this)" onmouseleave="resetZoom(this)">
-                                <img src="${result.imageUrl}" alt="${result.title}" style="width: 100%; display: block; transition: transform 0.1s ease, transform-origin 0.1s ease;">
-                                ${result.isMatchWorn ? '<span style="position:absolute; top:20px; left:20px; background:#8B0000; color:white; padding:5px 15px; font-weight:900; border-radius:4px; border:1px solid var(--gold); letter-spacing:1px; z-index:10; pointer-events: none;">MATCH USED</span>' : ''}
+                            <div class="detail-image" style="background:#000; border:2px solid var(--gold); border-radius:10px;">
+                                <img src="${result.imageUrl}" alt="${result.title}" style="width: 100%; display: block; object-fit:contain; max-height:700px; padding:15px;">
                             </div>
                             <div class="detail-content">
-                                <p class="gold-text" style="font-weight:900; letter-spacing:1px; font-size:0.8rem; margin-bottom:10px;">
-                                    ${result.itemType ? `<a href="filter.html?type=${encodeURIComponent(result.itemType)}" style="color:inherit; text-decoration:none;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">${result.itemType}</a>` : 'Archive'} 
-                                    ${result.year ? `• <a href="filter.html?year=${encodeURIComponent(result.year)}" style="color:inherit; text-decoration:none;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">${result.year}</a>` : ''}
-                                </p>
                                 <h1 style="color:white; margin-top:5px; margin-bottom:5px;">${result.title}</h1>
                                 <div class="detail-athletes" style="margin-bottom:25px; margin-top:10px;">
-                                    ${result.athleteNames ? result.athleteNames.map(a => `<a href="filter.html?athlete=${encodeURIComponent(a)}" style="color:var(--gold); font-size:1.3rem; font-weight:700; margin-right:15px; text-decoration:underline;" onmouseover="this.style.color='white'" onmouseout="this.style.color='var(--gold)'">${a}</a>`).join('') : ''}
+                                    ${result.athleteNames ? result.athleteNames.map(a => `<a href="filter.html?athlete=${encodeURIComponent(a)}" style="color:var(--gold); font-size:1.3rem; font-weight:700; margin-right:15px; text-decoration:underline;">${a}</a>`).join('') : ''}
                                 </div>
-                                ${metaHTML ? `<div class="detail-meta-box" style="color:var(--gold); padding: 15px; background: rgba(212,175,55,0.05); border-left: 3px solid var(--gold); border-radius: 4px; margin-bottom: 20px;">${metaHTML}</div>` : ''}
                                 ${result.description ? `<p class="detail-desc" style="line-height:1.8; opacity:0.85; margin-top:15px;">${result.description}</p>` : ''}
-                                <div class="tags-row" style="margin-top:30px; border-top:1px solid rgba(212,175,55,0.2); padding-top:20px;">
-                                    ${result.sportNames ? result.sportNames.map(s => `<a href="filter.html?sport=${encodeURIComponent(s)}" class="clickable-tag" style="background:rgba(212,175,55,0.1); color:var(--gold); padding:6px 14px; border-radius:4px; font-size:0.75rem; font-weight:900; margin-right:8px; text-decoration:none; display:inline-block;" onmouseover="this.style.background='var(--gold)'; this.style.color='black'" onmouseout="this.style.background='rgba(212,175,55,0.1)'; this.style.color='var(--gold)'">${s}</a>`).join('') : ''}
-                                </div>
                             </div>
                         </div>`;
-                    
-                    if (result.sportNames && result.sportNames.length > 0) {
-                        const rQuery = encodeURIComponent(`*[_type == "memorabilia" && sports[0]->name == "${result.sportNames[0]}" && title != "${itemTitle}"][0...4]{
-                            title, year, "imageUrl": image.asset->url, "itemType": itemType->name, "sportNames": sports[]->name, "athleteNames": sportsmen[]->name, "venueName": venue->name
-                        }`);
-                        const rResp = await fetch(`https://dpcpc70i.api.sanity.io/v2021-10-21/data/query/production?query=${rQuery}`);
-                        const {result: related} = await rResp.json();
-                        if(related && related.length > 0) {
-                            const grid = document.getElementById('relatedGrid');
-                            grid.innerHTML = related.map(i => `
-                                <div class="sport-card">
-                                    <a href="item.html?name=${encodeURIComponent(i.title)}" style="text-decoration: none;">
-                                        <div style="background:#000; width:100%; height:200px; display:flex; align-items:center; justify-content:center; border-bottom: 2px solid var(--gold);">
-                                            <img src="${i.imageUrl}" style="max-width:100%; max-height:100%; object-fit:contain; padding:10px;">
-                                        </div>
-                                        <div style="padding:15px; text-align: left;">
-                                            <h3 style="font-size:1rem; margin-bottom: 5px; color: white;">${i.title}</h3>
-                                            <p class="gold-text" style="font-size:0.8rem;">${(i.sportNames || []).join(', ')}</p>
-                                        </div>
-                                    </a>
-                                </div>`).join('');
-                        } else {
-                            document.querySelector('.related-section').style.display = 'none';
-                        }
-                    }
-
-                    if (result.athleteNames && result.athleteNames.length > 0) {
-                        const athleteArrayStr = JSON.stringify(result.athleteNames);
-                        const eQuery = encodeURIComponent(`*[_type == "encounter" && sportsman->name in ${athleteArrayStr}]{
-                            title, date, description, videoUrl, "videoFileUrl": videoFile.asset->url, "imageUrl": image.asset->url, "sportName": sport->name
-                        }`);
-                        const eResp = await fetch(`https://dpcpc70i.api.sanity.io/v2021-10-21/data/query/production?query=${eQuery}`);
-                        const {result: encounters} = await eResp.json();
-                        
-                        if (encounters && encounters.length > 0) {
-                            const encSection = document.getElementById('encounterSection');
-                            const encGrid = document.getElementById('encounterGrid');
-                            encSection.style.display = 'block'; 
-                            
-                            encGrid.innerHTML = encounters.map(enc => {
-                                let topMediaHTML = '';
-                                if (enc.videoFileUrl) {
-                                    topMediaHTML = `<video controls playsinline style="width: 100%; height: 250px; object-fit: cover; background: #000; outline: none; border: none; display: block;"><source src="${enc.videoFileUrl}"></video>`;
-                                } else if (enc.imageUrl) {
-                                    topMediaHTML = `<img src="${enc.imageUrl}" alt="${enc.title}" style="width: 100%; height: 250px; object-fit: cover; display: block;">`;
-                                } else {
-                                    topMediaHTML = `<img src="https://via.placeholder.com/400x250/050505/D4AF37?text=Encounter" style="width: 100%; height: 250px; object-fit: cover; display: block;">`;
-                                }
-
-                                let descHTML = '';
-                                if (enc.description) {
-                                    if (enc.description.length > 100) {
-                                        const safeDesc = enc.description.replace(/"/g, '&quot;').replace(/'/g, "&#39;");
-                                        const shortDesc = enc.description.substring(0, 100).replace(/"/g, '&quot;').replace(/'/g, "&#39;") + '...';
-                                        descHTML = `
-                                            <div style="font-size:0.85rem; line-height:1.6; opacity:0.85; margin-bottom: 15px;">
-                                                <span class="desc-short">${shortDesc}</span>
-                                                <span class="desc-full" style="display:none;">${safeDesc}</span>
-                                                <span onclick="this.parentElement.querySelector('.desc-short').style.display='none'; this.parentElement.querySelector('.desc-full').style.display='inline'; this.style.display='none';" style="color:var(--gold); font-weight:bold; cursor:pointer; margin-left:5px;">See More</span>
-                                            </div>`;
-                                    } else {
-                                        descHTML = `<p style="font-size:0.85rem; line-height:1.6; opacity:0.85; margin-bottom: 15px;">${enc.description}</p>`;
-                                    }
-                                }
-
-                                return `
-                                <div class="sport-card" style="cursor: default;">
-                                    <div class="card-image-container" style="padding:0; border-bottom: 2px solid var(--gold); position: relative; overflow:hidden; background: #000;">
-                                        ${topMediaHTML}
-                                    </div>
-                                    <div class="card-info" style="text-align:center; padding: 1.5rem;">
-                                        <h3 style="color:var(--gold); font-size:1.1rem; margin-bottom:5px;">${enc.title}</h3>
-                                        ${enc.date ? `<p style="font-size:0.8rem; opacity:0.6; margin-bottom: 10px;">${enc.date}</p>` : ''}
-                                        ${descHTML}
-                                    </div>
-                                </div>`;
-                            }).join('');
-                        }
-                    }
                 }
             } catch (e) { console.error("Item Load Error:", e); }
         }

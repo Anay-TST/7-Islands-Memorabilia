@@ -8,19 +8,7 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <header>
-        <nav>
-            <div class="logo" style="cursor: pointer;" onclick="window.location.href='index.html'">7 Islands Memorabilia</div>
-            <ul class="nav-links">
-                <li><a href="index.html" class="nav-item">The Vault</a></li>
-                <li><a href="sports.html" class="nav-item">Sports</a></li>
-                <li><a href="celebrities.html" class="nav-item active">Legends</a></li>
-                <li><a href="encounters.html" class="nav-item">Encounters</a></li>
-                <li><a href="testimonials.html" class="nav-item">Reviews</a></li> 
-                <li><a href="index.html#latest" class="nav-item">Latest</a></li>
-            </ul>
-        </nav>
-    </header>
+    <div id="navbar-placeholder"></div>
 
     <div class="section-padding" style="max-width: 1400px; margin: 0 auto; padding-top: 60px;">
         <h1 class="section-title" style="text-align: center; font-size: 2.5rem; margin-bottom: 10px;">THE <span class="gold-text">LEGENDS</span></h1>
@@ -38,18 +26,13 @@
         let allCelebrities = [];
 
         async function loadCelebrities() {
-            // Only fetch legends that actually have items
             const query = encodeURIComponent(`*[_type == "sportsman" && count(*[_type == "memorabilia" && references(^._id)]) > 0] | order(name asc) {
-                name,
-                description,
-                "encounterImg": *[_type == "encounter" && references(^._id)][0].image.asset->url,
+                name, description, "encounterImg": *[_type == "encounter" && references(^._id)][0].image.asset->url,
                 "fallbackImg": *[_type == "memorabilia" && references(^._id)][0].image.asset->url,
                 "itemCount": count(*[_type == "memorabilia" && references(^._id)])
             }`);
-            const url = `https://dpcpc70i.api.sanity.io/v2021-10-21/data/query/production?query=${query}`;
-            
             try {
-                const resp = await fetch(url);
+                const resp = await fetch(`https://dpcpc70i.api.sanity.io/v2021-10-21/data/query/production?query=${query}`);
                 const { result } = await resp.json();
                 allCelebrities = result || [];
                 renderCelebrities(allCelebrities);
@@ -60,42 +43,33 @@
         function renderCelebrities(list) {
             const grid = document.getElementById('celebGrid');
             grid.innerHTML = '';
-            
             list.forEach(celeb => {
-                const card = document.createElement('div');
-                card.className = 'sport-card';
-                
                 const displayImg = celeb.encounterImg || celeb.fallbackImg || 'https://via.placeholder.com/400x500/050505/D4AF37?text=Legend';
-                const profileUrl = `filter.html?athlete=${encodeURIComponent(celeb.name)}`;
-
-                card.innerHTML = `
-                    <a href="${profileUrl}" style="text-decoration: none; display: flex; flex-direction: column; height: 100%;">
-                        <div class="card-image-container" style="height:250px; border-bottom: 2px solid var(--gold); overflow: hidden; background: #000; display: flex; align-items: center; justify-content: center;">
-                            <img src="${displayImg}" alt="${celeb.name}" style="object-fit:cover; width:100%; height: 100%; transition: transform 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
-                        </div>
-                        <div class="card-info" style="text-align:center; padding: 1.5rem; flex-grow: 1;">
-                            <h3 class="gold-text" style="margin-bottom:10px; font-size: 1.2rem;">${celeb.name}</h3>
-                            <div style="display:inline-block; background:rgba(212,175,55,0.1); color:var(--gold); padding:6px 16px; border-radius:50px; font-size:0.75rem; font-weight:900; text-transform: uppercase;">
-                                ${celeb.itemCount} ${celeb.itemCount === 1 ? 'MEMORABILIA' : 'MEMORABILIA'}
+                grid.innerHTML += `
+                    <div class="sport-card">
+                        <a href="filter.html?athlete=${encodeURIComponent(celeb.name)}" style="text-decoration: none; display: flex; flex-direction: column; height: 100%;">
+                            <div style="height:250px; border-bottom: 2px solid var(--gold); overflow: hidden; background: #000; display: flex; align-items: center; justify-content: center;">
+                                <img src="${displayImg}" alt="${celeb.name}" style="object-fit:contain; padding: 15px; width:100%; height: 100%;">
                             </div>
-                        </div>
-                    </a>
-                `;
-                grid.appendChild(card);
+                            <div style="text-align:center; padding: 1.5rem; flex-grow: 1;">
+                                <h3 class="gold-text" style="margin-bottom:10px; font-size: 1.1rem;">${celeb.name}</h3>
+                                <div style="display:inline-block; background:rgba(212,175,55,0.1); color:var(--gold); padding:6px 16px; border-radius:50px; font-size:0.75rem; font-weight:900;">
+                                    ${celeb.itemCount} ITEMS
+                                </div>
+                            </div>
+                        </a>
+                    </div>`;
             });
         }
 
         function setupCelebSearch() {
             const searchInput = document.getElementById('celebSearch');
             if (!searchInput) return;
-
             searchInput.addEventListener('input', (e) => {
                 const term = e.target.value.toLowerCase();
-                const filtered = allCelebrities.filter(c => c.name.toLowerCase().includes(term));
-                renderCelebrities(filtered);
+                renderCelebrities(allCelebrities.filter(c => c.name.toLowerCase().includes(term)));
             });
         }
-
         loadCelebrities();
     </script>
 </body>
