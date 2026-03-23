@@ -2,20 +2,16 @@ const PROJECT_ID = 'dpcpc70i';
 const DATASET = 'production';
 const BASE_URL = `https://${PROJECT_ID}.api.sanity.io/v2021-10-21/data/query/${DATASET}?query=`;
 
-// --- ADDED NAVBAR BACK IN ---
-async function loadNavbar() {
-    const placeholder = document.getElementById('navbar-placeholder');
-    if (!placeholder) return;
-    try {
-        const response = await fetch('navbar.html');
-        placeholder.innerHTML = await response.text();
-    } catch (e) { console.error("Error loading navbar:", e); }
-}
-
 function getEmoji(sport) {
     const emojis = { 'Cricket': '🏏', 'Football': '⚽', 'Tennis': '🎾', 'NBA': '🏀', 'Basketball': '🏀', 'F1': '🏎️', 'Golf': '⛳' };
     return emojis[sport] || '🏆';
 }
+
+// Global function to expand testimonial text
+window.expandQuote = function() {
+    document.getElementById('t-quote-short').style.display = 'none';
+    document.getElementById('t-quote-full').style.display = 'block';
+};
 
 async function loadHomeContent() {
     const query = encodeURIComponent(`{
@@ -39,8 +35,9 @@ async function loadHomeContent() {
                 </a>`).join('');
         }
 
-        // 2. Testimonials (ADDED "SEE MORE" LINK)
+        // 2. Random Testimonials with "See More" toggle
         if (result.testimonials?.length > 0) {
+            // Picks a random testimonial every time the page loads
             const t = result.testimonials[Math.floor(Math.random() * result.testimonials.length)];
             
             let mediaHtml = '';
@@ -50,15 +47,25 @@ async function loadHomeContent() {
                 mediaHtml = `<img src="${t.iUrl}" class="sidebar-media" alt="Testimonial">`;
             }
 
+            // Truncate logic
+            const isLong = t.quote.length > 55;
+            const shortQuote = isLong ? t.quote.substring(0, 55) + "..." : t.quote;
+            const seeMoreBtn = isLong ? `<span style="color:var(--gold); cursor:pointer; font-weight:900; margin-left:5px;" onclick="expandQuote()">See More</span>` : '';
+
             document.getElementById('testimonial-display').innerHTML = `
                 ${mediaHtml}
-                <p style="font-style:italic; font-size:0.85rem; color:#ccc; line-height:1.4;">"${t.quote}"</p>
-                <h4 class="gold-text" style="font-size:0.75rem; margin-top:8px;">— ${t.name}</h4>
-                <a href="testimonials.html" style="display:inline-block; margin-top:12px; font-size:0.75rem; font-weight:900; text-transform:uppercase; color:var(--gold); border-bottom:1px solid var(--gold); text-decoration:none;">See More</a>`;
+                <div id="t-quote-short" style="font-style:italic; font-size:0.85rem; color:#ccc; line-height:1.4;">
+                    "${shortQuote}" ${seeMoreBtn}
+                </div>
+                <div id="t-quote-full" style="display:none; font-style:italic; font-size:0.85rem; color:#ccc; line-height:1.4;">
+                    "${t.quote}"
+                </div>
+                <h4 class="gold-text" style="font-size:0.75rem; margin-top:8px;">— ${t.name}</h4>`;
         }
 
-        // 3. Encounters
+        // 3. Random Encounters
         if (result.encounters?.length > 0) {
+            // Picks a random encounter every time the page loads
             const e = result.encounters[Math.floor(Math.random() * result.encounters.length)];
             const media = e.videoFileUrl ? `<video muted playsinline autoplay loop style="width:100%; border-radius:8px;"><source src="${e.videoFileUrl}"></video>` : `<img src="${e.imageUrl}" style="width:100%; border-radius:8px;">`;
             document.getElementById('encounter-display').innerHTML = `<div style="margin-top:10px;">${media}<p style="font-size:0.8rem; margin-top:8px; font-weight:700;">${e.title}</p></div>`;
@@ -105,7 +112,6 @@ async function loadVault() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    loadNavbar(); // Brings back your top navigation!
     loadHomeContent();
     loadVault();
 });
