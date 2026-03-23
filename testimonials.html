@@ -8,6 +8,9 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <div class="ticker-container">
+        <div class="ticker-wrap"><div class="ticker" id="dynamic-ticker">LOADING THE ARCHIVE • </div></div>
+    </div>
     <div id="navbar-placeholder"></div>
 
     <div class="section-padding" style="max-width: 1400px; margin: 0 auto; padding-top: 60px;">
@@ -17,6 +20,7 @@
         <div class="sport-grid" id="testimonialGrid"></div>
     </div>
 
+    <div id="footer-placeholder"></div>
     <script src="script.js"></script>
     <script>
         async function loadTestimonials() {
@@ -31,31 +35,44 @@
         }
 
         function renderTestimonials(list) {
-            const grid = document.getElementById('testimonialGrid');
-            grid.innerHTML = '';
-            
-            list.forEach(t => {
+            document.getElementById('testimonialGrid').innerHTML = list.map(t => {
                 let topMediaHTML = '';
                 if (t.videoFileUrl) {
                     topMediaHTML = `<video controls playsinline style="width: 100%; height: auto; max-height: 400px; object-fit: contain; background: #000; display: block;"><source src="${t.videoFileUrl}"></video>`;
-                } else {
-                    topMediaHTML = `<img src="${t.imageUrl || 'https://via.placeholder.com/400x280/050505/D4AF37?text=7+Islands'}" style="width: 100%; height: auto; max-height: 400px; object-fit: contain; background: #000; display: block;">`;
+                } else if (t.imageUrl) {
+                    topMediaHTML = `<img src="${t.imageUrl}" style="width: 100%; height: auto; max-height: 400px; object-fit: contain; background: #000; display: block;">`;
                 }
 
-                grid.innerHTML += `
-                    <div class="sport-card" style="cursor: default;">
+                let quoteHTML = '';
+                if (t.quote) {
+                    const cleanQuote = t.quote.replace(/"/g, '&quot;');
+                    // 1 Line Truncation Fix
+                    if (t.quote.length > 70) {
+                        const shortQuote = t.quote.substring(0, 70) + '...';
+                        quoteHTML = `
+                        <div style="font-size:0.9rem; font-style:italic; line-height:1.6; opacity:0.85; margin-bottom: 15px;">
+                            <span class="q-short">"${shortQuote}" <span onclick="this.parentElement.parentElement.querySelector('.q-short').style.display='none'; this.parentElement.parentElement.querySelector('.q-full').style.display='inline';" style="color:var(--gold); font-weight:bold; cursor:pointer; text-decoration:underline;">See More</span></span>
+                            <span class="q-full" style="display:none;">"${cleanQuote}"</span>
+                        </div>`;
+                    } else {
+                        quoteHTML = `<p style="font-size:0.9rem; font-style:italic; line-height:1.6; opacity:0.85; margin-bottom: 15px;">"${t.quote}"</p>`;
+                    }
+                }
+
+                return `
+                    <div class="sport-card" style="cursor: default; border: 1px solid rgba(212,175,55,0.1);">
                         <div style="padding:0; border-bottom: 2px solid var(--gold); position: relative; overflow:hidden; background: #000; display: flex; align-items: center; justify-content: center;">
                             ${topMediaHTML}
                         </div>
                         <div class="card-info" style="text-align:center; padding: 1.5rem;">
                             <h3 class="gold-text" style="font-size:1.2rem; margin-bottom:5px;">${t.name}</h3>
                             <p style="font-size:0.75rem; text-transform:uppercase; letter-spacing:1px; opacity:0.5; margin-bottom:15px;">${t.role || 'Collector'}</p>
-                            <p style="font-size:0.9rem; font-style:italic; line-height:1.6; opacity:0.85; margin-bottom: 15px;">"${t.quote}"</p>
+                            ${quoteHTML}
                         </div>
                     </div>`;
-            });
+            }).join('');
         }
-        loadTestimonials();
+        document.addEventListener('DOMContentLoaded', loadTestimonials);
     </script>
 </body>
 </html>

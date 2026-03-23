@@ -4,25 +4,40 @@ const BASE_URL = `https://${PROJECT_ID}.api.sanity.io/v2021-10-21/data/query/${D
 
 let allItems = []; 
 
-// --- NAVBAR LOADER ---
-async function loadNavbar() {
-    const placeholder = document.getElementById('navbar-placeholder');
-    if (!placeholder) return;
-    try {
-        const response = await fetch('navbar.html');
-        const navHtml = await response.text();
-        placeholder.innerHTML = navHtml;
-        
-        // Auto-highlight active page
-        const currentPage = window.location.pathname.split('/').pop() || 'index.html';
-        const navLinks = document.querySelectorAll('.nav-links .nav-item');
-        navLinks.forEach(link => {
-            const linkHref = link.getAttribute('href');
-            if (linkHref === currentPage || (currentPage === '' && linkHref === 'index.html')) {
-                link.classList.add('active');
-            }
-        });
-    } catch (e) { console.error("Error loading navbar:", e); }
+// --- COMPONENTS LOADER (Navbar & Footer) ---
+async function loadComponents() {
+    // Navbar
+    const navPlaceholder = document.getElementById('navbar-placeholder');
+    if (navPlaceholder) {
+        try {
+            const navResp = await fetch('navbar.html');
+            navPlaceholder.innerHTML = await navResp.text();
+            const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+            document.querySelectorAll('.nav-links .nav-item').forEach(link => {
+                if (link.getAttribute('href') === currentPage || (currentPage === '' && link.getAttribute('href') === 'index.html')) {
+                    link.classList.add('active');
+                }
+            });
+        } catch (e) { console.error("Navbar Error:", e); }
+    }
+
+    // Footer & Visitor Counter
+    const footPlaceholder = document.getElementById('footer-placeholder');
+    if (footPlaceholder) {
+        try {
+            const footResp = await fetch('footer.html');
+            footPlaceholder.innerHTML = await footResp.text();
+            
+            // Visitor Logic
+            let count = localStorage.getItem('siteVisitors');
+            if (!count) { count = 9500 + Math.floor(Math.random() * 20); } 
+            else { count = parseInt(count) + 1; }
+            localStorage.setItem('siteVisitors', count);
+            
+            const counterEl = document.getElementById('visitor-counter');
+            if (counterEl) counterEl.innerText = `Visitors: ${count.toLocaleString()}`;
+        } catch (e) { console.error("Footer Error:", e); }
+    }
 }
 
 function shuffleArray(array) {
@@ -42,11 +57,14 @@ function getEmoji(sport) {
     return emojis[sport] || '🏆';
 }
 
-window.expandQuote = function() {
-    document.getElementById('t-quote-short').style.display = 'none';
-    document.getElementById('t-quote-full').style.display = 'block';
+window.expandQuote = function(event) {
+    event.preventDefault(); // Stop sidebar click
+    const container = event.target.parentElement;
+    container.querySelector('.t-quote-short').style.display = 'none';
+    container.querySelector('.t-quote-full').style.display = 'block';
 };
 
+// --- DYNAMIC TICKER (INFINITE LOOP FIX) ---
 async function loadTicker() {
     try {
         const query = encodeURIComponent(`*[_type in ["sport", "sportsman"]]{name}`);
@@ -55,9 +73,12 @@ async function loadTicker() {
         if (result && result.length > 0) {
             const names = result.map(i => i.name).filter(Boolean);
             const shuffled = shuffleArray(names);
-            const tickerStr = shuffled.join(' • ') + ' • ' + shuffled.join(' • ');
+            // Repeat the string 4 times to ensure CSS translateX(-50%) creates a seamless loop
+            const baseStr = shuffled.join(' • ') + ' • ';
+            const infiniteStr = baseStr + baseStr + baseStr + baseStr;
+            
             document.querySelectorAll('#dynamic-ticker').forEach(el => {
-                el.innerHTML = tickerStr.toUpperCase() + ' • ';
+                el.innerHTML = infiniteStr.toUpperCase();
             });
         }
     } catch (e) { console.error("Ticker Error:", e); }
@@ -72,7 +93,7 @@ function renderGrid(id, items) {
     const titleSize = isSmall ? '0.85rem' : '1rem';
 
     grid.innerHTML = items.map(i => `
-        <div class="sport-card" style="transition: transform 0.3s; border: 1px solid rgba(212,175,55,0.1);">
+        <div class="sport-card" style="border: 1px solid rgba(212,175,55,0.1);">
             <a href="item.html?name=${encodeURIComponent(i.title)}" style="text-decoration:none; color:inherit; display:flex; flex-direction:column; height:100%;">
                 <div style="background:#000; width:100%; height:${imgHeight}; display:flex; align-items:center; justify-content:center; border-bottom: 2px solid var(--gold);">
                     <img src="${i.imageUrl}" style="max-width:100%; max-height:100%; object-fit:contain; padding:10px;">
@@ -131,14 +152,16 @@ async function loadHomeContent() {
             if (t.vUrl) mediaHtml = `<video class="sidebar-media" controls autoplay playsinline style="object-fit:contain; background:#000;"><source src="${t.vUrl}"></video>`;
             else if (t.iUrl) mediaHtml = `<img src="${t.iUrl}" class="sidebar-media" alt="Testimonial" style="object-fit:contain; background:#000;">`;
 
-            const isLong = t.quote.length > 60;
-            const shortQuote = isLong ? t.quote.substring(0, 60) + "..." : t.quote;
-            const seeMoreBtn = isLong ? `<span style="color:var(--gold); cursor:pointer; font-weight:900; margin-left:5px; text-decoration: underline;" onclick="expandQuote()">See More</span>` : '';
+            const isLong = t.quote.length > 50;
+            const shortQuote = isLong ? t.quote.substring(0, 50) + "..." : t.quote;
+            const seeMoreBtn = isLong ? `<span style="color:var(--gold); cursor:pointer; font-weight:900; margin-left:5px; text-decoration: underline;" onclick="expandQuote(event)">See More</span>` : '';
 
             document.getElementById('testimonial-display').innerHTML = `
                 ${mediaHtml}
-                <div id="t-quote-short" style="font-style:italic; font-size:0.85rem; color:#ccc; line-height:1.4;">"${shortQuote}" ${seeMoreBtn}</div>
-                <div id="t-quote-full" style="display:none; font-style:italic; font-size:0.85rem; color:#ccc; line-height:1.4;">"${t.quote}"</div>
+                <div>
+                    <div class="t-quote-short" style="font-style:italic; font-size:0.85rem; color:#ccc; line-height:1.4;">"${shortQuote}" ${seeMoreBtn}</div>
+                    <div class="t-quote-full" style="display:none; font-style:italic; font-size:0.85rem; color:#ccc; line-height:1.4;">"${t.quote}"</div>
+                </div>
                 <h4 class="gold-text" style="font-size:0.75rem; margin-top:8px;">— ${t.name}</h4>`;
         }
 
@@ -163,15 +186,12 @@ async function loadVault() {
         if (document.getElementById('latestGrid')) {
             renderGrid('latestGrid', allItems.filter(i => i.isLatest).slice(0, 3));
         }
-
         if (document.getElementById('sportGrid')) {
             renderGrid('sportGrid', shuffleArray([...allItems]).slice(0, 8));
         }
-
         if (document.getElementById('fullVaultGrid')) {
             setupFullVaultSearch();
         }
-        
         setupSearch(); 
     } catch (err) { console.error("Vault Error:", err); }
 }
@@ -207,7 +227,7 @@ function setupFullVaultSearch() {
     
     if(!searchInput && !sportFilter && !latestFilter) return;
 
-    const urlParams = newSearchParams(window.location.search);
+    const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('filter') === 'latest' && latestFilter) {
         latestFilter.checked = true;
     }
@@ -241,7 +261,7 @@ function setupFullVaultSearch() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    loadNavbar(); // Automatically loads navbar.html
+    loadComponents();
     loadTicker();
     loadHomeContent();
     loadVault();

@@ -3,143 +3,86 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Collection | 7 Islands Memorabilia</title>
+    <title>Filtered Results | 7 Islands Memorabilia</title>
     <link href="https://fonts.googleapis.com/css2?family=Arvo:700&family=Inter:wght@400;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <div class="ticker-container">
+        <div class="ticker-wrap"><div class="ticker" id="dynamic-ticker">LOADING THE ARCHIVE • </div></div>
+    </div>
+    
     <div id="navbar-placeholder"></div>
     
-    <section class="section-padding" style="padding-top:2rem;">
-        <h2 class="section-title" id="filterHeading" style="margin-bottom: 2rem; font-size: 1.5rem;">Loading Archive...</h2>
+    <div class="section-padding" style="max-width: 1400px; margin: 0 auto; padding-top: 60px;">
+        <h1 class="section-title" style="text-align: center; font-size: 2.5rem; margin-bottom: 10px;" id="filter-title">ARCHIVE <span class="gold-text">RESULTS</span></h1>
         
-        <h2 class="section-title" id="vaultHeading" style="font-size: 1.5rem; text-align: left; display: none;">THE <span class="gold-text">ARCHIVES</span></h2>
-        <div class="sport-grid" id="filterGrid" style="margin-bottom: 5rem;"></div>
-
-        <div id="encounterSection" style="display: none; padding-top: 3rem; border-top: 1px solid rgba(212,175,55,0.2);">
-            <h2 class="section-title" style="font-size: 1.5rem; text-align: left;">PERSONAL <span class="gold-text">ENCOUNTERS</span></h2>
-            <div class="sport-grid" id="encounterGrid"></div>
+        <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; margin-bottom: 50px;">
+            <a href="vault.html" class="see-more-btn">Clear Filters & View Full Vault</a>
         </div>
-    </section>
 
+        <div class="sport-grid six-grid" id="filterGrid">
+            <p style="text-align: center; grid-column: 1/-1; opacity: 0.5;">Scanning the archive...</p>
+        </div>
+    </div>
+    
+    <div id="footer-placeholder"></div>
     <script src="script.js"></script>
     <script>
-        const params = new URLSearchParams(window.location.search);
-        const type = params.keys().next().value;
-        const val = params.get(type);
+        async function loadFilteredData() {
+            const params = new URLSearchParams(window.location.search);
+            const sport = params.get('sport');
+            const athlete = params.get('athlete');
+            const team = params.get('team');
+            const venue = params.get('venue');
+            const year = params.get('year');
+            const type = params.get('type');
 
-        if (type && val) {
-            document.title = `${val} | 7 Islands Memorabilia`;
-            
-            let label = type.toUpperCase();
-            if(type === 'athlete') label = "LEGEND";
-            
-            document.getElementById('filterHeading').innerHTML = `${label}: <span class="gold-text" style="font-size:2.5rem; display:block; margin-top:10px;">${val}</span>`;
+            let titleText = "Filtered Results";
+            if(sport) titleText = sport;
+            if(athlete) titleText = athlete;
+            if(team) titleText = team;
+            if(venue) titleText = venue;
+            if(type) titleText = type;
 
-            async function loadFiltered() {
-                let f = "";
-                if(type === 'sport') f = `sports[]->name match "${val}"`;
-                if(type === 'athlete') f = `sportsmen[]->name match "${val}"`;
-                if(type === 'venue') f = `venue->name match "${val}"`;
-                if(type === 'team') f = `teams[]->name match "${val}"`;
-                if(type === 'type') f = `itemType->name match "${val}"`;
-                if(type === 'year') f = `year match "${val}"`; 
+            document.getElementById('filter-title').innerHTML = `<span class="gold-text">${titleText.toUpperCase()}</span> ARCHIVE`;
+
+            const query = encodeURIComponent(`*[_type == "memorabilia"]{ title, year, "imageUrl": image.asset->url, "itemType": itemType->name, "sportNames": sports[]->name, "athleteNames": sportsmen[]->name, "teamNames": teams[]->name, "venueName": venue->name }`);
+            try {
+                const resp = await fetch(`https://dpcpc70i.api.sanity.io/v2021-10-21/data/query/production?query=${query}`);
+                const { result } = await resp.json();
                 
-                const query = encodeURIComponent(`*[_type == "memorabilia" && ${f}]{
-                    title, year, "venueName": venue->name, "imageUrl": image.asset->url, "itemType": itemType->name, "sportNames": sports[]->name, "athleteNames": sportsmen[]->name, "teamNames": teams[]->name
-                }`);
-                
-                try {
-                    const resp = await fetch(`https://dpcpc70i.api.sanity.io/v2021-10-21/data/query/production?query=${query}`);
-                    const {result} = await resp.json();
-                    
-                    const grid = document.getElementById('filterGrid');
-                    if(result && result.length > 0) {
-                        document.getElementById('vaultHeading').style.display = 'block';
-                        result.forEach(item => grid.appendChild(createCard(item)));
-                    } else {
-                        grid.innerHTML = `<p style="grid-column: 1/-1; text-align:left; opacity:0.5; padding:20px 0;">No archives found for this specific tag.</p>`;
-                    }
-                } catch (e) { console.error("Filter Load Error", e); }
+                const filtered = result.filter(item => {
+                    if(sport && !(item.sportNames || []).includes(sport)) return false;
+                    if(athlete && !(item.athleteNames || []).includes(athlete)) return false;
+                    if(team && !(item.teamNames || []).includes(team)) return false;
+                    if(venue && item.venueName !== venue) return false;
+                    if(year && item.year != year) return false;
+                    if(type && item.itemType !== type) return false;
+                    return true;
+                });
 
-                if (type === 'athlete') {
-                    const eQuery = encodeURIComponent(`*[_type == "encounter" && sportsman->name == "${val}"]{
-                        title, date, description, videoUrl, "videoFileUrl": videoFile.asset->url, "imageUrl": image.asset->url, "sportName": sport->name
-                    }`);
-                    try {
-                        const eResp = await fetch(`https://dpcpc70i.api.sanity.io/v2021-10-21/data/query/production?query=${eQuery}`);
-                        const {result: encounters} = await eResp.json();
-                        
-                        if (encounters && encounters.length > 0) {
-                            const encSection = document.getElementById('encounterSection');
-                            const encGrid = document.getElementById('encounterGrid');
-                            encSection.style.display = 'block'; 
-                            
-                            encounters.forEach(enc => {
-                                const encCard = document.createElement('div');
-                                encCard.className = 'sport-card';
-                                encCard.style.cursor = 'default'; 
-                                
-                                let topMediaHTML = '';
-                                let containerStyle = 'height: 300px;'; 
-                                
-                                if (enc.videoFileUrl) {
-                                    topMediaHTML = `
-                                        <video controls playsinline style="width: 100%; height: auto; max-height: 500px; object-fit: contain; background: #000; outline: none; border: none; display: block;">
-                                            <source src="${enc.videoFileUrl}">
-                                            Your browser does not support the video player.
-                                        </video>`;
-                                    containerStyle = 'height: auto; max-height: 500px;'; 
-                                } else if (enc.imageUrl) {
-                                    topMediaHTML = `<img src="${enc.imageUrl}" alt="${enc.title}" style="width: 100%; height: 100%; object-fit: cover; padding: 0; display: block;">`;
-                                } else {
-                                    topMediaHTML = `<img src="https://via.placeholder.com/400x300/050505/D4AF37?text=Encounter" style="width: 100%; height: 100%; object-fit: cover; display: block;">`;
-                                }
-
-                                let linkHTML = '';
-                                if (enc.videoUrl && !enc.videoFileUrl) {
-                                    linkHTML = `<a href="${enc.videoUrl}" target="_blank" style="display:inline-block; margin-top:10px; padding:6px 18px; border:1px solid var(--gold); color:black; background:var(--gold); text-decoration:none; border-radius:50px; font-size:0.8rem; font-weight:bold;">▶ Watch External Video</a>`;
-                                }
-
-                                let descHTML = '';
-                                if (enc.description) {
-                                    if (enc.description.length > 120) {
-                                        const safeDesc = enc.description.replace(/"/g, '&quot;').replace(/'/g, "&#39;");
-                                        const shortDesc = enc.description.substring(0, 120).replace(/"/g, '&quot;').replace(/'/g, "&#39;") + '...';
-                                        
-                                        descHTML = `
-                                            <div style="font-size:0.85rem; line-height:1.6; opacity:0.85; margin-bottom: 15px;">
-                                                <span class="desc-short">${shortDesc}</span>
-                                                <span class="desc-full" style="display:none;">${safeDesc}</span>
-                                                <span onclick="this.parentElement.querySelector('.desc-short').style.display='none'; this.parentElement.querySelector('.desc-full').style.display='inline'; this.style.display='none';" style="color:var(--gold); font-weight:bold; cursor:pointer; margin-left:5px; white-space:nowrap;">See More</span>
-                                            </div>`;
-                                    } else {
-                                        descHTML = `<p style="font-size:0.85rem; line-height:1.6; opacity:0.85; margin-bottom: 15px;">${enc.description}</p>`;
-                                    }
-                                }
-
-                                encCard.innerHTML = `
-                                    <div class="card-image-container" style="${containerStyle} padding:0; border-bottom: 2px solid var(--gold); position: relative; overflow:hidden; background: #000;">
-                                        ${topMediaHTML}
-                                        ${enc.sportName ? `<span style="position: absolute; top: 15px; right: 15px; background: var(--gold); color: black; padding: 4px 10px; font-size: 0.6rem; font-weight: 900; border-radius: 4px; z-index: 10;">${enc.sportName}</span>` : ''}
-                                    </div>
-                                    <div class="card-info" style="text-align:center; padding: 1.5rem;">
-                                        <h3 style="color:var(--gold); font-size:1.1rem; margin-bottom:5px;">${enc.title}</h3>
-                                        ${enc.date ? `<p style="font-size:0.8rem; opacity:0.6; margin-bottom: 10px;">${enc.date}</p>` : ''}
-                                        ${descHTML}
-                                        ${linkHTML}
-                                    </div>
-                                `;
-                                encGrid.appendChild(encCard);
-                            });
-                        }
-                    } catch (e) { console.error("Encounters Load Error", e); }
+                const grid = document.getElementById('filterGrid');
+                if (filtered.length === 0) {
+                    grid.innerHTML = `<p style="grid-column: 1/-1; text-align:center; opacity:0.5;">No items found for this category.</p>`;
+                    return;
                 }
-            }
-            loadFiltered();
-        } else {
-            document.getElementById('filterHeading').innerHTML = "No Category Selected";
+                
+                grid.innerHTML = filtered.map(i => `
+                    <div class="sport-card" style="border: 1px solid rgba(212,175,55,0.1);">
+                        <a href="item.html?name=${encodeURIComponent(i.title)}" style="text-decoration:none; color:inherit; display:flex; flex-direction:column; height:100%;">
+                            <div style="background:#000; width:100%; height:220px; display:flex; align-items:center; justify-content:center; border-bottom: 2px solid var(--gold);">
+                                <img src="${i.imageUrl}" style="max-width:100%; max-height:100%; object-fit:contain; padding:10px;">
+                            </div>
+                            <div style="padding:15px; flex-grow:1;">
+                                <h3 style="font-size:1rem; margin-bottom: 5px;">${i.title}</h3>
+                                <p class="gold-text" style="font-size:0.8rem; font-weight:900;">${(i.athleteNames || []).join(', ').toUpperCase()}</p>
+                            </div>
+                        </a>
+                    </div>`).join('');
+            } catch (e) { console.error("Filter Error:", e); }
         }
+        document.addEventListener('DOMContentLoaded', loadFilteredData);
     </script>
 </body>
 </html>

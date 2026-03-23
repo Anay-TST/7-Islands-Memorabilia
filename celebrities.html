@@ -8,6 +8,9 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <div class="ticker-container">
+        <div class="ticker-wrap"><div class="ticker" id="dynamic-ticker">LOADING THE ARCHIVE • </div></div>
+    </div>
     <div id="navbar-placeholder"></div>
 
     <div class="section-padding" style="max-width: 1400px; margin: 0 auto; padding-top: 60px;">
@@ -21,13 +24,13 @@
         <div class="sport-grid six-grid" id="celebGrid"></div>
     </div>
 
+    <div id="footer-placeholder"></div>
     <script src="script.js"></script>
     <script>
         let allCelebrities = [];
-
         async function loadCelebrities() {
             const query = encodeURIComponent(`*[_type == "sportsman" && count(*[_type == "memorabilia" && references(^._id)]) > 0] | order(name asc) {
-                name, description, "encounterImg": *[_type == "encounter" && references(^._id)][0].image.asset->url,
+                name, "encounterImg": *[_type == "encounter" && references(^._id)][0].image.asset->url,
                 "fallbackImg": *[_type == "memorabilia" && references(^._id)][0].image.asset->url,
                 "itemCount": count(*[_type == "memorabilia" && references(^._id)])
             }`);
@@ -36,17 +39,20 @@
                 const { result } = await resp.json();
                 allCelebrities = result || [];
                 renderCelebrities(allCelebrities);
-                setupCelebSearch();
+                
+                document.getElementById('celebSearch').addEventListener('input', (e) => {
+                    const term = e.target.value.toLowerCase();
+                    renderCelebrities(allCelebrities.filter(c => c.name.toLowerCase().includes(term)));
+                });
             } catch (e) { console.error("Legends Load Error:", e); }
         }
 
         function renderCelebrities(list) {
             const grid = document.getElementById('celebGrid');
-            grid.innerHTML = '';
-            list.forEach(celeb => {
+            grid.innerHTML = list.map(celeb => {
                 const displayImg = celeb.encounterImg || celeb.fallbackImg || 'https://via.placeholder.com/400x500/050505/D4AF37?text=Legend';
-                grid.innerHTML += `
-                    <div class="sport-card">
+                return `
+                    <div class="sport-card" style="border: 1px solid rgba(212,175,55,0.1);">
                         <a href="filter.html?athlete=${encodeURIComponent(celeb.name)}" style="text-decoration: none; display: flex; flex-direction: column; height: 100%;">
                             <div style="height:250px; border-bottom: 2px solid var(--gold); overflow: hidden; background: #000; display: flex; align-items: center; justify-content: center;">
                                 <img src="${displayImg}" alt="${celeb.name}" style="object-fit:contain; padding: 15px; width:100%; height: 100%;">
@@ -59,18 +65,9 @@
                             </div>
                         </a>
                     </div>`;
-            });
+            }).join('');
         }
-
-        function setupCelebSearch() {
-            const searchInput = document.getElementById('celebSearch');
-            if (!searchInput) return;
-            searchInput.addEventListener('input', (e) => {
-                const term = e.target.value.toLowerCase();
-                renderCelebrities(allCelebrities.filter(c => c.name.toLowerCase().includes(term)));
-            });
-        }
-        loadCelebrities();
+        document.addEventListener('DOMContentLoaded', loadCelebrities);
     </script>
 </body>
 </html>

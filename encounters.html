@@ -8,6 +8,9 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <div class="ticker-container">
+        <div class="ticker-wrap"><div class="ticker" id="dynamic-ticker">LOADING THE ARCHIVE • </div></div>
+    </div>
     <div id="navbar-placeholder"></div>
 
     <div class="section-padding" style="max-width: 1400px; margin: 0 auto; padding-top: 60px;">
@@ -21,10 +24,10 @@
         <div class="sport-grid" id="encounterGrid"></div>
     </div>
 
+    <div id="footer-placeholder"></div>
     <script src="script.js"></script>
     <script>
         let allEncounters = [];
-
         async function loadAllEncounters() {
             const query = encodeURIComponent(`*[_type == "encounter"] | order(date desc) {
                 title, date, description, videoUrl, "videoFileUrl": videoFile.asset->url, 
@@ -35,15 +38,18 @@
                 const { result } = await resp.json();
                 allEncounters = result || [];
                 renderEncounters(allEncounters);
-                setupEncSearch();
+                
+                document.getElementById('encSearch').addEventListener('input', (e) => {
+                    const term = e.target.value.toLowerCase();
+                    renderEncounters(allEncounters.filter(enc => {
+                        return (enc.title||"").toLowerCase().includes(term) || (enc.athleteName||"").toLowerCase().includes(term) || (enc.sportName||"").toLowerCase().includes(term);
+                    }));
+                });
             } catch (e) { console.error("Encounters Load Error:", e); }
         }
 
         function renderEncounters(list) {
-            const grid = document.getElementById('encounterGrid');
-            grid.innerHTML = '';
-            
-            list.forEach(enc => {
+            document.getElementById('encounterGrid').innerHTML = list.map(enc => {
                 let topMediaHTML = '';
                 if (enc.videoFileUrl) {
                     topMediaHTML = `<video controls playsinline style="width: 100%; height: auto; max-height: 450px; object-fit: contain; background: #000; display: block;"><source src="${enc.videoFileUrl}"></video>`;
@@ -51,10 +57,24 @@
                     topMediaHTML = `<img src="${enc.imageUrl}" style="width: 100%; height: auto; max-height: 450px; object-fit: contain; background: #000; display: block;">`;
                 }
 
-                let descHTML = `<p style="font-size:0.85rem; line-height:1.6; opacity:0.85; margin-bottom: 15px;">${enc.description || ''}</p>`;
+                let descHTML = '';
+                if (enc.description) {
+                    const cleanDesc = enc.description.replace(/"/g, '&quot;');
+                    // 1 Line Truncation Fix
+                    if (enc.description.length > 70) {
+                        const shortDesc = enc.description.substring(0, 70) + '...';
+                        descHTML = `
+                            <div style="font-size:0.85rem; line-height:1.6; opacity:0.85; margin-bottom: 15px;">
+                                <span class="desc-short">${shortDesc} <span onclick="this.parentElement.parentElement.querySelector('.desc-short').style.display='none'; this.parentElement.parentElement.querySelector('.desc-full').style.display='inline';" style="color:var(--gold); font-weight:bold; cursor:pointer; text-decoration:underline;">See More</span></span>
+                                <span class="desc-full" style="display:none;">${cleanDesc}</span>
+                            </div>`;
+                    } else {
+                        descHTML = `<p style="font-size:0.85rem; line-height:1.6; opacity:0.85; margin-bottom: 15px;">${enc.description}</p>`;
+                    }
+                }
 
-                grid.innerHTML += `
-                    <div class="sport-card" style="cursor: default;">
+                return `
+                    <div class="sport-card" style="cursor: default; border: 1px solid rgba(212,175,55,0.1);">
                         <div style="padding:0; border-bottom: 2px solid var(--gold); position: relative; overflow:hidden; background: #000; display: flex; align-items: center; justify-content: center;">
                             ${topMediaHTML}
                         </div>
@@ -64,23 +84,9 @@
                             ${descHTML}
                         </div>
                     </div>`;
-            });
+            }).join('');
         }
-
-        function setupEncSearch() {
-            const searchInput = document.getElementById('encSearch');
-            if (!searchInput) return;
-            searchInput.addEventListener('input', (e) => {
-                const term = e.target.value.toLowerCase();
-                renderEncounters(allEncounters.filter(enc => {
-                    const title = (enc.title || "").toLowerCase();
-                    const athlete = (enc.athleteName || "").toLowerCase();
-                    const sport = (enc.sportName || "").toLowerCase();
-                    return title.includes(term) || athlete.includes(term) || sport.includes(term);
-                }));
-            });
-        }
-        loadAllEncounters();
+        document.addEventListener('DOMContentLoaded', loadAllEncounters);
     </script>
 </body>
 </html>

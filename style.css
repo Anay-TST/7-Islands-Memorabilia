@@ -23,10 +23,7 @@ h1, h2, h3 { font-family: 'Arvo', serif; font-weight: 900; }
 .gold-text { color: var(--gold); }
 
 /* --- Navbar --- */
-header { 
-    background: rgba(0,0,0,0.95); position: sticky; top: 0; z-index: 2000; 
-    border-bottom: 1px solid rgba(212,175,55,0.2); backdrop-filter: blur(10px); 
-}
+header { background: rgba(0,0,0,0.95); position: sticky; top: 0; z-index: 2000; border-bottom: 1px solid rgba(212,175,55,0.2); backdrop-filter: blur(10px); }
 nav { display: flex; justify-content: space-between; align-items: center; padding: 1rem 5%; max-width: 1400px; margin: 0 auto; }
 .logo { font-size: 1.2rem; color: var(--gold); cursor: pointer; text-decoration: none; font-family: 'Arvo', serif; font-weight: 900; text-transform: uppercase; }
 .nav-links { display: flex; list-style: none; gap: 2rem; }
@@ -42,11 +39,7 @@ nav { display: flex; justify-content: space-between; align-items: center; paddin
 .hero-subtitle { opacity: 0.6; margin-bottom: 2rem; font-weight: 700; letter-spacing: 2px; border-left: 2px solid var(--gold); padding-left: 15px; }
 
 /* --- Buttons --- */
-.see-more-btn {
-    background: transparent; border: 2px solid var(--gold); color: var(--gold); padding: 12px 35px;
-    font-size: 0.85rem; font-weight: 900; text-transform: uppercase; border-radius: 50px; cursor: pointer;
-    transition: 0.3s; display: inline-block; text-decoration: none; letter-spacing: 1px;
-}
+.see-more-btn { background: transparent; border: 2px solid var(--gold); color: var(--gold); padding: 12px 35px; font-size: 0.85rem; font-weight: 900; text-transform: uppercase; border-radius: 50px; cursor: pointer; transition: 0.3s; display: inline-block; text-decoration: none; letter-spacing: 1px; }
 .see-more-btn:hover { background: var(--gold); color: black; box-shadow: 0 0 20px var(--gold-glow); }
 
 /* --- Icons --- */
@@ -60,7 +53,8 @@ nav { display: flex; justify-content: space-between; align-items: center; paddin
 #vaultSearch { width: 100%; padding: 15px 25px; background: rgba(0,0,0,0.5); border: 2px solid var(--gold); border-radius: 50px; color: white; outline: none; }
 
 /* --- Sidebar Blocks --- */
-.sidebar-block { background: var(--glass); border: 1px solid rgba(212, 175, 55, 0.1); padding: 25px; border-radius: 15px; backdrop-filter: blur(10px); }
+.sidebar-block { background: var(--glass); border: 1px solid rgba(212, 175, 55, 0.1); padding: 25px; border-radius: 15px; backdrop-filter: blur(10px); transition: 0.3s; }
+.sidebar-block:hover { border-color: var(--gold); transform: translateY(-3px); box-shadow: 0 5px 20px rgba(212,175,55,0.1); }
 .sidebar-label { color: var(--gold); text-transform: uppercase; font-size: 0.75rem; letter-spacing: 2px; margin-bottom: 15px; }
 .sidebar-media { width: 100%; border-radius: 8px; margin-bottom: 12px; border: 1px solid rgba(212, 175, 55, 0.2); object-fit: cover; }
 
@@ -75,10 +69,10 @@ nav { display: flex; justify-content: space-between; align-items: center; paddin
 .sport-grid.small-grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; }
 .sport-grid.six-grid { grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 20px; }
 
-/* --- Ticker Placeholders --- */
-.ticker-container { background: var(--gold); color: black; padding: 10px 0; overflow: hidden; }
-.ticker { display: inline-block; white-space: nowrap; animation: move 30s linear infinite; font-weight: 900; }
-@keyframes move { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
+/* --- Ticker Animation (FIXED SPEED & LOOP) --- */
+.ticker-container { background: var(--gold); color: black; padding: 10px 0; overflow: hidden; white-space: nowrap; }
+.ticker { display: inline-block; white-space: nowrap; animation: move 45s linear infinite; font-weight: 900; letter-spacing: 1px;}
+@keyframes move { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
 
 /* --- Responsive --- */
 @media (max-width: 1024px) { .layout-wrapper { flex-direction: column; } .sidebar-column { width: 100%; } }
