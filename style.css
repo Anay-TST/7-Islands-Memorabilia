@@ -1,91 +1,74 @@
-/* --- MASTER THEME --- */
+/* --- THEME FIX --- */
 :root {
     --gold: #D4AF37;
     --royal-purple: #1a0a2e;
     --pitch-black: #050505;
     --glass: rgba(255, 255, 255, 0.03);
-    --gold-glow: rgba(212, 175, 55, 0.3);
 }
 
-* { margin: 0; padding: 0; box-sizing: border-box; }
-
 body {
-    background-color: var(--pitch-black);
-    background-image: radial-gradient(circle at top, var(--royal-purple), var(--pitch-black));
+    background-color: var(--pitch-black) !important;
+    background-image: radial-gradient(circle at top, var(--royal-purple), var(--pitch-black)) !important;
     background-attachment: fixed;
     color: white;
     font-family: 'Inter', sans-serif;
-    line-height: 1.6;
+    margin: 0;
 }
 
-h1, h2, h3 { font-family: 'Arvo', serif; font-weight: 900; }
-.gold-text { color: var(--gold); }
-
-/* --- Layout Structure --- */
-.layout-wrapper {
-    display: flex;
-    gap: 50px;
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 40px 5%;
-}
-
+/* --- LAYOUT --- */
+.layout-wrapper { display: flex; gap: 40px; max-width: 1400px; margin: 0 auto; padding: 40px 5%; }
 .main-content { flex: 3; }
-.sidebar-column { flex: 1; min-width: 320px; }
+.sidebar-column { flex: 1; min-width: 300px; }
+.sidebar-sticky-wrap { position: sticky; top: 100px; display: flex; flex-direction: column; gap: 20px; }
 
-.sidebar-sticky-wrap {
-    position: sticky;
-    top: 100px;
-    display: flex;
+/* --- CARDS: FULL IMAGE LOGIC --- */
+.sport-card { 
+    background: var(--glass); 
+    border: 1px solid rgba(212, 175, 55, 0.1); 
+    border-radius: 12px; 
+    overflow: hidden; 
+    display: flex; 
     flex-direction: column;
-    gap: 25px;
 }
 
-/* --- Hero Intro & Icons --- */
-.hero-subtitle {
-    opacity: 0.6; margin-bottom: 2rem; font-weight: 700; 
-    letter-spacing: 2px; border-left: 2px solid var(--gold); padding-left: 15px;
+.img-container {
+    width: 100%;
+    background: #000; /* Black background behind the contained image */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
 }
 
-#sports-icons-row { margin: 2rem 0; display: flex; gap: 20px; flex-wrap: wrap; }
-.icon-circle {
-    background: rgba(212, 175, 55, 0.1); width: 60px; height: 60px; 
-    border-radius: 50%; display: flex; align-items: center; justify-content: center;
-    border: 1px solid var(--gold); transition: 0.3s;
-}
-.icon-circle:hover { background: var(--gold); transform: scale(1.1); box-shadow: 0 0 20px var(--gold-glow); }
-.icon-circle:hover span { filter: brightness(0); }
+/* Latest cards are taller */
+#latestGrid .img-container { height: 280px; }
+/* Vault cards are shorter */
+#sportGrid .img-container { height: 180px; }
 
-/* --- Search Bar --- */
-.search-container { width: 100%; max-width: 500px; margin-bottom: 20px; }
-#vaultSearch {
-    width: 100%; padding: 15px 25px; background: rgba(0,0,0,0.5);
-    border: 2px solid var(--gold); border-radius: 50px; color: white; outline: none;
+.sport-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* THIS SHOWS THE FULL IMAGE */
+    padding: 10px;
 }
 
-/* --- Sidebar Blocks --- */
-.sidebar-block {
-    background: var(--glass); border: 1px solid rgba(212, 175, 55, 0.1);
-    padding: 25px; border-radius: 15px; backdrop-filter: blur(10px);
+/* --- GRID SIZES --- */
+.sport-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+.small-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); } /* SMALLER VAULT CARDS */
+
+/* --- SIDEBAR MEDIA --- */
+.sidebar-media {
+    width: 100%;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    border: 1px solid rgba(212, 175, 55, 0.2);
 }
-.sidebar-label { color: var(--gold); text-transform: uppercase; font-size: 0.75rem; letter-spacing: 2px; margin-bottom: 15px; }
 
-/* --- Grids --- */
-.section-title { margin-bottom: 2rem; font-size: 1.8rem; text-transform: uppercase; }
-.sport-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; margin-bottom: 4rem; }
-.sport-card { background: var(--glass); border: 1px solid rgba(212, 175, 55, 0.1); border-radius: 12px; overflow: hidden; transition: 0.3s; }
-.sport-card:hover { transform: translateY(-8px); border-color: var(--gold); }
+.sidebar-block { background: var(--glass); padding: 20px; border-radius: 15px; border: 1px solid rgba(212, 175, 55, 0.1); }
+.sidebar-label { color: var(--gold); text-transform: uppercase; font-size: 0.7rem; letter-spacing: 2px; margin-bottom: 15px; display: block; }
 
-/* --- Instagram --- */
-.insta-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 4rem; }
-.insta-post img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; }
-
-/* --- Ticker & Nav Placeholders --- */
-.ticker-container { background: var(--gold); color: black; padding: 10px 0; overflow: hidden; }
-.ticker { display: inline-block; white-space: nowrap; animation: move 30s linear infinite; font-weight: 900; }
-@keyframes move { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
-
-@media (max-width: 1024px) {
-    .layout-wrapper { flex-direction: column; }
-    .sidebar-column { width: 100%; }
-}
+/* --- SEARCH & ICONS --- */
+#vaultSearch { width: 100%; max-width: 500px; padding: 15px; border-radius: 50px; border: 2px solid var(--gold); background: #000; color: #fff; }
+#sports-icons-row { margin: 2rem 0; display: flex; gap: 15px; flex-wrap: wrap; }
+.icon-circle { width: 50px; height: 50px; border-radius: 50%; border: 1px solid var(--gold); display: flex; align-items: center; justify-content: center; background: rgba(212,175,55,0.1); transition: 0.3s; }
+.icon-circle:hover { background: var(--gold); transform: scale(1.1); }
