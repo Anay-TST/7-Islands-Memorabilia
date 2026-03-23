@@ -1,69 +1,69 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>7 Islands Memorabilia | The Vault</title>
-    <link href="https://fonts.googleapis.com/css2?family=Arvo:700&family=Inter:wght@400;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
-</head>
 <body>
     <div class="ticker-container">
         <div class="ticker-wrap"><div class="ticker">CRICKET • FOOTBALL • TENNIS • NBA • F1 • GOLF • OLYMPICS • BASEBALL • HOCKEY • RUGBY • BOXING • MOTOGP • SQUASH •</div></div>
     </div>
     
     <div id="navbar-placeholder"></div>
-    
-    <section class="hero-split">
-        <div class="hero-left">
-            <h1 style="margin-bottom: 0.5rem;">THE <span class="gold-text">VAULT</span></h1>
-            <p style="opacity: 0.6; margin-bottom: 2rem; font-weight: 700; letter-spacing: 1px;">CURATING WORLD SPORTING HISTORY</p>
-            
-            <div class="search-container" style="justify-content: flex-start; margin: 0;">
-                <input type="text" id="vaultSearch" placeholder="Search Legend, Sport, or Year...">
+
+    <div class="layout-wrapper section-padding">
+        
+        <main class="main-content">
+            <div class="hero-intro">
+                <h1 style="margin-bottom: 0.5rem;">THE <span class="gold-text">VAULT</span></h1>
+                <p class="hero-subtitle">CURATING WORLD SPORTING HISTORY</p>
+                
+                <div class="search-container">
+                    <input type="text" id="vaultSearch" placeholder="Search Legend, Sport, or Year...">
+                </div>
+
+                <div id="sports-icons-row">
+                    </div>
             </div>
 
-            <div id="sports-icons-row" style="margin-top: 3rem; display: flex; gap: 25px; flex-wrap: wrap;">
-                </div>
-        </div>
+            <hr class="section-divider">
 
-        <div class="hero-sidebar">
-            <div class="sidebar-block">
-                <h2 class="sidebar-label">Testimonials</h2>
-                <div id="testimonial-display">
-                    <p style="opacity:0.3; font-size: 0.8rem;">Loading feedback...</p>
-                </div>
-            </div>
-            <div class="sidebar-block">
-                <h2 class="sidebar-label">Recent Meetings</h2>
-                <div id="encounter-display">
-                    <p style="opacity:0.3; font-size: 0.8rem;">Loading moment...</p>
-                </div>
-            </div>
-        </div>
-    </section>
-    
-    <section id="latest" class="section-padding" style="background: rgba(212,175,55,0.02);">
-        <h2 class="section-title">NEW <span class="gold-text">ARRIVALS</span></h2>
-        <div class="sport-grid" id="latestGrid"></div>
-    </section>
+            <section id="latest">
+                <h2 class="section-title" style="text-align: left;">NEW <span class="gold-text">ARRIVALS</span></h2>
+                <div class="sport-grid" id="latestGrid"></div>
+            </section>
 
-    <section class="insta-section section-padding">
-        <h2 class="section-title" style="margin-bottom: 10px;">@7ISLANDSMEMORABILIA</h2>
-        <p style="text-align: center; opacity: 0.5; font-size: 0.9rem; margin-bottom: 30px;">Follow our journey on Instagram</p>
-        <div class="insta-grid">
-            <a href="https://www.instagram.com/7islandsmemorabilia/" target="_blank" class="insta-post"><img src="https://via.placeholder.com/400" alt="Post"></a>
-            <a href="https://www.instagram.com/7islandsmemorabilia/" target="_blank" class="insta-post"><img src="https://via.placeholder.com/400" alt="Post"></a>
-            <a href="https://www.instagram.com/7islandsmemorabilia/" target="_blank" class="insta-post"><img src="https://via.placeholder.com/400" alt="Post"></a>
-            <a href="https://www.instagram.com/7islandsmemorabilia/" target="_blank" class="insta-post"><img src="https://via.placeholder.com/400" alt="Post"></a>
-        </div>
-    </section>
-    
-    <section id="collection" class="section-padding">
-        <h2 class="section-title">THE <span class="gold-text">100+</span> VAULT</h2>
-        <div class="sport-grid" id="sportGrid"></div>
-    </section>
+            <section class="insta-section">
+                <h2 class="section-title" style="text-align: left;">@7ISLANDSMEMORABILIA</h2>
+                <div class="insta-grid">
+                    <a href="https://www.instagram.com/7islandsmemorabilia/" target="_blank" class="insta-post"><img src="https://via.placeholder.com/400" alt="Post"></a>
+                    <a href="https://www.instagram.com/7islandsmemorabilia/" target="_blank" class="insta-post"><img src="https://via.placeholder.com/400" alt="Post"></a>
+                    <a href="https://www.instagram.com/7islandsmemorabilia/" target="_blank" class="insta-post"><img src="https://via.placeholder.com/400" alt="Post"></a>
+                    <a href="https://www.instagram.com/7islandsmemorabilia/" target="_blank" class="insta-post"><img src="https://via.placeholder.com/400" alt="Post"></a>
+                </div>
+            </section>
+
+            <section id="collection">
+                <h2 class="section-title" style="text-align: left;">THE <span class="gold-text">100+</span> VAULT</h2>
+                <div class="sport-grid" id="sportGrid"></div>
+            </section>
+        </main>
+
+        <aside class="sidebar-column">
+            <div class="sidebar-sticky-wrap">
+                
+                <div class="sidebar-block">
+                    <h2 class="sidebar-label">Testimonials</h2>
+                    <div id="testimonial-display">
+                        <p style="opacity:0.3; font-size: 0.8rem;">Loading collector reviews...</p>
+                    </div>
+                </div>
+
+                <div class="sidebar-block">
+                    <h2 class="sidebar-label">Recent Meetings</h2>
+                    <div id="encounter-display">
+                        <p style="opacity:0.3; font-size: 0.8rem;">Loading moments...</p>
+                    </div>
+                </div>
+
+            </div>
+        </aside>
+
+    </div>
     
     <script src="script.js"></script>
 </body>
-</html>

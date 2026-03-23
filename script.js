@@ -21,15 +21,27 @@ async function loadNavbar() {
     } catch (e) { console.error("Error loading navbar:", e); }
 }
 
-// --- HOME PAGE RANDOM HIGHLIGHTS & SPORTS ICONS ---
+// --- SPORT EMOJI MAPPING ---
+function getEmoji(sport) {
+    const emojis = { 
+        'Cricket': '🏏', 'Football': '⚽', 'Basketball': '🏀', 
+        'F1': '🏎️', 'Tennis': '🎾', 'Golf': '⛳', 'Boxing': '🥊',
+        'NBA': '🏀', 'Baseball': '⚾', 'Hockey': '🏒', 'Rugby': '🏉'
+    };
+    return emojis[sport] || '🏆';
+}
+
+// --- HOME PAGE CONTENT (Icons, Testimonials, Recent Meetings) ---
 async function loadHomeContent() {
     const tDisplay = document.getElementById('testimonial-display');
     const eDisplay = document.getElementById('encounter-display');
     const sIcons = document.getElementById('sports-icons-row');
     
+    if (!tDisplay && !eDisplay && !sIcons) return;
+
     const query = encodeURIComponent(`{
         "testimonials": *[_type == "testimonial"]{ name, role, quote },
-        "encounters": *[_type == "encounter"] | order(date desc)[0...10]{ 
+        "encounters": *[_type == "encounter"] | order(date desc)[0...5]{ 
             title, "imageUrl": image.asset->url, "videoFileUrl": videoFile.asset->url
         },
         "sports": *[_type == "sport"] | order(name asc) {
@@ -42,12 +54,12 @@ async function loadHomeContent() {
         const resp = await fetch(BASE_URL + query);
         const { result } = await resp.json();
 
-        // Load Sports Icons
+        // 1. Load Sports Icons with Counts
         if (sIcons && result.sports) {
             sIcons.innerHTML = result.sports.map(s => `
-                <a href="filter.html?sport=${encodeURIComponent(s.name)}" style="text-decoration:none; text-align:center; min-width:60px;">
-                    <div style="background: rgba(212,175,55,0.1); width:50px; height:50px; border-radius:50%; display:flex; align-items:center; justify-content:center; border:1px solid var(--gold); margin: 0 auto 8px; transition:0.3s;" onmouseover="this.style.background='var(--gold)';" onmouseout="this.style.background='rgba(212,175,55,0.1)';">
-                        <span style="font-size:1.2rem;">${getEmoji(s.name)}</span>
+                <a href="filter.html?sport=${encodeURIComponent(s.name)}" style="text-decoration:none; text-align:center; min-width:65px;">
+                    <div style="background: rgba(212,175,55,0.1); width:55px; height:55px; border-radius:50%; display:flex; align-items:center; justify-content:center; border:1px solid var(--gold); margin: 0 auto 8px; transition:0.3s;" class="icon-circle">
+                        <span style="font-size:1.3rem;">${getEmoji(s.name)}</span>
                     </div>
                     <p style="font-size:0.6rem; color:var(--gold); font-weight:900; text-transform:uppercase; margin:0;">${s.name}</p>
                     <p style="font-size:0.5rem; opacity:0.5; margin:0; color:white;">${s.itemCount}</p>
@@ -55,7 +67,7 @@ async function loadHomeContent() {
             `).join('');
         }
 
-        // Random Testimonial
+        // 2. Random Testimonial
         if (tDisplay && result.testimonials?.length > 0) {
             const t = result.testimonials[Math.floor(Math.random() * result.testimonials.length)];
             tDisplay.innerHTML = `
@@ -64,7 +76,7 @@ async function loadHomeContent() {
             `;
         }
 
-        // Random Encounter
+        // 3. Recent Meetings Spotlight
         if (eDisplay && result.encounters?.length > 0) {
             const enc = result.encounters[Math.floor(Math.random() * result.encounters.length)];
             const media = enc.videoFileUrl 
@@ -83,12 +95,7 @@ async function loadHomeContent() {
     } catch (e) { console.error("Home Content Error:", e); }
 }
 
-function getEmoji(sport) {
-    const emojis = { 'Cricket': '🏏', 'Football': '⚽', 'Basketball': '🏀', 'NBA': '🏀', 'F1': '🏎️', 'Tennis': '🎾', 'Golf': '⛳', 'Boxing': '🥊' };
-    return emojis[sport] || '🏆';
-}
-
-// --- VAULT LOGIC ---
+// --- VAULT GRID LOGIC ---
 const MAIN_QUERY = encodeURIComponent(`*[_type == "memorabilia"]{
   title, year, "venueName": venue->name, "imageUrl": image.asset->url,
   "itemType": itemType->name, "sportNames": sports[]->name,
@@ -102,10 +109,17 @@ async function loadVault() {
         const response = await fetch(BASE_URL + MAIN_QUERY);
         const { result } = await response.json();
         allItems = result || [];
+
+        // DYNAMIC VAULT COUNT UPDATE
+        const vaultTitle = document.querySelector('#collection .section-title');
+        if (vaultTitle && allItems.length > 0) {
+            vaultTitle.innerHTML = `THE <span class="gold-text">${allItems.length}+</span> VAULT`;
+        }
+
         if(document.getElementById('latestGrid')) renderGrid('latestGrid', allItems.filter(i => i.isLatest));
         if(document.getElementById('sportGrid')) renderGrid('sportGrid', allItems, true);
         setupSearch();
-    } catch (e) { console.error("Data Load Error:", e); }
+    } catch (e) { console.error("Vault Load Error:", e); }
 }
 
 function renderGrid(gridId, items, shuffle = false) {
@@ -153,6 +167,7 @@ function setupSearch() {
     });
 }
 
+// --- MASTER INIT ---
 document.addEventListener('DOMContentLoaded', () => {
     loadNavbar();
     loadVault();
