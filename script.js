@@ -8,11 +8,9 @@ async function loadComponents() {
     const navPlaceholder = document.getElementById('navbar-placeholder');
     if (navPlaceholder) {
         try {
-            // Fetch must retain .html to find the file
             const navResp = await fetch('navbar.html');
             navPlaceholder.innerHTML = await navResp.text();
             
-            // Clean URL Active Link Logic
             const path = window.location.pathname.split('/').pop();
             let currentPage = path.replace('.html', '');
             if (currentPage === '' || currentPage === 'index') currentPage = '.';
@@ -37,7 +35,6 @@ async function loadComponents() {
     const footPlaceholder = document.getElementById('footer-placeholder');
     if (footPlaceholder) {
         try {
-            // Fetch must retain .html
             const footResp = await fetch('footer.html');
             footPlaceholder.innerHTML = await footResp.text();
             
@@ -156,11 +153,12 @@ async function loadHomeContent() {
             }).join('');
         }
 
+        // Testimonials with 9:16 aspect ratio
         if (result.testimonials?.length > 0) {
             const t = result.testimonials[Math.floor(Math.random() * result.testimonials.length)];
             let mediaHtml = '';
-            if (t.vUrl) mediaHtml = `<video class="sidebar-media" controls autoplay playsinline style="object-fit:contain; background:#000;"><source src="${t.vUrl}"></video>`;
-            else if (t.iUrl) mediaHtml = `<img src="${t.iUrl}" class="sidebar-media" alt="Testimonial" style="object-fit:contain; background:#000;">`;
+            if (t.vUrl) mediaHtml = `<video class="testimonial-media" controls autoplay playsinline muted><source src="${t.vUrl}"></video>`;
+            else if (t.iUrl) mediaHtml = `<img src="${t.iUrl}" class="testimonial-media" alt="Testimonial">`;
 
             const isLong = t.quote.length > 50;
             const shortQuote = isLong ? t.quote.substring(0, 50) + "..." : t.quote;
@@ -175,12 +173,13 @@ async function loadHomeContent() {
                 <h4 class="gold-text" style="font-size:0.75rem; margin-top:8px;">— ${t.name}</h4>`;
         }
 
+        // Encounters with 4:5 aspect ratio
         if (result.encounters?.length > 0) {
             const sliderHTML = result.encounters.map((e, index) => {
-                const media = e.videoFileUrl ? `<video muted playsinline autoplay loop style="width:100%; border-radius:8px; object-fit:contain; background:#000; max-height:200px;"><source src="${e.videoFileUrl}"></video>` : `<img src="${e.imageUrl}" style="width:100%; border-radius:8px; object-fit:contain; background:#000; max-height:200px;">`;
+                const media = e.videoFileUrl ? `<video class="encounter-media" muted playsinline autoplay loop><source src="${e.videoFileUrl}"></video>` : `<img src="${e.imageUrl}" class="encounter-media">`;
                 return `
                 <div class="encounter-slide ${index === 0 ? 'active' : ''}">
-                    <div style="margin-top:10px;">
+                    <div>
                         ${media}
                         <p style="font-size:0.8rem; margin-top:8px; font-weight:700;">${e.title}</p>
                     </div>
@@ -229,16 +228,29 @@ async function loadVault() {
     } catch (err) { console.error("Vault Error:", err); }
 }
 
+// SEARCH BAR VISIBILITY FIX
 function setupSearch() {
     const searchInput = document.getElementById('vaultSearch');
-    const seeMoreBtn = document.getElementById('see-more-container');
     if(!searchInput) return;
     
     searchInput.addEventListener('input', (e) => {
         const term = e.target.value.toLowerCase();
+        
+        // Grab surrounding UI elements to hide them during a search
+        const latestSec = document.getElementById('latest');
+        const legendsSec = document.getElementById('top-legends');
+        const iconsRow = document.getElementById('sports-icons-row');
+        const instaSec = document.querySelector('.insta-section');
+        const seeMoreBtn = document.getElementById('see-more-container');
+        
         if(term === '') {
             renderGrid('sportGrid', shuffleArray([...allItems]).slice(0, 8));
+            if(latestSec) latestSec.style.display = 'block';
+            if(legendsSec) legendsSec.style.display = 'block';
+            if(iconsRow) iconsRow.style.display = 'flex';
+            if(instaSec) instaSec.style.display = 'block';
             if(seeMoreBtn) seeMoreBtn.style.display = 'block';
+            document.getElementById('dynamic-vault-count').innerHTML = `${allItems.length}+ VAULT`;
         } else {
             const filtered = allItems.filter(item => {
                 const title = (item.title || "").toLowerCase();
@@ -248,7 +260,19 @@ function setupSearch() {
                 return title.includes(term) || athletes.includes(term) || sports.includes(term) || year.includes(term);
             });
             renderGrid('sportGrid', filtered);
+            
+            // Hide everything else so the results grid moves to the top and is instantly visible
+            if(latestSec) latestSec.style.display = 'none';
+            if(legendsSec) legendsSec.style.display = 'none';
+            if(iconsRow) iconsRow.style.display = 'none';
+            if(instaSec) instaSec.style.display = 'none';
             if(seeMoreBtn) seeMoreBtn.style.display = 'none';
+            document.getElementById('dynamic-vault-count').innerHTML = `SEARCH RESULTS`;
+            
+            // Auto scroll down slightly if it's their first keystroke
+            if(term.length === 1) {
+                document.getElementById('collection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
         }
     });
 }

@@ -9,7 +9,6 @@
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
-/* Fixed the horizontal scroll bug by locking the width */
 html, body {
     background-color: var(--pitch-black) !important;
     background-image: radial-gradient(circle at top, var(--royal-purple), var(--pitch-black)) !important;
@@ -40,11 +39,41 @@ nav { display: flex; justify-content: space-between; align-items: center; paddin
 
 /* --- Layout Structure --- */
 .layout-wrapper { display: flex; gap: 50px; max-width: 1400px; margin: 0 auto; padding: 40px 5%; overflow-x: hidden; }
-.main-content { flex: 3; min-width: 0; } /* min-width: 0 stops flex items from blowing out the screen */
+.main-content { flex: 3; min-width: 0; } 
 .sidebar-column { flex: 1; min-width: 320px; }
-.sidebar-sticky-wrap { position: sticky; top: 100px; display: flex; flex-direction: column; gap: 25px; }
+
+/* Moved higher to close the gap on desktop */
+.sidebar-sticky-wrap { position: sticky; top: 85px; margin-top: -20px; display: flex; flex-direction: column; gap: 25px; }
+
 .section-divider { border: 0; height: 1px; background: linear-gradient(to right, transparent, var(--gold), transparent); margin: 3.5rem 0; opacity: 0.4; }
 .hero-subtitle { opacity: 0.6; margin-bottom: 2rem; font-weight: 700; letter-spacing: 2px; border-left: 2px solid var(--gold); padding-left: 15px; }
+
+/* --- Sidebar Media Ratios (Reels & 4:5) --- */
+.testimonial-media {
+    width: 100%;
+    aspect-ratio: 9 / 16;
+    object-fit: cover;
+    border-radius: 8px;
+    background: #000;
+    display: block;
+    margin-bottom: 12px;
+    border: 1px solid rgba(212, 175, 55, 0.2);
+}
+
+.encounter-media {
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    border-radius: 8px;
+    background: #000;
+    display: block;
+    margin-bottom: 12px;
+    border: 1px solid rgba(212, 175, 55, 0.2);
+}
+
+.encounter-slide { display: none; animation: fadeIn 0.5s ease-in-out; }
+.encounter-slide.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
 /* --- Buttons --- */
 .see-more-btn { background: transparent; border: 2px solid var(--gold); color: var(--gold); padding: 12px 35px; font-size: 0.85rem; font-weight: 900; text-transform: uppercase; border-radius: 50px; cursor: pointer; transition: 0.3s; display: inline-block; text-decoration: none; letter-spacing: 1px; }
@@ -60,15 +89,10 @@ nav { display: flex; justify-content: space-between; align-items: center; paddin
 .search-container { width: 100%; max-width: 500px; margin-bottom: 20px; }
 #vaultSearch { width: 100%; padding: 15px 25px; background: rgba(0,0,0,0.5); border: 2px solid var(--gold); border-radius: 50px; color: white; outline: none; }
 
-/* --- Sidebar Blocks & Slideshows --- */
+/* --- Sidebar Blocks --- */
 .sidebar-block { background: var(--glass); border: 1px solid rgba(212, 175, 55, 0.1); padding: 25px; border-radius: 15px; backdrop-filter: blur(10px); transition: 0.3s; overflow: hidden; }
 .sidebar-block:hover { border-color: var(--gold); transform: translateY(-3px); box-shadow: 0 5px 20px rgba(212,175,55,0.1); }
 .sidebar-label { color: var(--gold); text-transform: uppercase; font-size: 0.75rem; letter-spacing: 2px; margin-bottom: 15px; }
-.sidebar-media { width: 100%; border-radius: 8px; margin-bottom: 12px; border: 1px solid rgba(212, 175, 55, 0.2); object-fit: cover; }
-
-.encounter-slide { display: none; animation: fadeIn 0.5s ease-in-out; }
-.encounter-slide.active { display: block; }
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
 /* --- Grids --- */
 .section-title { margin-bottom: 2rem; font-size: 1.8rem; text-transform: uppercase; text-align: left;}
@@ -86,7 +110,6 @@ nav { display: flex; justify-content: space-between; align-items: center; paddin
 .ticker { display: inline-block; white-space: nowrap; animation: move 45s linear infinite; font-weight: 900; letter-spacing: 1px;}
 @keyframes move { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
 
-
 /* ========================================= */
 /* --- MOBILE RESPONSIVENESS & COMPACTNESS --- */
 /* ========================================= */
@@ -94,7 +117,11 @@ nav { display: flex; justify-content: space-between; align-items: center; paddin
 @media (max-width: 1024px) { 
     .layout-wrapper { flex-direction: column; gap: 30px; } 
     .sidebar-column { width: 100%; min-width: 100%; } 
-    .sidebar-sticky-wrap { position: relative; top: 0; }
+    .sidebar-sticky-wrap { position: relative; top: 0; margin-top: 0; }
+}
+
+@media (max-width: 900px) { 
+    #latestGrid { grid-template-columns: repeat(2, 1fr); } 
 }
 
 @media (max-width: 768px) {
@@ -127,7 +154,6 @@ nav { display: flex; justify-content: space-between; align-items: center; paddin
     }
     .mobile-scroll-row::-webkit-scrollbar { display: none; } 
     
-    /* 2-ITEM SWIPEABLE GRIDS FOR LATEST & VAULT */
     #latestGrid, #sportGrid {
         display: flex !important;
         flex-wrap: nowrap !important;
@@ -139,12 +165,11 @@ nav { display: flex; justify-content: space-between; align-items: center; paddin
     }
     #latestGrid::-webkit-scrollbar, #sportGrid::-webkit-scrollbar { display: none; }
     #latestGrid .sport-card, #sportGrid .sport-card {
-        flex: 0 0 calc(50% - 8px) !important; /* Forces exactly 2 items on screen */
+        flex: 0 0 calc(50% - 8px) !important;
         scroll-snap-align: start;
         min-width: 150px;
     }
     
-    /* SWIPEABLE ENCOUNTERS SIDEBAR */
     .encounter-slider {
         display: flex;
         overflow-x: auto;
@@ -155,16 +180,12 @@ nav { display: flex; justify-content: space-between; align-items: center; paddin
     }
     .encounter-slider::-webkit-scrollbar { display: none; }
     .encounter-slide {
-        display: block !important; /* Overrides Desktop Slideshow */
-        flex: 0 0 85%; /* Shows 1 card and a peek of the next */
+        display: block !important; 
+        flex: 0 0 85%; 
         scroll-snap-align: center;
         animation: none; 
     }
 
-    /* Shrink Testimonial Videos/Images */
-    .sidebar-media { max-height: 200px !important; object-fit: contain; }
-
-    /* UI Shrinking */
     .search-container { margin: 0 auto 20px auto; }
     .search-container input, select { padding: 12px 20px !important; font-size: 0.9rem; width: 100%; }
     .sport-card h3 { font-size: 0.85rem !important; }
