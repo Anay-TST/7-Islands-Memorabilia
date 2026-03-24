@@ -3,17 +3,22 @@ const DATASET = 'production';
 const BASE_URL = `https://${PROJECT_ID}.api.sanity.io/v2021-10-21/data/query/${DATASET}?query=`;
 
 let allItems = []; 
-let encounterInterval; // For the desktop slideshow timer
 
 async function loadComponents() {
     const navPlaceholder = document.getElementById('navbar-placeholder');
     if (navPlaceholder) {
         try {
+            // Fetch must retain .html to find the file
             const navResp = await fetch('navbar.html');
             navPlaceholder.innerHTML = await navResp.text();
-            const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+            
+            // Clean URL Active Link Logic
+            const path = window.location.pathname.split('/').pop();
+            let currentPage = path.replace('.html', '');
+            if (currentPage === '' || currentPage === 'index') currentPage = '.';
+
             document.querySelectorAll('.nav-links .nav-item').forEach(link => {
-                if (link.getAttribute('href') === currentPage || (currentPage === '' && link.getAttribute('href') === 'index.html')) {
+                if (link.getAttribute('href') === currentPage) {
                     link.classList.add('active');
                 }
             });
@@ -32,6 +37,7 @@ async function loadComponents() {
     const footPlaceholder = document.getElementById('footer-placeholder');
     if (footPlaceholder) {
         try {
+            // Fetch must retain .html
             const footResp = await fetch('footer.html');
             footPlaceholder.innerHTML = await footResp.text();
             
@@ -98,7 +104,7 @@ function renderGrid(id, items) {
 
     grid.innerHTML = items.map(i => `
         <div class="sport-card" style="border: 1px solid rgba(212,175,55,0.1);">
-            <a href="item.html?name=${encodeURIComponent(i.title)}" style="text-decoration:none; color:inherit; display:flex; flex-direction:column; height:100%;">
+            <a href="item?name=${encodeURIComponent(i.title)}" style="text-decoration:none; color:inherit; display:flex; flex-direction:column; height:100%;">
                 <div style="background:#000; width:100%; height:${imgHeight}; display:flex; align-items:center; justify-content:center; border-bottom: 2px solid var(--gold);">
                     <img src="${i.imageUrl}" style="max-width:100%; max-height:100%; object-fit:contain; padding:10px;">
                 </div>
@@ -127,24 +133,22 @@ async function loadHomeContent() {
         const resp = await fetch(BASE_URL + query);
         const { result } = await resp.json();
 
-        // 1. SPORTS
         const iconRow = document.getElementById('sports-icons-row');
         if (iconRow && result.sports) {
             iconRow.innerHTML = result.sports.map(s => `
-                <a href="filter.html?sport=${encodeURIComponent(s.name)}" style="text-decoration:none; text-align:center;">
+                <a href="filter?sport=${encodeURIComponent(s.name)}" style="text-decoration:none; text-align:center;">
                     <div class="icon-circle"><span>${getEmoji(s.name)}</span></div>
                     <p style="font-size:0.6rem; color:var(--gold); font-weight:900; margin-top:5px;">${s.name.toUpperCase()}</p>
                     <p style="font-size:0.5rem; opacity:0.5; color:white;">${s.itemCount}</p>
                 </a>`).join('');
         }
 
-        // 2. LEGENDS
         const legendsRow = document.getElementById('legends-icons-row');
         if (legendsRow && result.legends) {
             legendsRow.innerHTML = result.legends.map(l => {
                 const initials = l.name.split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase();
                 return `
-                <a href="filter.html?athlete=${encodeURIComponent(l.name)}" style="text-decoration:none; text-align:center; min-width: 60px;">
+                <a href="filter?athlete=${encodeURIComponent(l.name)}" style="text-decoration:none; text-align:center; min-width: 60px;">
                     <div class="icon-circle" style="background:rgba(212,175,55,0.05); color:var(--gold); font-family:'Arvo', serif; font-size:1.2rem;">${initials}</div>
                     <p style="font-size:0.6rem; color:var(--gold); font-weight:900; margin-top:5px; max-width: 60px; line-height: 1.2; margin-left: auto; margin-right: auto;">${l.name.toUpperCase()}</p>
                     <p style="font-size:0.5rem; opacity:0.5; color:white;">${l.itemCount} ITEMS</p>
@@ -152,7 +156,6 @@ async function loadHomeContent() {
             }).join('');
         }
 
-        // 3. TESTIMONIALS
         if (result.testimonials?.length > 0) {
             const t = result.testimonials[Math.floor(Math.random() * result.testimonials.length)];
             let mediaHtml = '';
@@ -172,7 +175,6 @@ async function loadHomeContent() {
                 <h4 class="gold-text" style="font-size:0.75rem; margin-top:8px;">— ${t.name}</h4>`;
         }
 
-        // 4. ENCOUNTERS (Desktop Slideshow & Mobile Swipe)
         if (result.encounters?.length > 0) {
             const sliderHTML = result.encounters.map((e, index) => {
                 const media = e.videoFileUrl ? `<video muted playsinline autoplay loop style="width:100%; border-radius:8px; object-fit:contain; background:#000; max-height:200px;"><source src="${e.videoFileUrl}"></video>` : `<img src="${e.imageUrl}" style="width:100%; border-radius:8px; object-fit:contain; background:#000; max-height:200px;">`;
@@ -187,20 +189,18 @@ async function loadHomeContent() {
             
             document.getElementById('encounter-display').innerHTML = `<div class="encounter-slider">${sliderHTML}</div>`;
 
-            // Start Desktop Slideshow Logic
-            clearInterval(encounterInterval);
+            clearInterval(window.encounterInterval);
             let currentSlide = 0;
             const slides = document.querySelectorAll('.encounter-slide');
             
             if (slides.length > 1) {
-                encounterInterval = setInterval(() => {
-                    // Only run the slideshow if we are NOT on a mobile screen (since mobile uses CSS swiping)
+                window.encounterInterval = setInterval(() => {
                     if (window.innerWidth > 600) {
                         slides[currentSlide].classList.remove('active');
                         currentSlide = (currentSlide + 1) % slides.length;
                         slides[currentSlide].classList.add('active');
                     }
-                }, 4000); // Changes every 4 seconds
+                }, 4000); 
             }
         }
     } catch (err) { console.error("Data Load Error:", err); }

@@ -3,14 +3,11 @@ const fs = require('fs');
 const PROJECT_ID = 'dpcpc70i';
 const DATASET = 'production';
 const BASE_URL = `https://${PROJECT_ID}.api.sanity.io/v2021-10-21/data/query/${DATASET}?query=`;
-
-// Make sure this matches your exact live URL!
 const SITE_URL = 'https://anay-tst.github.io/7-Islands-Memorabilia';
 
 async function generateSitemap() {
     console.log("Fetching live data from Sanity...");
 
-    // Query all items, active sports, and active legends
     const query = encodeURIComponent(`{
         "items": *[_type == "memorabilia"]{title},
         "sports": *[_type == "sport" && count(*[_type == "memorabilia" && references(^._id)]) > 0]{name},
@@ -23,42 +20,25 @@ async function generateSitemap() {
 
         let urls = [];
 
-        // 1. Add Core Static Pages
-        const staticPages = [
-            '', 
-            '/vault.html', 
-            '/sports.html', 
-            '/celebrities.html', 
-            '/encounters.html', 
-            '/testimonials.html'
-        ];
-        
-        staticPages.forEach(page => {
-            urls.push(`${SITE_URL}${page}`);
-        });
+        // 1. Add Core Static Pages (No .html)
+        const staticPages = ['', '/vault', '/sports', '/celebrities', '/encounters', '/testimonials'];
+        staticPages.forEach(page => urls.push(`${SITE_URL}${page}`));
 
-        // 2. Add Dynamic Vault Items
+        // 2. Add Dynamic Vault Items (No .html)
         if (result.items) {
-            result.items.forEach(item => {
-                urls.push(`${SITE_URL}/item.html?name=${encodeURIComponent(item.title)}`);
-            });
+            result.items.forEach(item => urls.push(`${SITE_URL}/item?name=${encodeURIComponent(item.title)}`));
         }
 
-        // 3. Add Dynamic Sport Categories
+        // 3. Add Dynamic Sport Categories (No .html)
         if (result.sports) {
-            result.sports.forEach(sport => {
-                urls.push(`${SITE_URL}/filter.html?sport=${encodeURIComponent(sport.name)}`);
-            });
+            result.sports.forEach(sport => urls.push(`${SITE_URL}/filter?sport=${encodeURIComponent(sport.name)}`));
         }
 
-        // 4. Add Dynamic Legend Profiles
+        // 4. Add Dynamic Legend Profiles (No .html)
         if (result.legends) {
-            result.legends.forEach(legend => {
-                urls.push(`${SITE_URL}/filter.html?athlete=${encodeURIComponent(legend.name)}`);
-            });
+            result.legends.forEach(legend => urls.push(`${SITE_URL}/filter?athlete=${encodeURIComponent(legend.name)}`));
         }
 
-        // Build the XML String
         const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     ${urls.map(url => `
@@ -69,14 +49,10 @@ async function generateSitemap() {
     </url>`).join('')}
 </urlset>`;
 
-        // Save the file
         fs.writeFileSync('sitemap.xml', xml.trim());
         console.log(`✅ sitemap.xml generated successfully with ${urls.length} URLs!`);
 
-    } catch (error) {
-        console.error("Error generating sitemap:", error);
-    }
+    } catch (error) { console.error("Error generating sitemap:", error); }
 }
 
-// Run the function
 generateSitemap();
