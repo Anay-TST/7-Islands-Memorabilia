@@ -3,9 +3,9 @@ const DATASET = 'production';
 const BASE_URL = `https://${PROJECT_ID}.api.sanity.io/v2021-10-21/data/query/${DATASET}?query=`;
 
 let allItems = []; 
+let encounterInterval; // For the desktop slideshow timer
 
 async function loadComponents() {
-    // 1. Load Navbar
     const navPlaceholder = document.getElementById('navbar-placeholder');
     if (navPlaceholder) {
         try {
@@ -18,7 +18,6 @@ async function loadComponents() {
                 }
             });
 
-            // Mobile Menu Logic
             const mobileBtn = document.getElementById('mobile-menu-btn');
             const navMenu = document.getElementById('nav-links-menu');
             if (mobileBtn && navMenu) {
@@ -30,7 +29,6 @@ async function loadComponents() {
         } catch (e) { console.error("Navbar Error:", e); }
     }
 
-    // 2. Load Footer & Counter
     const footPlaceholder = document.getElementById('footer-placeholder');
     if (footPlaceholder) {
         try {
@@ -129,6 +127,7 @@ async function loadHomeContent() {
         const resp = await fetch(BASE_URL + query);
         const { result } = await resp.json();
 
+        // 1. SPORTS
         const iconRow = document.getElementById('sports-icons-row');
         if (iconRow && result.sports) {
             iconRow.innerHTML = result.sports.map(s => `
@@ -139,6 +138,7 @@ async function loadHomeContent() {
                 </a>`).join('');
         }
 
+        // 2. LEGENDS
         const legendsRow = document.getElementById('legends-icons-row');
         if (legendsRow && result.legends) {
             legendsRow.innerHTML = result.legends.map(l => {
@@ -152,6 +152,7 @@ async function loadHomeContent() {
             }).join('');
         }
 
+        // 3. TESTIMONIALS
         if (result.testimonials?.length > 0) {
             const t = result.testimonials[Math.floor(Math.random() * result.testimonials.length)];
             let mediaHtml = '';
@@ -171,10 +172,36 @@ async function loadHomeContent() {
                 <h4 class="gold-text" style="font-size:0.75rem; margin-top:8px;">— ${t.name}</h4>`;
         }
 
+        // 4. ENCOUNTERS (Desktop Slideshow & Mobile Swipe)
         if (result.encounters?.length > 0) {
-            const e = result.encounters[Math.floor(Math.random() * result.encounters.length)];
-            const media = e.videoFileUrl ? `<video muted playsinline autoplay loop style="width:100%; border-radius:8px; object-fit:contain; background:#000;"><source src="${e.videoFileUrl}"></video>` : `<img src="${e.imageUrl}" style="width:100%; border-radius:8px; object-fit:contain; background:#000;">`;
-            document.getElementById('encounter-display').innerHTML = `<div style="margin-top:10px;">${media}<p style="font-size:0.8rem; margin-top:8px; font-weight:700;">${e.title}</p></div>`;
+            const sliderHTML = result.encounters.map((e, index) => {
+                const media = e.videoFileUrl ? `<video muted playsinline autoplay loop style="width:100%; border-radius:8px; object-fit:contain; background:#000; max-height:200px;"><source src="${e.videoFileUrl}"></video>` : `<img src="${e.imageUrl}" style="width:100%; border-radius:8px; object-fit:contain; background:#000; max-height:200px;">`;
+                return `
+                <div class="encounter-slide ${index === 0 ? 'active' : ''}">
+                    <div style="margin-top:10px;">
+                        ${media}
+                        <p style="font-size:0.8rem; margin-top:8px; font-weight:700;">${e.title}</p>
+                    </div>
+                </div>`;
+            }).join('');
+            
+            document.getElementById('encounter-display').innerHTML = `<div class="encounter-slider">${sliderHTML}</div>`;
+
+            // Start Desktop Slideshow Logic
+            clearInterval(encounterInterval);
+            let currentSlide = 0;
+            const slides = document.querySelectorAll('.encounter-slide');
+            
+            if (slides.length > 1) {
+                encounterInterval = setInterval(() => {
+                    // Only run the slideshow if we are NOT on a mobile screen (since mobile uses CSS swiping)
+                    if (window.innerWidth > 600) {
+                        slides[currentSlide].classList.remove('active');
+                        currentSlide = (currentSlide + 1) % slides.length;
+                        slides[currentSlide].classList.add('active');
+                    }
+                }, 4000); // Changes every 4 seconds
+            }
         }
     } catch (err) { console.error("Data Load Error:", err); }
 }
