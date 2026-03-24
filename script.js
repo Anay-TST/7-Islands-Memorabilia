@@ -5,6 +5,7 @@ const BASE_URL = `https://${PROJECT_ID}.api.sanity.io/v2021-10-21/data/query/${D
 let allItems = []; 
 
 async function loadComponents() {
+    // 1. Load Navbar
     const navPlaceholder = document.getElementById('navbar-placeholder');
     if (navPlaceholder) {
         try {
@@ -16,9 +17,20 @@ async function loadComponents() {
                     link.classList.add('active');
                 }
             });
+
+            // Mobile Menu Logic
+            const mobileBtn = document.getElementById('mobile-menu-btn');
+            const navMenu = document.getElementById('nav-links-menu');
+            if (mobileBtn && navMenu) {
+                mobileBtn.addEventListener('click', () => {
+                    navMenu.classList.toggle('mobile-active');
+                    mobileBtn.classList.toggle('is-active');
+                });
+            }
         } catch (e) { console.error("Navbar Error:", e); }
     }
 
+    // 2. Load Footer & Counter
     const footPlaceholder = document.getElementById('footer-placeholder');
     if (footPlaceholder) {
         try {
@@ -221,7 +233,6 @@ function setupFullVaultSearch() {
     
     if(!searchInput && !sportFilter && !latestFilter) return;
 
-    // DYNAMICALLY FILL THE SPORT DROPDOWN
     if (sportFilter && allItems.length > 0) {
         const uniqueSports = new Set();
         allItems.forEach(item => {

@@ -17,6 +17,7 @@ body {
     font-family: 'Inter', sans-serif;
     line-height: 1.6;
     margin: 0;
+    overflow-x: hidden;
 }
 
 h1, h2, h3 { font-family: 'Arvo', serif; font-weight: 900; }
@@ -24,11 +25,15 @@ h1, h2, h3 { font-family: 'Arvo', serif; font-weight: 900; }
 
 /* --- Navbar --- */
 header { background: rgba(0,0,0,0.95); position: sticky; top: 0; z-index: 2000; border-bottom: 1px solid rgba(212,175,55,0.2); backdrop-filter: blur(10px); }
-nav { display: flex; justify-content: space-between; align-items: center; padding: 1rem 5%; max-width: 1400px; margin: 0 auto; }
-.logo { font-size: 1.2rem; color: var(--gold); cursor: pointer; text-decoration: none; font-family: 'Arvo', serif; font-weight: 900; text-transform: uppercase; }
-.nav-links { display: flex; list-style: none; gap: 2rem; }
+nav { display: flex; justify-content: space-between; align-items: center; padding: 1rem 5%; max-width: 1400px; margin: 0 auto; position: relative; }
+.logo { font-size: 1.2rem; color: var(--gold); cursor: pointer; text-decoration: none; font-family: 'Arvo', serif; font-weight: 900; text-transform: uppercase; z-index: 2001; }
+.nav-links { display: flex; list-style: none; gap: 2rem; transition: 0.4s ease-in-out; }
 .nav-links a { text-decoration: none; color: white; font-weight: 700; font-size: 0.8rem; text-transform: uppercase; transition: 0.3s; }
 .nav-links a:hover, .nav-links a.active { color: var(--gold); }
+
+/* --- Hamburger Menu (Hidden by default) --- */
+.menu-toggle { display: none; flex-direction: column; cursor: pointer; gap: 5px; z-index: 2001; }
+.menu-toggle span { background: var(--gold); width: 25px; height: 3px; border-radius: 2px; transition: 0.3s; }
 
 /* --- Layout Structure --- */
 .layout-wrapper { display: flex; gap: 50px; max-width: 1400px; margin: 0 auto; padding: 40px 5%; }
@@ -43,8 +48,8 @@ nav { display: flex; justify-content: space-between; align-items: center; paddin
 .see-more-btn:hover { background: var(--gold); color: black; box-shadow: 0 0 20px var(--gold-glow); }
 
 /* --- Icons --- */
-#sports-icons-row { margin: 2rem 0; display: flex; gap: 20px; flex-wrap: wrap; }
-.icon-circle { background: rgba(212, 175, 55, 0.1); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1px solid var(--gold); transition: 0.3s; }
+#sports-icons-row, #legends-icons-row { margin: 2rem 0; display: flex; gap: 20px; flex-wrap: wrap; }
+.icon-circle { background: rgba(212, 175, 55, 0.1); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1px solid var(--gold); transition: 0.3s; flex-shrink: 0; }
 .icon-circle:hover { background: var(--gold); transform: scale(1.1); box-shadow: 0 0 20px var(--gold-glow); }
 .icon-circle:hover span { filter: brightness(0); }
 
@@ -56,7 +61,6 @@ nav { display: flex; justify-content: space-between; align-items: center; paddin
 .sidebar-block { background: var(--glass); border: 1px solid rgba(212, 175, 55, 0.1); padding: 25px; border-radius: 15px; backdrop-filter: blur(10px); transition: 0.3s; }
 .sidebar-block:hover { border-color: var(--gold); transform: translateY(-3px); box-shadow: 0 5px 20px rgba(212,175,55,0.1); }
 .sidebar-label { color: var(--gold); text-transform: uppercase; font-size: 0.75rem; letter-spacing: 2px; margin-bottom: 15px; }
-.sidebar-media { width: 100%; border-radius: 8px; margin-bottom: 12px; border: 1px solid rgba(212, 175, 55, 0.2); object-fit: cover; }
 
 /* --- Grids --- */
 .section-title { margin-bottom: 2rem; font-size: 1.8rem; text-transform: uppercase; text-align: left;}
@@ -69,12 +73,72 @@ nav { display: flex; justify-content: space-between; align-items: center; paddin
 .sport-grid.small-grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; }
 .sport-grid.six-grid { grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 20px; }
 
-/* --- Ticker Animation (FIXED SPEED & LOOP) --- */
+/* --- Ticker Animation --- */
 .ticker-container { background: var(--gold); color: black; padding: 10px 0; overflow: hidden; white-space: nowrap; }
 .ticker { display: inline-block; white-space: nowrap; animation: move 45s linear infinite; font-weight: 900; letter-spacing: 1px;}
 @keyframes move { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
 
-/* --- Responsive --- */
-@media (max-width: 1024px) { .layout-wrapper { flex-direction: column; } .sidebar-column { width: 100%; } }
-@media (max-width: 900px) { #latestGrid { grid-template-columns: repeat(2, 1fr); } .nav-links { gap: 1rem; } }
-@media (max-width: 600px) { #latestGrid { grid-template-columns: 1fr; } .nav-links { display: none; } }
+/* ========================================= */
+/* --- MOBILE RESPONSIVENESS & COMPACTNESS --- */
+/* ========================================= */
+
+@media (max-width: 1024px) { 
+    .layout-wrapper { flex-direction: column; gap: 30px; } 
+    .sidebar-column { width: 100%; min-width: 100%; } 
+    .sidebar-sticky-wrap { position: relative; top: 0; }
+}
+
+@media (max-width: 900px) { 
+    #latestGrid { grid-template-columns: repeat(2, 1fr); } 
+}
+
+@media (max-width: 768px) {
+    /* Navbar Mobile Menu */
+    .menu-toggle { display: flex; }
+    .nav-links {
+        position: absolute; top: 100%; left: 0; right: 0; background: rgba(0,0,0,0.98);
+        flex-direction: column; align-items: center; padding: 20px 0; gap: 20px;
+        border-bottom: 2px solid var(--gold); backdrop-filter: blur(15px);
+        clip-path: polygon(0 0, 100% 0, 100% 0, 0 0);
+    }
+    .nav-links.mobile-active { clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); }
+    .menu-toggle.is-active span:nth-child(1) { transform: translateY(8px) rotate(45deg); }
+    .menu-toggle.is-active span:nth-child(2) { opacity: 0; }
+    .menu-toggle.is-active span:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
+}
+
+@media (max-width: 600px) { 
+    /* Force Compact Spacing Everywhere */
+    .layout-wrapper, .section-padding { padding: 20px 5% !important; padding-top: 30px !important; }
+    .mobile-center { text-align: center !important; }
+    .hero-intro h1 { font-size: 2rem !important; }
+    .hero-subtitle { font-size: 0.8rem; border-left: none; padding-left: 0; border-bottom: 2px solid var(--gold); padding-bottom: 10px; }
+    
+    /* Mobile Icon Row - Horizontal Swipe Carousel */
+    .mobile-scroll-row {
+        flex-wrap: nowrap !important;
+        overflow-x: auto;
+        padding-bottom: 15px;
+        justify-content: flex-start !important;
+        -webkit-overflow-scrolling: touch;
+        gap: 15px !important;
+    }
+    .mobile-scroll-row::-webkit-scrollbar { display: none; } /* Hides scrollbar for clean look */
+    
+    /* Shrink Grids & Force 2-Columns for Vault */
+    .sport-grid { gap: 15px !important; }
+    #latestGrid { grid-template-columns: 1fr; }
+    .sport-grid.small-grid { grid-template-columns: repeat(2, 1fr) !important; } /* 2 Cards per row */
+    
+    /* Search Bars */
+    .search-container { margin: 0 auto 20px auto; }
+    .search-container input, select { padding: 12px 20px !important; font-size: 0.9rem; width: 100%; }
+    
+    /* Fonts on Mobile Cards */
+    .sport-card h3 { font-size: 0.85rem !important; }
+    .sport-card p.gold-text { font-size: 0.65rem !important; }
+    
+    /* Divs */
+    .section-divider { margin: 2rem 0 !important; }
+    .hide-mobile { display: none; }
+}
