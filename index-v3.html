@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>7 Islands Memorabilia | V3 Editorial</title>
+    <link href="https://fonts.googleapis.com/css2?family=Arvo:700&family=Inter:wght@300;600;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    
+    <style>
+        /* CSS Film Grain Overlay */
+        body::before {
+            content: ""; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            opacity: 0.04; z-index: 9999; pointer-events: none;
+        }
+
+        /* Force pure black background */
+        html, body { background: #030303 !important; background-image: none !important; }
+
+        /* Typography Override */
+        h1, h2, h3 { font-family: 'Inter', sans-serif !important; text-transform: uppercase; letter-spacing: -1px; }
+
+        /* V3 Hero: Massive, Asymmetric, Outline Text */
+        .hero-v3 {
+            min-height: 85vh; display: flex; flex-direction: column; justify-content: flex-end;
+            padding: 0 5% 10vh 5%; position: relative;
+        }
+        .hero-v3 h1 {
+            font-size: clamp(4rem, 12vw, 10rem); line-height: 0.85; margin: 0;
+            color: white; letter-spacing: -4px; z-index: 2;
+        }
+        .hero-v3 .outline-text {
+            -webkit-text-stroke: 2px rgba(255,255,255,0.2); color: transparent;
+            display: block; margin-left: 5vw;
+        }
+        .hero-v3 .gold-text { color: var(--gold); -webkit-text-stroke: 0; }
+        
+        /* Command-Line Style Search */
+        .v3-search-wrap { margin-top: 50px; max-width: 800px; position: relative; z-index: 2; }
+        #vaultSearch {
+            background: transparent !important; border: none !important; border-bottom: 2px solid rgba(255,255,255,0.3) !important;
+            border-radius: 0 !important; font-size: clamp(1.5rem, 3vw, 2.5rem) !important; padding: 15px 0 !important;
+            color: white !important; font-weight: 300; transition: 0.3s; font-family: 'Inter', sans-serif;
+        }
+        #vaultSearch:focus { border-bottom-color: var(--gold) !important; outline: none; }
+        #vaultSearch::placeholder { color: rgba(255,255,255,0.2); }
+
+        /* Section Styling */
+        .v3-section { padding: 120px 5%; border-top: 1px solid rgba(255,255,255,0.05); max-width: 1600px; margin: 0 auto; }
+        .v3-section-title { font-size: clamp(2rem, 5vw, 4rem); font-weight: 900; margin-bottom: 60px; letter-spacing: -2px; }
+        .section-divider { display: none; } /* Hide old dividers */
+
+        /* ========================================== */
+        /* HIJACKING THE CARDS                        */
+        /* ========================================== */
+        .sport-grid { gap: 40px !important; }
+        .sport-card { background: transparent !important; border: none !important; border-radius: 0 !important; overflow: visible !important; }
+        .sport-card:hover { transform: none !important; }
+        
+        /* Image Box Hijack */
+        .sport-card > a > div:first-child {
+            background: rgba(255,255,255,0.02) !important; border: 1px solid rgba(255,255,255,0.05) !important;
+            border-radius: 16px !important; height: 350px !important; overflow: hidden;
+            transition: 0.6s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        }
+        .sport-card:hover > a > div:first-child {
+            transform: scale(0.96); border-color: var(--gold) !important; box-shadow: 0 10px 40px rgba(212,175,55,0.15);
+        }
+        /* Make image zoom in slightly on hover */
+        .sport-card img { transition: 0.6s cubic-bezier(0.16, 1, 0.3, 1) !important; }
+        .sport-card:hover img { transform: scale(1.08) !important; }
+
+        /* Text Box Hijack */
+        .sport-card > a > div:nth-child(2) { padding: 25px 0 0 0 !important; text-align: left !important; }
+        .sport-card h3 { font-size: 1.2rem !important; font-weight: 900 !important; letter-spacing: -0.5px; margin-bottom: 8px !important; }
+        .sport-card p { font-family: 'Inter', sans-serif; font-size: 0.75rem !important; letter-spacing: 1px; color: rgba(255,255,255,0.5) !important; }
+
+        /* ========================================== */
+        /* HIJACKING THE ICONS                        */
+        /* Changing circles to architectural blocks   */
+        /* ========================================== */
+        #sports-icons-row, #legends-icons-row { gap: 20px !important; justify-content: flex-start !important; }
+        #sports-icons-row a, #legends-icons-row a {
+            display: flex !important; flex-direction: column; align-items: flex-start !important; text-align: left !important;
+            background: transparent !important; border: 1px solid rgba(255,255,255,0.1) !important;
+            padding: 25px !important; border-radius: 16px; min-width: 160px; transition: 0.4s;
+        }
+        #sports-icons-row a:hover, #legends-icons-row a:hover {
+            background: var(--gold) !important; border-color: var(--gold) !important; transform: translateY(-5px);
+        }
+        /* Shrink the inner icon container to a square */
+        .icon-circle {
+            width: 45px !important; height: 45px !important; border-radius: 8px !important;
+            background: rgba(255,255,255,0.1) !important; border: none !important; margin-bottom: 20px !important;
+            font-size: 1.2rem !important; color: white !important;
+        }
+        #sports-icons-row a:hover .icon-circle, #legends-icons-row a:hover .icon-circle { background: black !important; color: var(--gold) !important; }
+        #sports-icons-row a:hover p, #legends-icons-row a:hover p { color: black !important; }
+        .icon-circle p { font-size: 1rem !important; margin: 0 !important; } /* Fix legend initials */
+        
+        /* ========================================== */
+        /* EDITORIAL SPREADS (Encounters/Reviews)     */
+        /* ========================================== */
+        .editorial-spread { display: flex; align-items: center; gap: 8vw; margin-bottom: 50px; }
+        .editorial-spread.reverse { flex-direction: row-reverse; }
+        .editorial-text { flex: 1; }
+        .editorial-media-wrap { flex: 1; position: relative; }
+        
+        /* Hijack Testimonial */
+        #testimonial-display { display: flex; flex-direction: column; }
+        .testimonial-media { width: 100% !important; aspect-ratio: 4/5 !important; object-fit: cover !important; border-radius: 0 !important; border: none !important; filter: grayscale(100%); transition: 0.5s; }
+        .editorial-media-wrap:hover .testimonial-media { filter: grayscale(0%); }
+        #testimonial-display > div { position: absolute; bottom: -30px; left: -30px; background: var(--gold); padding: 40px; width: 90%; color: black; z-index: 10; }
+        #testimonial-display .t-quote-short, #testimonial-display .t-quote-full { font-size: 1.2rem !important; color: black !important; font-weight: 600; font-family: 'Inter', sans-serif !important; line-height: 1.4 !important; }
+        #testimonial-display span[onclick] { color: white !important; font-weight: 900; background: black; padding: 5px 10px; font-size: 0.7rem; text-decoration: none !important; }
+        #testimonial-display h4 { color: black !important; font-size: 1.5rem !important; font-weight: 900 !important; letter-spacing: -1px; margin-top: 15px !important; }
+
+        /* Hijack Encounters */
+        #encounter-display { width: 100%; }
+        .encounter-slider { display: flex; width: 100%; }
+        .encounter-slide > div { display: flex; flex-direction: column; position: relative; }
+        .encounter-media { width: 100% !important; aspect-ratio: 16/9 !important; object-fit: cover !important; border-radius: 0 !important; border: none !important; }
+        .encounter-slide p { position: absolute; top: -20px; right: -20px; background: white; color: black; padding: 20px 30px; font-size: 1.5rem !important; font-weight: 900 !important; z-index: 10; max-width: 80%; }
+
+        /* Buttons */
+        .see-more-btn { border-radius: 0 !important; border: 1px solid var(--gold) !important; }
+
+        /* ========================================== */
+        /* MOBILE ADJUSTMENTS                         */
+        /* ========================================== */
+        @media (max-width: 768px) {
+            .hero-v3 { min-height: 60vh; padding-top: 60px; justify-content: center; }
+            .hero-v3 h1 { font-size: 18vw; }
+            .hero-v3 .outline-text { margin-left: 0; }
+            .v3-section { padding: 60px 5%; }
+            .sport-card > a > div:first-child { height: 280px !important; }
+            
+            /* Break Editorial Spreads */
+            .editorial-spread, .editorial-spread.reverse { flex-direction: column; gap: 40px; }
+            #testimonial-display > div { position: relative; bottom: 0; left: 0; width: 100%; }
+            .encounter-slide p { position: relative; top: 0; right: 0; width: 100%; max-width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="ticker-container">
+        <div class="ticker-wrap"><div class="ticker" id="dynamic-ticker">LOADING THE ARCHIVE • </div></div>
+    </div>
+    
+    <div id="navbar-placeholder"></div>
+    
+    <main>
+        
+        <header class="hero-v3">
+            <h1>THE <span class="outline-text">WORLD</span> <span class="gold-text">VAULT.</span></h1>
+            
+            <div class="v3-search-wrap">
+                <input type="text" id="vaultSearch" placeholder="Search the archive_">
+            </div>
+            
+            <div class="swipe-hint" style="margin-top: 40px; justify-content: flex-start;">Explore Categories ➔</div>
+            <div id="sports-icons-row" class="mobile-scroll-row"></div>
+        </header>
+
+        <section id="latest" class="v3-section">
+            <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 60px; flex-wrap: wrap; gap: 20px;">
+                <h2 class="v3-section-title" style="margin: 0;">NEW <span class="gold-text">ARRIVALS</span></h2>
+                <a href="vault" class="see-more-btn">View All</a>
+            </div>
+            <div class="swipe-hint">Swipe Arrivals ➔</div>
+            <div class="sport-grid" id="latestGrid"></div>
+        </section>
+        
+        <section class="v3-section">
+            <div class="editorial-spread">
+                <div class="editorial-text">
+                    <h2 class="v3-section-title" style="margin-bottom: 20px;">BEHIND THE <br><span class="gold-text">SIGNATURE</span></h2>
+                    <p style="font-size: 1.1rem; opacity: 0.6; margin-bottom: 30px; max-width: 400px;">The stories, the moments, and the personal history behind the world's most iconic sporting artifacts.</p>
+                    <a href="encounters" class="see-more-btn">View All Meetings</a>
+                </div>
+                <div class="editorial-media-wrap">
+                    <a href="encounters" style="text-decoration:none; color:inherit;">
+                        <div id="encounter-display"><p style="opacity:0.3;">Loading moments...</p></div>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <section id="collection" class="v3-section">
+            <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 60px; flex-wrap: wrap; gap: 20px;">
+                <h2 class="v3-section-title" id="dynamic-vault-count" style="margin: 0;">THE <span class="gold-text">VAULT</span></h2>
+                <a href="vault" class="see-more-btn" id="see-more-container">Enter Archive</a>
+            </div>
+            <div class="swipe-hint">Swipe Collection ➔</div>
+            <div class="sport-grid small-grid" id="sportGrid"></div>
+        </section>
+
+        <section class="v3-section">
+            <div class="editorial-spread reverse">
+                <div class="editorial-text" style="text-align: right;">
+                    <h2 class="v3-section-title" style="margin-bottom: 20px;">COLLECTOR <br><span class="gold-text">REVIEWS</span></h2>
+                    <p style="font-size: 1.1rem; opacity: 0.6; margin-bottom: 30px; margin-left: auto; max-width: 400px;">Hear from the athletes, authenticators, and high-end collectors who trust the Vault.</p>
+                    <a href="testimonials" class="see-more-btn">Read All Reviews</a>
+                </div>
+                <div class="editorial-media-wrap">
+                    <a href="testimonials" style="text-decoration:none; color:inherit;">
+                        <div id="testimonial-display"><p style="opacity:0.3;">Loading reviews...</p></div>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <section id="top-legends" class="v3-section">
+            <h2 class="v3-section-title">ICONIC <span class="gold-text">LEGENDS</span></h2>
+            <div class="swipe-hint">Swipe Legends ➔</div>
+            <div id="legends-icons-row" class="mobile-scroll-row"></div>
+        </section>
+
+    </main>
+    
+    <div id="footer-placeholder"></div>
+    <script src="script.js"></script>
+</body>
+</html>

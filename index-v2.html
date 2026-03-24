@@ -3,90 +3,110 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>7 Islands Memorabilia | The Vault V2</title>
+    <title>7 Islands Memorabilia | The Vault V2 (Compact)</title>
     <link href="https://fonts.googleapis.com/css2?family=Arvo:700&family=Inter:wght@400;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     
     <style>
-        /* Override layout wrapper to remove sidebar structure */
+        /* Force no sidebar and compact layout */
         .layout-wrapper { display: block; max-width: 100%; padding: 0; gap: 0; }
         
-        /* Massive Cinematic Hero Section */
+        /* Compact Cinematic Hero */
         .hero-v2 {
-            min-height: 80vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            padding: 0 5%;
-            border-bottom: 1px solid rgba(212,175,55,0.2);
-            background: radial-gradient(circle at center, rgba(212, 175, 55, 0.08), transparent 60%);
+            min-height: 60vh; /* Reduced from 80vh */
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            text-align: center; padding: 60px 5%; border-bottom: 1px solid rgba(212,175,55,0.2);
+            background: radial-gradient(circle at center, rgba(212, 175, 55, 0.05), transparent 70%);
             position: relative;
         }
-        .hero-v2 h1 { 
-            font-size: clamp(3rem, 8vw, 7rem); 
-            letter-spacing: 10px; 
-            margin-bottom: 0.5rem; 
-            text-shadow: 0 10px 40px rgba(0,0,0,0.9); 
-        }
-        .hero-v2 .hero-subtitle { 
-            font-size: clamp(0.8rem, 2vw, 1.2rem); 
-            border-left: none; padding-left: 0; 
-            margin-bottom: 40px; letter-spacing: 5px; 
-            color: white; opacity: 0.7;
-        }
-        .hero-v2 .search-container { max-width: 600px; transform: scale(1.1); margin-bottom: 40px; }
+        .hero-v2 h1 { font-size: clamp(2.5rem, 6vw, 6rem); letter-spacing: 10px; margin-bottom: 0; }
+        .hero-v2 .hero-subtitle { font-size: clamp(0.7rem, 1.5vw, 1rem); border-left: none; padding-left: 0; margin-bottom: 30px; letter-spacing: 5px; color: white; opacity: 0.6; }
+        .hero-v2 .search-container { max-width: 600px; transform: scale(1.05); margin-bottom: 30px; }
 
-        /* Transform Sports Circles into Sleek Pill Badges */
-        #sports-icons-row { 
-            justify-content: center; gap: 15px; width: 100%; max-width: 1000px; margin: 0 auto;
-        }
-        #sports-icons-row a { 
-            display: flex; align-items: center; justify-content: center;
-            background: rgba(255,255,255,0.03); border: 1px solid rgba(212,175,55,0.3); 
-            padding: 10px 25px; border-radius: 50px; transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1); 
-        }
-        #sports-icons-row a:hover { background: var(--gold); transform: translateY(-5px); box-shadow: 0 10px 20px rgba(212,175,55,0.2); }
+        /* V2 Sleek Pill Badges */
+        #sports-icons-row { justify-content: center; gap: 12px; width: 100%; max-width: 1000px; margin: 0 auto; }
+        #sports-icons-row a { display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.03); border: 1px solid rgba(212,175,55,0.1); padding: 8px 20px; border-radius: 50px; transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        #sports-icons-row a:hover { background: var(--gold); transform: translateY(-3px); box-shadow: 0 5px 15px rgba(212,175,55,0.1); border-color: transparent;}
         #sports-icons-row a:hover p, #sports-icons-row a:hover span { color: black !important; filter: brightness(0); }
-        #sports-icons-row .icon-circle { border: none; background: transparent; width: auto; height: auto; margin-right: 10px; }
+        #sports-icons-row .icon-circle { border: none; background: transparent; width: auto; height: auto; margin-right: 8px; }
         #sports-icons-row .icon-circle:hover { transform: none; box-shadow: none; }
-        #sports-icons-row p { margin-top: 0 !important; font-size: 0.85rem !important; letter-spacing: 1px; }
-        #sports-icons-row p:last-child { display: none; } /* Hides item count for cleaner pills */
+        #sports-icons-row p { margin-top: 0 !important; font-size: 0.75rem !important; letter-spacing: 1px; font-weight: 700; }
+        #sports-icons-row p:last-child { display: none; } 
 
-        /* Centered Exhibition Sections */
-        .v2-section { max-width: 1400px; margin: 0 auto; padding: 100px 5%; }
-        .v2-section-title { text-align: center; font-size: clamp(2rem, 4vw, 3rem); margin-bottom: 50px; letter-spacing: 4px; }
+        /* Centered V2 Exhibition Sections */
+        .v2-section { max-width: 1400px; margin: 0 auto; padding: 60px 5%; }
+        .v2-section-title { text-align: center; font-size: clamp(1.8rem, 3.5vw, 2.5rem); margin-bottom: 40px; letter-spacing: 3px; font-family: 'Arvo', serif; }
         
+        /* Grids optimization */
+        .sport-grid { gap: 20px; }
+        .sport-card h3 { font-size: 0.95rem; }
+
+        /* Hide inherited dividers */
+        .section-divider { display: none; }
+
         /* ========================================== */
-        /* IMMERSIVE BANNER HIJACKING                 */
-        /* Turns sidebar widgets into full-screen art */
+        /* EXHBIT FRAME HIJACKING                     */
+        /* Frames your media instead of cropping it.   */
         /* ========================================== */
-        .cinematic-banner {
-            position: relative; width: 100vw; min-height: 70vh; 
-            left: 50%; right: 50%; margin-left: -50vw; margin-right: -50vw; /* Forces full bleed out of container */
-            display: flex; align-items: center; justify-content: center; text-align: center;
-            border-top: 1px solid rgba(212,175,55,0.3); border-bottom: 1px solid rgba(212,175,55,0.3);
-            overflow: hidden; background: #000;
+        .cinematic-exhibit-frame {
+            max-width: 1100px; margin: 0 auto;
+            background: var(--glass); border: 1px solid rgba(212, 175, 55, 0.15); border-radius: 15px;
+            backdrop-filter: blur(10px); display: flex; align-items: center; gap: 40px;
+            transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            background-image: radial-gradient(circle at center, rgba(212, 175, 55, 0.05), transparent);
         }
+        .cinematic-exhibit-frame:hover { border-color: var(--gold); box-shadow: 0 5px 30px rgba(212,175,55,0.1); transform: translateY(-3px); }
 
-        /* Hijacking Testimonial Widget */
-        #testimonial-display { position: static; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 5%; z-index: 2; }
-        .testimonial-media { position: absolute !important; top: 0; left: 0; width: 100% !important; height: 100% !important; max-height: none !important; aspect-ratio: auto !important; object-fit: cover !important; border-radius: 0 !important; margin: 0 !important; border: none !important; z-index: 0; opacity: 0.35; filter: grayscale(80%); }
-        #testimonial-display > div { z-index: 2; position: relative; }
-        #testimonial-display .t-quote-short, #testimonial-display .t-quote-full { font-size: clamp(1.5rem, 4vw, 2.5rem) !important; color: white !important; font-style: normal !important; font-family: 'Arvo', serif; line-height: 1.4 !important; max-width: 1000px; text-shadow: 0 4px 30px rgba(0,0,0,1); }
-        #testimonial-display h4 { font-size: 1.2rem !important; margin-top: 30px !important; letter-spacing: 3px; z-index: 2; position: relative; text-shadow: 0 4px 20px rgba(0,0,0,1); }
+        /* Hijacking Testimonial Layout (Reel Style 9:16) */
+        #testimonial-display { position: static; width: 100%; height: auto; display: flex; flex-direction: row; align-items: center; gap: 40px; }
+        .testimonial-media {
+            flex: 0 0 250px; /* Locked width */
+            aspect-ratio: 9 / 16 !important; /* Force Reel Ratio */
+            object-fit: cover !important; /* Perfect Framing */
+            border-radius: 8px !important; margin: 0 !important; max-height: none !important;
+            border: 2px solid rgba(212, 175, 55, 0.3) !important;
+        }
+        #testimonial-display > div { flex: 1; padding: 20px; }
+        #testimonial-display .t-quote-short, #testimonial-display .t-quote-full { font-size: 1.4rem !important; color: white !important; font-style: normal !important; font-family: 'Arvo', serif; line-height: 1.5 !important; margin-bottom: 15px; }
+        #testimonial-display h4 { font-size: 0.9rem !important; margin-top: 15px !important; letter-spacing: 2px; color: var(--gold); }
         
-        /* Hijacking Encounter Widget */
-        #encounter-display { width: 100%; height: 100%; }
-        .encounter-slider { display: block; width: 100%; height: 100%; }
-        .encounter-slide > div { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 70vh; padding: 40px 5%; position: relative; z-index: 2; }
-        .encounter-media { position: absolute !important; top: 0; left: 0; width: 100% !important; height: 100% !important; max-height: none !important; aspect-ratio: auto !important; object-fit: cover !important; border-radius: 0 !important; margin: 0 !important; border: none !important; z-index: 0; opacity: 0.35; }
-        .encounter-slide p { position: relative; z-index: 2; font-size: clamp(2rem, 5vw, 4rem) !important; font-family: 'Arvo', serif; text-transform: uppercase; letter-spacing: 5px; text-shadow: 0 10px 40px rgba(0,0,0,1); margin-top: 0 !important; color: white; }
+        /* Hijacking Encounter Layout (Post Style 4:5) */
+        #encounter-display { width: 100%; height: auto; }
+        .encounter-slider { display: block; width: 100%; }
+        .encounter-slide > div { display: flex; flex-direction: row-reverse; align-items: center; gap: 40px; } /* Swapped to vary layout */
+        .encounter-media {
+            flex: 0 0 320px; /* Locked width */
+            aspect-ratio: 4 / 5 !important; /* Force Portrait Ratio */
+            object-fit: cover !important; border-radius: 8px !important; margin: 0 !important; max-height: none !important;
+            border: 2px solid rgba(212, 175, 55, 0.3) !important;
+        }
+        .encounter-slide div:nth-child(2) { flex: 1; padding: 20px; text-align: left; } /* Target content div */
+        .encounter-slide p { font-size: 1.8rem !important; font-family: 'Arvo', serif; text-transform: uppercase; letter-spacing: 3px; margin-top: 0 !important; color: white; line-height: 1.3; margin-bottom: 10px; }
+        .e-detail-btn { background: transparent; border: 2px solid var(--gold); color: var(--gold); padding: 8px 25px; font-size: 0.75rem; font-weight: 900; text-transform: uppercase; border-radius: 50px; cursor: pointer; transition: 0.3s; display: inline-block; text-decoration: none; margin-top: 15px; }
+        .e-detail-btn:hover { background: var(--gold); color: black; }
 
-        /* Hide unwanted elements inherited from standard layout */
-        .sidebar-label { display: none; }
-        .section-divider { display: none; } /* We use background blocks instead of thin lines now */
+        /* Clear filter button compact for V2 */
+        .v2-clear-btn-wrap { display: flex; gap: 15px; justify-content: center; margin-top: 30px; margin-bottom: 30px;}
+
+        /* MOBILE OVERRIDES for Exhibit Frames */
+        @media (max-width: 600px) {
+            .hero-v2 { min-height: 50vh; padding: 40px 5%; }
+            .hero-subtitle { margin-bottom: 20px !important; }
+            .cinematic-exhibit-frame { border-radius: 12px; }
+            
+            /* Testimonial Mobile: Stacked with Full Reel */
+            #testimonial-display { flex-direction: column; gap: 20px; padding: 20px; }
+            .testimonial-media { flex: 0 0 auto; width: 100% !important; max-width: 250px; margin: 0 auto !important; }
+            #testimonial-display .t-quote-short, #testimonial-display .t-quote-full { font-size: 1.1rem !important; text-align: center; }
+            #testimonial-display h4 { text-align: center; margin-top: 10px !important; }
+
+            /* Encounter Mobile: Stacked with 4:5 Post */
+            .encounter-slide > div { flex-direction: column; gap: 20px; padding: 20px; }
+            .encounter-media { flex: 0 0 auto; width: 100% !important; max-width: 320px; }
+            .encounter-slide div:nth-child(2) { text-align: center; padding: 0; }
+            .encounter-slide p { font-size: 1.3rem !important; text-align: center; }
+            .encounter-slider::-webkit-scrollbar { display: none; }
+        }
     </style>
 </head>
 <body>
@@ -101,53 +121,59 @@
             
             <div class="hero-v2">
                 <h1>THE <span class="gold-text">VAULT</span></h1>
-                <p class="hero-subtitle">THE WORLD'S PREMIER SPORTING ARCHIVE</p>
+                <p class="hero-subtitle">WORLD SPORTING HISTORY ARCHIVE</p>
                 <div class="search-container">
                     <input type="text" id="vaultSearch" placeholder="Search Legend, Sport, or Year...">
                 </div>
                 
-                <div class="swipe-hint" style="margin-top: 20px;">Explore Categories ➔</div>
+                <div class="swipe-hint">Swipe Categories ➔</div>
                 <div id="sports-icons-row" class="mobile-scroll-row"></div>
             </div>
 
-            <section id="latest" class="v2-section" style="padding-top: 80px;">
+            <section id="latest" class="v2-section">
                 <h2 class="v2-section-title">NEW <span class="gold-text">ARRIVALS</span></h2>
                 <div class="swipe-hint">Swipe Arrivals ➔</div>
                 <div class="sport-grid" id="latestGrid"></div>
-                <div style="text-align: center; margin-top: 50px;">
+                <div style="text-align: center; margin-top: 40px;">
                     <a href="vault.html?filter=latest" class="see-more-btn">Explore All New Arrivals</a>
-                </div>
-
-                <div class="cinematic-banner" style="margin-top: 100px; margin-bottom: -100px;">
-                    <a href="encounters.html" style="text-decoration:none; color:inherit; display:block; width: 100%;">
-                        <div id="encounter-display"><p style="opacity:0.3; font-size: 0.8rem;">Loading moments...</p></div>
-                    </a>
                 </div>
             </section>
             
-            <section id="collection" class="v2-section" style="background: rgba(255,255,255,0.01);">
-                <h2 class="v2-section-title">THE <span class="gold-text" id="dynamic-vault-count">VAULT</span></h2>
+            <section id="collection" class="v2-section" style="background: rgba(212, 175, 55, 0.015); border-top: 1px solid rgba(212,175,55,0.05); border-bottom: 1px solid rgba(212,175,55,0.05);">
+                
+                <h1 class="v2-section-title" id="filter-title" style="display:none;">RESULTS</h1>
+                <div class="v2-clear-btn-wrap" id="filter-clear-wrap" style="display:none;">
+                    <a href="index-v2.html" class="see-more-btn" style="font-size: 0.7rem; padding: 10px 25px;">Clear Filters & Return Home</a>
+                </div>
+
+                <h2 class="v2-section-title" id="vault-standard-title">THE <span class="gold-text" id="dynamic-vault-count">VAULT</span></h2>
                 <div class="swipe-hint">Swipe Collection ➔</div>
                 <div class="sport-grid small-grid" id="sportGrid"></div>
-                <div id="see-more-container" style="text-align: center; margin-top: 50px;">
-                    <a href="vault.html" class="see-more-btn">Enter The Full Archive</a>
+                <div id="see-more-container" style="text-align: center; margin-top: 40px;">
+                    <a href="vault.html" class="see-more-btn">Enter Full Archive</a>
                 </div>
             </section>
 
             <section id="top-legends" class="v2-section">
-                
-                <div class="cinematic-banner" style="margin-top: -100px; margin-bottom: 100px;">
-                    <a href="testimonials.html" style="text-decoration:none; color:inherit; display:block; width: 100%;">
-                        <div id="testimonial-display"><p style="opacity:0.3; font-size: 0.8rem;">Loading reviews...</p></div>
-                    </a>
-                </div>
-
                 <h2 class="v2-section-title">ICONIC <span class="gold-text">LEGENDS</span></h2>
                 <div class="swipe-hint">Swipe Legends ➔</div>
-                <div id="legends-icons-row" class="mobile-scroll-row" style="justify-content: center;"></div>
+                <div id="legends-icons-row" class="mobile-scroll-row"></div>
             </section>
 
-            <section class="insta-section v2-section" style="padding-top: 0;">
+            <section id="v2-highlights" class="v2-section" style="background: rgba(212, 175, 55, 0.015); border-top: 1px solid rgba(212,175,55,0.05); border-bottom: 1px solid rgba(212,175,55,0.05); padding: 80px 5%;">
+                <h2 class="v2-section-title">ARCHIVE <span class="gold-text">HIGHLIGHTS</span></h2>
+
+                <div class="cinematic-exhibit-frame sidebar-block" style="margin-bottom: 40px;">
+                    <div id="testimonial-display"><p style="opacity:0.3; font-size: 0.8rem;">Loading reviews...</p></div>
+                </div>
+
+                <div class="cinematic-exhibit-frame sidebar-block">
+                    <div class="swipe-hint hide-desktop" style="position:absolute; top: 15px; right: 20px; margin: 0; font-size: 0.55rem;">Swipe Moments ➔</div>
+                    <div id="encounter-display"><p style="opacity:0.3; font-size: 0.8rem;">Loading moments...</p></div>
+                </div>
+            </section>
+
+            <section class="insta-section v2-section">
                 <h2 class="v2-section-title">@7ISLANDSMEMORABILIA</h2>
                 <script src="https://elfsightcdn.com/platform.js" async></script>
                 <div class="elfsight-app-5198fc4c-cd1c-4a89-b39c-4a6f90a3da28" data-elfsight-app-lazy></div>
@@ -158,5 +184,61 @@
     
     <div id="footer-placeholder"></div>
     <script src="script.js"></script>
+    
+    <script>
+        async function loadV2FilteredData() {
+            const params = new URLSearchParams(window.location.search);
+            if(!params.toString()) return; // No filters active
+
+            const sport = params.get('sport');
+            const athlete = params.get('athlete');
+
+            let titleText = "ARCHIVE RESULTS";
+            if(sport) titleText = sport;
+            if(athlete) titleText = athlete;
+
+            // Hide standard hero content if filters are active
+            const hero = document.querySelector('.hero-v2');
+            if(hero) hero.style.display = 'none';
+            document.getElementById('latest').style.display = 'none';
+            document.getElementById('v2-highlights').style.display = 'none';
+            
+            // Setup Filter UI
+            document.getElementById('vault-standard-title').style.display = 'none';
+            document.getElementById('vault-standard-title').style.display = 'none';
+            document.getElementById('see-more-container').style.display = 'none';
+            
+            const filterTitle = document.getElementById('filter-title');
+            filterTitle.innerHTML = `<span class="gold-text">${titleText.toUpperCase()}</span> ARCHIVE`;
+            filterTitle.style.display = 'block';
+            document.getElementById('filter-clear-wrap').style.display = 'flex';
+            
+            // Adjust section spacing for results
+            document.getElementById('collection').style.paddingTop = '100px';
+            document.getElementById('collection').style.background = 'none';
+
+            // Query results based on filters
+            const query = encodeURIComponent(`*[_type == "memorabilia"]{ title, year, "imageUrl": image.asset->url, "itemType": itemType->name, "sportNames": sports[]->name, "athleteNames": sportsmen[]->name }`);
+            try {
+                const resp = await fetch(`https://dpcpc70i.api.sanity.io/v2021-10-21/data/query/production?query=${query}`);
+                const { result } = await resp.json();
+                
+                const filtered = result.filter(item => {
+                    if(sport && !(item.sportNames || []).includes(sport)) return false;
+                    if(athlete && !(item.athleteNames || []).includes(athlete)) return false;
+                    return true;
+                });
+
+                const grid = document.getElementById('sportGrid');
+                if (filtered.length === 0) {
+                    grid.innerHTML = `<p style="grid-column: 1/-1; text-align:center; opacity:0.5; padding: 50px 0;">No items found in this category.</p>`;
+                    return;
+                }
+                renderGrid('sportGrid', filtered); // Render results into the main grid
+
+            } catch (e) { console.error("V2 Filter Error:", e); }
+        }
+        document.addEventListener('DOMContentLoaded', loadV2FilteredData);
+    </script>
 </body>
 </html>
