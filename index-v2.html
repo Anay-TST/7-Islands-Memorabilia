@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>7 Islands Memorabilia | The Vault V2</title>
+    <link href="https://fonts.googleapis.com/css2?family=Arvo:700&family=Inter:wght@400;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    
+    <style>
+        /* Override layout wrapper to remove sidebar structure */
+        .layout-wrapper { display: block; max-width: 100%; padding: 0; gap: 0; }
+        
+        /* Massive Cinematic Hero Section */
+        .hero-v2 {
+            min-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 0 5%;
+            border-bottom: 1px solid rgba(212,175,55,0.2);
+            background: radial-gradient(circle at center, rgba(212, 175, 55, 0.08), transparent 60%);
+            position: relative;
+        }
+        .hero-v2 h1 { 
+            font-size: clamp(3rem, 8vw, 7rem); 
+            letter-spacing: 10px; 
+            margin-bottom: 0.5rem; 
+            text-shadow: 0 10px 40px rgba(0,0,0,0.9); 
+        }
+        .hero-v2 .hero-subtitle { 
+            font-size: clamp(0.8rem, 2vw, 1.2rem); 
+            border-left: none; padding-left: 0; 
+            margin-bottom: 40px; letter-spacing: 5px; 
+            color: white; opacity: 0.7;
+        }
+        .hero-v2 .search-container { max-width: 600px; transform: scale(1.1); margin-bottom: 40px; }
+
+        /* Transform Sports Circles into Sleek Pill Badges */
+        #sports-icons-row { 
+            justify-content: center; gap: 15px; width: 100%; max-width: 1000px; margin: 0 auto;
+        }
+        #sports-icons-row a { 
+            display: flex; align-items: center; justify-content: center;
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(212,175,55,0.3); 
+            padding: 10px 25px; border-radius: 50px; transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1); 
+        }
+        #sports-icons-row a:hover { background: var(--gold); transform: translateY(-5px); box-shadow: 0 10px 20px rgba(212,175,55,0.2); }
+        #sports-icons-row a:hover p, #sports-icons-row a:hover span { color: black !important; filter: brightness(0); }
+        #sports-icons-row .icon-circle { border: none; background: transparent; width: auto; height: auto; margin-right: 10px; }
+        #sports-icons-row .icon-circle:hover { transform: none; box-shadow: none; }
+        #sports-icons-row p { margin-top: 0 !important; font-size: 0.85rem !important; letter-spacing: 1px; }
+        #sports-icons-row p:last-child { display: none; } /* Hides item count for cleaner pills */
+
+        /* Centered Exhibition Sections */
+        .v2-section { max-width: 1400px; margin: 0 auto; padding: 100px 5%; }
+        .v2-section-title { text-align: center; font-size: clamp(2rem, 4vw, 3rem); margin-bottom: 50px; letter-spacing: 4px; }
+        
+        /* ========================================== */
+        /* IMMERSIVE BANNER HIJACKING                 */
+        /* Turns sidebar widgets into full-screen art */
+        /* ========================================== */
+        .cinematic-banner {
+            position: relative; width: 100vw; min-height: 70vh; 
+            left: 50%; right: 50%; margin-left: -50vw; margin-right: -50vw; /* Forces full bleed out of container */
+            display: flex; align-items: center; justify-content: center; text-align: center;
+            border-top: 1px solid rgba(212,175,55,0.3); border-bottom: 1px solid rgba(212,175,55,0.3);
+            overflow: hidden; background: #000;
+        }
+
+        /* Hijacking Testimonial Widget */
+        #testimonial-display { position: static; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 5%; z-index: 2; }
+        .testimonial-media { position: absolute !important; top: 0; left: 0; width: 100% !important; height: 100% !important; max-height: none !important; aspect-ratio: auto !important; object-fit: cover !important; border-radius: 0 !important; margin: 0 !important; border: none !important; z-index: 0; opacity: 0.35; filter: grayscale(80%); }
+        #testimonial-display > div { z-index: 2; position: relative; }
+        #testimonial-display .t-quote-short, #testimonial-display .t-quote-full { font-size: clamp(1.5rem, 4vw, 2.5rem) !important; color: white !important; font-style: normal !important; font-family: 'Arvo', serif; line-height: 1.4 !important; max-width: 1000px; text-shadow: 0 4px 30px rgba(0,0,0,1); }
+        #testimonial-display h4 { font-size: 1.2rem !important; margin-top: 30px !important; letter-spacing: 3px; z-index: 2; position: relative; text-shadow: 0 4px 20px rgba(0,0,0,1); }
+        
+        /* Hijacking Encounter Widget */
+        #encounter-display { width: 100%; height: 100%; }
+        .encounter-slider { display: block; width: 100%; height: 100%; }
+        .encounter-slide > div { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 70vh; padding: 40px 5%; position: relative; z-index: 2; }
+        .encounter-media { position: absolute !important; top: 0; left: 0; width: 100% !important; height: 100% !important; max-height: none !important; aspect-ratio: auto !important; object-fit: cover !important; border-radius: 0 !important; margin: 0 !important; border: none !important; z-index: 0; opacity: 0.35; }
+        .encounter-slide p { position: relative; z-index: 2; font-size: clamp(2rem, 5vw, 4rem) !important; font-family: 'Arvo', serif; text-transform: uppercase; letter-spacing: 5px; text-shadow: 0 10px 40px rgba(0,0,0,1); margin-top: 0 !important; color: white; }
+
+        /* Hide unwanted elements inherited from standard layout */
+        .sidebar-label { display: none; }
+        .section-divider { display: none; } /* We use background blocks instead of thin lines now */
+    </style>
+</head>
+<body>
+    <div class="ticker-container">
+        <div class="ticker-wrap"><div class="ticker" id="dynamic-ticker">LOADING THE ARCHIVE • </div></div>
+    </div>
+    
+    <div id="navbar-placeholder"></div>
+    
+    <div class="layout-wrapper">
+        <main class="main-content">
+            
+            <div class="hero-v2">
+                <h1>THE <span class="gold-text">VAULT</span></h1>
+                <p class="hero-subtitle">THE WORLD'S PREMIER SPORTING ARCHIVE</p>
+                <div class="search-container">
+                    <input type="text" id="vaultSearch" placeholder="Search Legend, Sport, or Year...">
+                </div>
+                
+                <div class="swipe-hint" style="margin-top: 20px;">Explore Categories ➔</div>
+                <div id="sports-icons-row" class="mobile-scroll-row"></div>
+            </div>
+
+            <section id="latest" class="v2-section" style="padding-top: 80px;">
+                <h2 class="v2-section-title">NEW <span class="gold-text">ARRIVALS</span></h2>
+                <div class="swipe-hint">Swipe Arrivals ➔</div>
+                <div class="sport-grid" id="latestGrid"></div>
+                <div style="text-align: center; margin-top: 50px;">
+                    <a href="vault.html?filter=latest" class="see-more-btn">Explore All New Arrivals</a>
+                </div>
+
+                <div class="cinematic-banner" style="margin-top: 100px; margin-bottom: -100px;">
+                    <a href="encounters.html" style="text-decoration:none; color:inherit; display:block; width: 100%;">
+                        <div id="encounter-display"><p style="opacity:0.3; font-size: 0.8rem;">Loading moments...</p></div>
+                    </a>
+                </div>
+            </section>
+            
+            <section id="collection" class="v2-section" style="background: rgba(255,255,255,0.01);">
+                <h2 class="v2-section-title">THE <span class="gold-text" id="dynamic-vault-count">VAULT</span></h2>
+                <div class="swipe-hint">Swipe Collection ➔</div>
+                <div class="sport-grid small-grid" id="sportGrid"></div>
+                <div id="see-more-container" style="text-align: center; margin-top: 50px;">
+                    <a href="vault.html" class="see-more-btn">Enter The Full Archive</a>
+                </div>
+            </section>
+
+            <section id="top-legends" class="v2-section">
+                
+                <div class="cinematic-banner" style="margin-top: -100px; margin-bottom: 100px;">
+                    <a href="testimonials.html" style="text-decoration:none; color:inherit; display:block; width: 100%;">
+                        <div id="testimonial-display"><p style="opacity:0.3; font-size: 0.8rem;">Loading reviews...</p></div>
+                    </a>
+                </div>
+
+                <h2 class="v2-section-title">ICONIC <span class="gold-text">LEGENDS</span></h2>
+                <div class="swipe-hint">Swipe Legends ➔</div>
+                <div id="legends-icons-row" class="mobile-scroll-row" style="justify-content: center;"></div>
+            </section>
+
+            <section class="insta-section v2-section" style="padding-top: 0;">
+                <h2 class="v2-section-title">@7ISLANDSMEMORABILIA</h2>
+                <script src="https://elfsightcdn.com/platform.js" async></script>
+                <div class="elfsight-app-5198fc4c-cd1c-4a89-b39c-4a6f90a3da28" data-elfsight-app-lazy></div>
+            </section>
+            
+        </main>
+    </div>
+    
+    <div id="footer-placeholder"></div>
+    <script src="script.js"></script>
+</body>
+</html>
