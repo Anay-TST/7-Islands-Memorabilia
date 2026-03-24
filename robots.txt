@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://anay-tst.github.io/7-Islands-Memorabilia/sitemap.xml
