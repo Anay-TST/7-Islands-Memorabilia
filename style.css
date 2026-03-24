@@ -43,12 +43,12 @@ nav { display: flex; justify-content: space-between; align-items: center; paddin
 .sidebar-column { flex: 1; min-width: 320px; }
 
 /* Moved higher to close the gap on desktop */
-.sidebar-sticky-wrap { position: sticky; top: 85px; margin-top: -20px; display: flex; flex-direction: column; gap: 25px; }
+.sidebar-sticky-wrap { position: sticky; top: 90px; margin-top: -35px; display: flex; flex-direction: column; gap: 25px; }
 
 .section-divider { border: 0; height: 1px; background: linear-gradient(to right, transparent, var(--gold), transparent); margin: 3.5rem 0; opacity: 0.4; }
 .hero-subtitle { opacity: 0.6; margin-bottom: 2rem; font-weight: 700; letter-spacing: 2px; border-left: 2px solid var(--gold); padding-left: 15px; }
 
-/* --- Sidebar Media Ratios (Reels & 4:5) --- */
+/* --- Sidebar Media Ratios (Reels 9:16 & Portrait 4:5) --- */
 .testimonial-media {
     width: 100%;
     aspect-ratio: 9 / 16;
@@ -110,6 +110,9 @@ nav { display: flex; justify-content: space-between; align-items: center; paddin
 .ticker { display: inline-block; white-space: nowrap; animation: move 45s linear infinite; font-weight: 900; letter-spacing: 1px;}
 @keyframes move { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
 
+/* --- Swipe Hint --- */
+.swipe-hint { display: none; }
+
 /* ========================================= */
 /* --- MOBILE RESPONSIVENESS & COMPACTNESS --- */
 /* ========================================= */
@@ -142,48 +145,45 @@ nav { display: flex; justify-content: space-between; align-items: center; paddin
     .layout-wrapper, .section-padding { padding: 20px 5% !important; padding-top: 30px !important; }
     .mobile-center { text-align: center !important; }
     .hero-intro h1 { font-size: 2rem !important; }
-    .hero-subtitle { font-size: 0.8rem; border-left: none; padding-left: 0; border-bottom: 2px solid var(--gold); padding-bottom: 10px; }
+    .hero-subtitle { font-size: 0.8rem; border-left: none; padding-left: 0; border-bottom: 2px solid var(--gold); padding-bottom: 10px; margin-bottom: 1rem; }
+    
+    .swipe-hint {
+        display: flex; align-items: center; justify-content: center; gap: 5px;
+        color: var(--gold); font-size: 0.65rem; font-weight: 900; text-transform: uppercase;
+        letter-spacing: 1px; margin-bottom: 10px; opacity: 0.8;
+        animation: swipePulse 1.5s infinite ease-in-out;
+    }
+    @keyframes swipePulse {
+        0%, 100% { transform: translateX(0); opacity: 0.5; }
+        50% { transform: translateX(8px); opacity: 1; }
+    }
     
     .mobile-scroll-row {
-        flex-wrap: nowrap !important;
-        overflow-x: auto;
-        padding-bottom: 15px;
-        justify-content: flex-start !important;
-        -webkit-overflow-scrolling: touch;
-        gap: 15px !important;
+        flex-wrap: nowrap !important; overflow-x: auto; padding-bottom: 15px;
+        justify-content: flex-start !important; -webkit-overflow-scrolling: touch; gap: 15px !important;
     }
     .mobile-scroll-row::-webkit-scrollbar { display: none; } 
     
     #latestGrid, #sportGrid {
-        display: flex !important;
-        flex-wrap: nowrap !important;
-        overflow-x: auto;
-        scroll-snap-type: x mandatory;
-        padding-bottom: 15px;
-        gap: 15px !important;
+        display: flex !important; flex-wrap: nowrap !important; overflow-x: auto;
+        scroll-snap-type: x mandatory; padding-bottom: 15px; gap: 15px !important;
         -webkit-overflow-scrolling: touch;
     }
     #latestGrid::-webkit-scrollbar, #sportGrid::-webkit-scrollbar { display: none; }
+    
     #latestGrid .sport-card, #sportGrid .sport-card {
-        flex: 0 0 calc(50% - 8px) !important;
-        scroll-snap-align: start;
-        min-width: 150px;
+        flex: 0 0 40vw !important; scroll-snap-align: start; min-width: 150px;
     }
     
     .encounter-slider {
-        display: flex;
-        overflow-x: auto;
-        scroll-snap-type: x mandatory;
-        gap: 15px;
-        padding-bottom: 10px;
-        -webkit-overflow-scrolling: touch;
+        display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 15px;
+        padding-bottom: 10px; -webkit-overflow-scrolling: touch;
     }
     .encounter-slider::-webkit-scrollbar { display: none; }
+    
     .encounter-slide {
-        display: block !important; 
-        flex: 0 0 85%; 
-        scroll-snap-align: center;
-        animation: none; 
+        display: block !important; flex: 0 0 75vw !important; 
+        scroll-snap-align: center; animation: none; 
     }
 
     .search-container { margin: 0 auto 20px auto; }

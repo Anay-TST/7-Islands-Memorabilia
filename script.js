@@ -73,19 +73,38 @@ window.expandQuote = function(event) {
     container.querySelector('.t-quote-full').style.display = 'block';
 };
 
+// --- DYNAMIC TICKER (GROUPED BY SPORT) ---
 async function loadTicker() {
     try {
-        const query = encodeURIComponent(`*[_type in ["sport", "sportsman"]]{name}`);
+        const query = encodeURIComponent(`*[_type == "memorabilia"]{ "sports": sports[]->name, "athletes": sportsmen[]->name }`);
         const resp = await fetch(BASE_URL + query);
         const { result } = await resp.json();
+
         if (result && result.length > 0) {
-            const names = result.map(i => i.name).filter(Boolean);
-            const shuffled = shuffleArray(names);
-            const baseStr = shuffled.join(' • ') + ' • ';
-            const infiniteStr = baseStr + baseStr + baseStr + baseStr;
-            
+            const sportMap = {};
+            result.forEach(item => {
+                if (item.sports && item.athletes) {
+                    item.sports.forEach(sport => {
+                        if (!sportMap[sport]) sportMap[sport] = new Set();
+                        item.athletes.forEach(a => sportMap[sport].add(a));
+                    });
+                }
+            });
+
+            let tickerParts = [];
+            Object.keys(sportMap).sort().forEach(sport => {
+                // Add the Sport Name wrapped in a colored badge
+                tickerParts.push(`<span style="color: white; background: var(--royal-purple); padding: 2px 10px; border-radius: 4px; font-weight: 900; letter-spacing: 1px;">${sport.toUpperCase()}</span>`);
+                // Add the shuffled athletes for this sport
+                const athletes = Array.from(sportMap[sport]);
+                shuffleArray(athletes).forEach(a => tickerParts.push(a.toUpperCase()));
+            });
+
+            const baseStr = tickerParts.join(' • ') + ' • ';
+            const infiniteStr = baseStr + baseStr + baseStr + baseStr; // Loop
+
             document.querySelectorAll('#dynamic-ticker').forEach(el => {
-                el.innerHTML = infiniteStr.toUpperCase();
+                el.innerHTML = infiniteStr;
             });
         }
     } catch (e) { console.error("Ticker Error:", e); }
@@ -153,7 +172,6 @@ async function loadHomeContent() {
             }).join('');
         }
 
-        // Testimonials with 9:16 aspect ratio
         if (result.testimonials?.length > 0) {
             const t = result.testimonials[Math.floor(Math.random() * result.testimonials.length)];
             let mediaHtml = '';
@@ -173,7 +191,6 @@ async function loadHomeContent() {
                 <h4 class="gold-text" style="font-size:0.75rem; margin-top:8px;">— ${t.name}</h4>`;
         }
 
-        // Encounters with 4:5 aspect ratio
         if (result.encounters?.length > 0) {
             const sliderHTML = result.encounters.map((e, index) => {
                 const media = e.videoFileUrl ? `<video class="encounter-media" muted playsinline autoplay loop><source src="${e.videoFileUrl}"></video>` : `<img src="${e.imageUrl}" class="encounter-media">`;
@@ -228,7 +245,7 @@ async function loadVault() {
     } catch (err) { console.error("Vault Error:", err); }
 }
 
-// SEARCH BAR VISIBILITY FIX
+// --- HOME PAGE SEARCH FIX ---
 function setupSearch() {
     const searchInput = document.getElementById('vaultSearch');
     if(!searchInput) return;
@@ -236,43 +253,39 @@ function setupSearch() {
     searchInput.addEventListener('input', (e) => {
         const term = e.target.value.toLowerCase();
         
-        // Grab surrounding UI elements to hide them during a search
+        // Target elements to hide/show during search
         const latestSec = document.getElementById('latest');
         const legendsSec = document.getElementById('top-legends');
-        const iconsRow = document.getElementById('sports-icons-row');
         const instaSec = document.querySelector('.insta-section');
         const seeMoreBtn = document.getElementById('see-more-container');
         
         if(term === '') {
+            // Restore Home Page
             renderGrid('sportGrid', shuffleArray([...allItems]).slice(0, 8));
             if(latestSec) latestSec.style.display = 'block';
             if(legendsSec) legendsSec.style.display = 'block';
-            if(iconsRow) iconsRow.style.display = 'flex';
             if(instaSec) instaSec.style.display = 'block';
             if(seeMoreBtn) seeMoreBtn.style.display = 'block';
             document.getElementById('dynamic-vault-count').innerHTML = `${allItems.length}+ VAULT`;
+            document.querySelectorAll('.swipe-hint').forEach(el => el.style.display = '');
         } else {
+            // Execute Search
             const filtered = allItems.filter(item => {
                 const title = (item.title || "").toLowerCase();
                 const athletes = (item.athleteNames || []).join(" ").toLowerCase();
                 const sports = (item.sportNames || []).join(" ").toLowerCase();
-                const year = (item.year || "").toString().toLowerCase();
+                const year = item.year ? item.year.toString().toLowerCase() : "";
                 return title.includes(term) || athletes.includes(term) || sports.includes(term) || year.includes(term);
             });
             renderGrid('sportGrid', filtered);
             
-            // Hide everything else so the results grid moves to the top and is instantly visible
+            // Hide distracting sections
             if(latestSec) latestSec.style.display = 'none';
             if(legendsSec) legendsSec.style.display = 'none';
-            if(iconsRow) iconsRow.style.display = 'none';
             if(instaSec) instaSec.style.display = 'none';
             if(seeMoreBtn) seeMoreBtn.style.display = 'none';
             document.getElementById('dynamic-vault-count').innerHTML = `SEARCH RESULTS`;
-            
-            // Auto scroll down slightly if it's their first keystroke
-            if(term.length === 1) {
-                document.getElementById('collection').scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
+            document.querySelectorAll('.swipe-hint').forEach(el => el.style.display = 'none');
         }
     });
 }
@@ -316,7 +329,7 @@ function setupFullVaultSearch() {
             const athletes = (item.athleteNames || []).join(" ").toLowerCase();
             const sportsArr = (item.sportNames || []).map(s => s.toLowerCase());
             const sportsString = sportsArr.join(" ");
-            const year = (item.year || "").toString().toLowerCase();
+            const year = item.year ? item.year.toString().toLowerCase() : "";
             
             const matchesSearch = title.includes(term) || athletes.includes(term) || sportsString.includes(term) || year.includes(term);
             const matchesSport = sport === '' || sportsArr.includes(sport);
